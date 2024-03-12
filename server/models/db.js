@@ -57,15 +57,13 @@ const helpers = {
 
 
     addTopic: async function(boardid, question) {
-        //check if board exists
-        try {
-            const precon = await pool.query(`SELECT * from boards WHERE id = ${boardid}`);
-        } catch(err)
-        {
-            console.log('Board does not exist')
-        }
-        const q = 'INSERT INTO topics VALUES(DEFAULT, $1, $2)'
+        const q = 'INSERT INTO topics VALUES(DEFAULT, $1, $2, CURRENT_TIMESTAMP)'
         const res = await pool.query(q, [boardid, question])
+    },
+
+    deleteTopic: async function(topicId) {
+        const q = 'DELETE FROM topics WHERE id = $1'
+        const res = await pool.query(q, [topicId]);
     }
     
 }

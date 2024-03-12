@@ -64,7 +64,12 @@ app.post('/boards/:boardId/topic/:topicId', async (req, res) => {
 //editing
 
 //deleting
+app.delete('/boards/:boardId/topic/:topicId', async (req, res) => {
+  
+})
 
+
+//Socket connection
 
 // Initialize the database
 async function InitDB() {
