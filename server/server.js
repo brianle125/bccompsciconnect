@@ -11,7 +11,6 @@ var logger = require('morgan');
 var app = express();
 const cors = require('cors')
 const server = require('http').createServer(app)
-const path = require("path");
 const fs = require("fs");
 //for future automatic refreshing
 const io = require('socket.io')(server)

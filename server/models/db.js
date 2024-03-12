@@ -12,8 +12,8 @@ const helpers = {
     //database queries
     init: async function() {
         //create tables
-        const board = 'CREATE TABLE IF NOT EXISTS boards (id SERIAL, title character varying(255), created_at timestamp, PRIMARY KEY(id))'
-        const topics = 'CREATE TABLE IF NOT EXISTS topics (id SERIAL, boardid integer, question varchar(1000), PRIMARY KEY(id), CONSTRAINT fk_board FOREIGN KEY (boardid) REFERENCES boards(id) ON DELETE CASCADE)'
+        const board = 'CREATE TABLE IF NOT EXISTS boards (id SERIAL, title character varying(255), PRIMARY KEY(id))'
+        const topics = 'CREATE TABLE IF NOT EXISTS topics (id SERIAL, boardid integer, question varchar(1000), created_at timestamp, PRIMARY KEY(id), CONSTRAINT fk_board FOREIGN KEY (boardid) REFERENCES boards(id) ON DELETE CASCADE)'
         const users = 'CREATE TABLE IF NOT EXISTS users (id SERIAL, username varchar(255), role varchar(255), created_at timestamp, PRIMARY KEY(id))'
         const messages = 'CREATE TABLE IF NOT EXISTS messages (id SERIAL, topicid integer, body text, status varchar(255), created_at timestamp, PRIMARY KEY(id), CONSTRAINT fk_topic FOREIGN KEY(topicid) REFERENCES topics(id) ON DELETE CASCADE)'
         const login = 'CREATE TABLE IF NOT EXISTS login (id SERIAL, username varchar(255), password varchar(1000), PRIMARY KEY(id))'
