@@ -2,7 +2,7 @@ const { Pool } = require('pg');
 require('dotenv').config()
 const connect = require('./connector')
 
-//const x = connect.connectWithConnector();
+const x = connect.connectWithConnector();
 
 const pool = new Pool({
     database: 'testing',
