@@ -1,5 +1,8 @@
 const { Pool } = require('pg');
 require('dotenv').config()
+const connect = require('./connector')
+
+//const x = connect.connectWithConnector();
 
 const pool = new Pool({
     database: 'testing',
@@ -10,6 +13,7 @@ const pool = new Pool({
 
 const helpers = {
     //database queries
+
     init: async function() {
         //create tables
         const board = 'CREATE TABLE IF NOT EXISTS boards (id SERIAL, title character varying(255), PRIMARY KEY(id))'
@@ -48,13 +52,11 @@ const helpers = {
         return res.rows[0]
     },
 
-    getMessages: async function(boardId, topicId) {
-        const q = 'SELECT * FROM messages WHERE boardid = $1 AND topicid = $2';
+    getMessages: async function(topicId) {
+        const q = 'SELECT * FROM messages WHERE topicid = $1';
         const res = await pool.query(q, [topicId]);
         return res.rows
     },
-    
-
 
     addTopic: async function(boardid, question) {
         const q = 'INSERT INTO topics VALUES(DEFAULT, $1, $2, CURRENT_TIMESTAMP)'

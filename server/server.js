@@ -13,10 +13,10 @@ const cors = require('cors')
 const server = require('http').createServer(app)
 const fs = require("fs");
 //for future automatic refreshing
-const io = require('socket.io')(server)
-
-
+const { Server } = require("socket.io")
+const io = new Server(server)
 const port = process.env.PORT || 8080;
+
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -65,11 +65,13 @@ app.post('/boards/:boardId/topic/:topicId', async (req, res) => {
 
 //deleting
 app.delete('/boards/:boardId/topic/:topicId', async (req, res) => {
-  
+  let topicId = req.params.topicId
+  await db.helpers.deleteTopic(topicId)
+  res.redirect(302, '/')
 })
 
 
-//Socket connection
+//TODO: Socket connection
 
 // Initialize the database
 async function InitDB() {
