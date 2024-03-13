@@ -1,13 +1,12 @@
 const { Pool } = require('pg');
 require('dotenv').config()
 const connect = require('./connector')
-
-const x = connect.connectWithConnector();
+const {Connector} = require('@google-cloud/cloud-sql-connector');
 
 const pool = new Pool({
     database: 'testing',
     user: 'postgres',
-    host: 'localhost',
+    host: process.env.DB_HOST || 'localhost',
     password: process.env.LOCAL_PASS
 })
 
@@ -62,6 +61,7 @@ const helpers = {
         const q = 'INSERT INTO topics VALUES(DEFAULT, $1, $2, CURRENT_TIMESTAMP)'
         const res = await pool.query(q, [boardid, question])
     },
+
 
     deleteTopic: async function(topicId) {
         const q = 'DELETE FROM topics WHERE id = $1'
