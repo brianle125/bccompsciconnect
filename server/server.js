@@ -41,25 +41,34 @@ app.get('/', async (req, res) => {
 //IN PROGRESS
 // Either id based params (the easy way) or hard coded board topics into url (e.g. /java or /algorithms, etc)
 app.get('/boards/:id', async(req, res) => {
-  let id = req.params.id
-  const board = await db.helpers.getBoard(id)
-  res.json(board)
+  try {
+    let id = req.params.id
+    const board = await db.helpers.getBoard(id)
+    res.json(board)
+  } catch (err) {
+    console.log("Redirect or 404 here")
+  }
+  
 })
 
 app.get('/boards/:boardId/topic/:topicId', async (req, res) => {
   let boardId = req.params.boardId;
   let topicId = req.params.topicId;
   const topic = await db.helpers.getTopic(topicId);
-  console.log(topic)
-  res.json(topic);
+  const messages = await db.helpers.getMessages(topicId);
+
+  //Subject to change; this just bundles the topic and associated messages together
+  res.json({
+    topic: topic,
+    messages: messages
+  })
 })
 
-//handle topic and message posting
+//TODO: handle topic and message posting
 app.post('/boards/:boardId/topic/:topicId', async (req, res) => {
   await db.helpers.addTopic(0, 'something');
   res.redirect('/')
 })
-
 
 //editing
 
