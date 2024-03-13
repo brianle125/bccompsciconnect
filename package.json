@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@google-cloud/cloud-sql-connector": "^1.2.3",
+    "socket-io": "^1.0.0",
+    "socket.io": "^4.7.4",
+    "tedious": "^18.1.0"
+  }
+}
