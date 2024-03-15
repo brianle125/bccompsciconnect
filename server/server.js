@@ -129,15 +129,18 @@ app.delete('/boards/:boardId/topics/:topicId', async (req, res) => {
 })
 
 app.post('/boards/:boardId/topics/:topicId', async(req, res) => {
+  let boardId = req.params.boardId;
   let topicId = req.params.topicId
-  let message = req.body.message
-  await db.helpers.addMessage(topicId, message)
+  let text = req.body.text
+  await db.helpers.addPost(topicId, text)
+  res.redirect(302, `/boards/${boardId}/topics/${topicId}`);
 })
 
-//CHANGING THIS
+//CHANGING THIS ENDPOINT LATER
 app.delete('/boards/:boardId/topics/:topicId/delete', async(req, res) => {
   let postId = req.body.postId;
   await db.helpers.deletePost(postId);
+  res.redirect(302, `/boards/${boardId}/topics/${topicId}`);
 })
 
 

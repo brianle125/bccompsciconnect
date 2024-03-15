@@ -115,7 +115,7 @@ const helpers = {
     },
     
     addPost: async function(topicId, text) {
-        const q = `INSERT INTO posts VALUES(DEFAULT, topicId, $1, 'status', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP`;
+        const q = `INSERT INTO posts VALUES(DEFAULT, $1, $2, 'status', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`;
         const res = await pool.query(q, [topicId, text])
     },
 
