@@ -22,8 +22,8 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-//app.use('/', express.static(path.join(__dirname, 'public'), { index: ['index.html'] }));
-app.use(express.static('../frontend/src'))
+app.use('/', express.static(path.join(__dirname, 'public'), { index: ['index.html'] }));
+//app.use(express.static('../frontend/dist'))
 
 // internal modules
 const db = require('./models/db')
@@ -33,50 +33,111 @@ app.use(cors());
 app.set('view engine', 'jade');
 
 app.get('/', async (req, res) => {
+  //CHANGE THIS
   const boards = await db.helpers.getBoards();
-  return res.json(boards)
+  console.log(boards)
+  res.json(boards)
 })
 
+// BOARDS //
 
-//IN PROGRESS
+app.get('/boards', async (req, res) => {
+  const boards = await db.helpers.getBoards();
+  console.log(boards)
+  res.json(boards)
+})
+
 // Either id based params (the easy way) or hard coded board topics into url (e.g. /java or /algorithms, etc)
 app.get('/boards/:id', async(req, res) => {
   try {
     let id = req.params.id
     const board = await db.helpers.getBoard(id)
-    res.json(board)
+    const topics = await db.helpers.getTopics(id);
+    res.json({
+      board: board,
+      topics: topics
+    })
   } catch (err) {
     console.log("Redirect or 404 here")
   }
   
 })
 
-app.get('/boards/:boardId/topic/:topicId', async (req, res) => {
-  let boardId = req.params.boardId;
-  let topicId = req.params.topicId;
-  const topic = await db.helpers.getTopic(topicId);
-  const messages = await db.helpers.getMessages(topicId);
-
-  //Subject to change; this just bundles the topic and associated messages together
-  res.json({
-    topic: topic,
-    messages: messages
-  })
+//could probably attach query string for further page calls
+app.get('/boards/:id/latest', async(req, res) => {
+  try {
+    let id = req.params.id
+    const board = await db.helpers.getBoard(id)
+    const topics = await db.helpers.getTopicsByRange(id, 0, 10);
+    res.json({
+      board: board,
+      topics: topics
+    })
+  } catch (err) {
+    console.log("Redirect or 404 here")
+  }
 })
 
-//TODO: handle topic and message posting
-app.post('/boards/:boardId/topic/:topicId', async (req, res) => {
-  await db.helpers.addTopic(0, 'something');
+app.post('/boards', async (req, res) => {
+  let title = req.body.title;
+  const board = await db.helpers.addBoard(title);
+  res.redirect(303, '/boards')
+})
+
+app.put('/boards/:boardId', async (req, res) => {
+  let boardId = req.params.boardId;
+  let boardTitle = req.body.boardTitle;
+  await db.helpers.editBoard(boardId, boardTitle)
+  res.redirect(303, '/boards')
+})
+
+app.delete('/boards/:boardId', async (req, res) => {
+  let boardId = req.params.boardId;
+  const deletedBoard = await db.helpers.deleteBoard(boardId);
+  res.redirect(303, '/boards');
+})
+
+// TOPICS AND POSTS //
+
+app.post('/boards/:boardId', async (req, res) => {
+  let boardId = req.params.boardId;
+  let question = req.body.question
+  await db.helpers.addTopic(boardId, question);
   res.redirect('/')
 })
 
-//editing
 
-//deleting
-app.delete('/boards/:boardId/topic/:topicId', async (req, res) => {
+app.get('/boards/:boardId/topics/:topicId', async (req, res) => {
+  let boardId = req.params.boardId;
+  let topicId = req.params.topicId;
+  const topic = await db.helpers.getTopic(topicId);
+  const posts = await db.helpers.getPosts(topicId);
+  const postCount = await db.helpers.getPostCount(topicId);
+
+  //Subject to change; this just bundles the topic and associated Posts together
+  res.json({
+    topic: topic,
+    posts: posts,
+    postCount: postCount
+  })
+})
+
+app.delete('/boards/:boardId/topics/:topicId', async (req, res) => {
   let topicId = req.params.topicId
   await db.helpers.deleteTopic(topicId)
   res.redirect(302, '/')
+})
+
+app.post('/boards/:boardId/topics/:topicId', async(req, res) => {
+  let topicId = req.params.topicId
+  let message = req.body.message
+  await db.helpers.addMessage(topicId, message)
+})
+
+//CHANGING THIS
+app.delete('/boards/:boardId/topics/:topicId/delete', async(req, res) => {
+  let postId = req.body.postId;
+  await db.helpers.deletePost(postId);
 })
 
 
@@ -85,7 +146,7 @@ app.delete('/boards/:boardId/topic/:topicId', async (req, res) => {
 // Initialize the database
 async function InitDB() {
   await db.helpers.init()
-  console.log("success")
+  console.log("Successfully init db")
 }
 
 InitDB().then(() => {
