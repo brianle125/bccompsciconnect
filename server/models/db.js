@@ -15,7 +15,7 @@ const helpers = {
     init: async function() {
         //create tables
         const board = 'CREATE TABLE IF NOT EXISTS boards (id SERIAL, title character varying(255), PRIMARY KEY(id))'
-        const topics = 'CREATE TABLE IF NOT EXISTS topics (id SERIAL, boardid integer, question varchar(1000), created_at timestamp, last_modified timestamp, PRIMARY KEY(id), CONSTRAINT fk_board FOREIGN KEY (boardid) REFERENCES boards(id) ON DELETE CASCADE)'
+        const topics = 'CREATE TABLE IF NOT EXISTS topics (id SERIAL, boardid integer, question varchar(1000), created_at timestamp, last_modified timestamp, latest_post timestamp, PRIMARY KEY(id), CONSTRAINT fk_board FOREIGN KEY (boardid) REFERENCES boards(id) ON DELETE CASCADE)'
         const users = 'CREATE TABLE IF NOT EXISTS users (id SERIAL, username varchar(255), role varchar(255), created_at timestamp, PRIMARY KEY(id))'
         const posts = 'CREATE TABLE IF NOT EXISTS posts (id SERIAL, topicid integer, body text, status varchar(255), created_at timestamp, last_modified timestamp, PRIMARY KEY(id), CONSTRAINT fk_topic FOREIGN KEY(topicid) REFERENCES topics(id) ON DELETE CASCADE)'
         const login = 'CREATE TABLE IF NOT EXISTS login (id SERIAL, username varchar(255), password varchar(1000), PRIMARY KEY(id))'
@@ -89,7 +89,7 @@ const helpers = {
     },
 
     addTopic: async function(boardid, question) {
-        const q = 'INSERT INTO topics VALUES(DEFAULT, $1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)'
+        const q = 'INSERT INTO topics VALUES(DEFAULT, $1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL)'
         const res = await pool.query(q, [boardid, question])
     },
 
@@ -115,6 +115,10 @@ const helpers = {
     },
     
     addPost: async function(topicId, text) {
+        //update latest post in topic
+        const updated = 'UPDATE topics SET latest_post = CURRENT_TIMESTAMP';
+        const updateQuery = await pool.query(updated);
+        //add the post
         const q = `INSERT INTO posts VALUES(DEFAULT, $1, $2, 'status', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`;
         const res = await pool.query(q, [topicId, text])
     },
