@@ -64,9 +64,12 @@ app.get('/boards/:id', async(req, res) => {
 //could probably attach query string for further page calls
 app.get('/boards/:id/latest', async(req, res) => {
   try {
-    let id = req.params.id
+    let id = req.params.id;
+    let range = 10;
+    let offset = 0;
+
     const board = await db.helpers.getBoard(id)
-    const topics = await db.helpers.getTopicsByRange(id, 0, 10);
+    const topics = await db.helpers.getTopicsByRange(id, offset, range);
     res.json({
       board: board,
       topics: topics
@@ -75,6 +78,7 @@ app.get('/boards/:id/latest', async(req, res) => {
     console.log("Redirect or 404 here")
   }
 })
+
 
 app.post('/boards', async (req, res) => {
   let boardTitle = req.body.boardTitle;
