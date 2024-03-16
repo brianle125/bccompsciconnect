@@ -116,8 +116,8 @@ const helpers = {
     
     addPost: async function(topicId, text) {
         //update latest post in topic
-        const updated = 'UPDATE topics SET latest_post = CURRENT_TIMESTAMP';
-        const updateQuery = await pool.query(updated);
+        const updated = 'UPDATE topics SET latest_post = CURRENT_TIMESTAMP WHERE id = $1';
+        const updateQuery = await pool.query(updated, [topicId]);
         //add the post
         const q = `INSERT INTO posts VALUES(DEFAULT, $1, $2, 'status', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`;
         const res = await pool.query(q, [topicId, text])
