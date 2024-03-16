@@ -124,7 +124,7 @@ const helpers = {
     },
 
     editPost: async function(topicId, text) {
-        const q = 'UPDATE posts SET text = $1, last_modified = CURRENT_TIMESTAMP WHERE topicid = $2';
+        const q = 'UPDATE posts SET body = $1, last_modified = CURRENT_TIMESTAMP WHERE topicid = $2';
         const res = await pool.query(q, [text, topicId])
     },
 
