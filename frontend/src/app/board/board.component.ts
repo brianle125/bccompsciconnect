@@ -7,6 +7,9 @@ import { Component } from '@angular/core';
   templateUrl: './board.component.html',
   styleUrl: './board.component.css'
 })
+/**
+ * The main page for a board
+ */
 export class BoardComponent {
 
 }

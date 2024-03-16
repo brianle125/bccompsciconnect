@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common'
   styleUrl: './board-list.component.css'
 })
 /**
- * For representing a list of pages. Meant to be used to list boards, topics, etc
+ * A list of boards for home-page
  */
 export class BoardList implements OnInit{
   @Input() pages: PageBarData[] = [new PageBarData(), new PageBarData(), new PageBarData()]
