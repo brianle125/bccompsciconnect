@@ -101,7 +101,7 @@ app.post('/boards/:boardId', async (req, res) => {
   let boardId = req.params.boardId;
   let question = req.body.question
   await db.helpers.addTopic(boardId, question);
-  res.redirect('/')
+  res.redirect(`/boards/${boardId}`)
 })
 
 
@@ -134,12 +134,20 @@ app.post('/boards/:boardId/topics/:topicId', async(req, res) => {
   res.redirect(302, `/boards/${boardId}/topics/${topicId}`);
 })
 
-//CHANGING THIS ENDPOINT LATER
+//CHANGING THESE ENDPOINT LATER IF NEEDED
 app.delete('/boards/:boardId/topics/:topicId/delete', async(req, res) => {
   let boardId = req.params.boardId;
   let topicId = req.params.topicId
   let postId = req.body.postId;
   await db.helpers.deletePost(postId);
+  res.redirect(302, `/boards/${boardId}/topics/${topicId}`);
+})
+
+app.put('/boards/:boardId/topics/:topicId/edit', async(req, res) => {
+  let boardId = req.params.boardId;
+  let topicId = req.params.topicId
+  let postText = req.body.text;
+  await db.helpers.editPost(topicId, postText)
   res.redirect(302, `/boards/${boardId}/topics/${topicId}`);
 })
 
