@@ -1,0 +1,10 @@
+<!-- <app-page-bar *ngFor="let page of pages;"></app-page-bar> -->
+<div *ngFor="let page of pages;" class="col-sm-12 page">
+    <div class="image-frame">
+        <img src="{{page.icon}}" class="icon">
+    </div>
+    <div class="text">
+        <h2><a [href]="page.goToOnClick">{{page.title}}</a></h2>
+        <p>{{page.description}}</p>
+    </div>
+</div>
