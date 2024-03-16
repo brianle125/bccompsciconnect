@@ -83,7 +83,7 @@ const helpers = {
     },
 
     getTopicsByRange: async function(id, start, end) {
-        const q = 'SELECT * FROM topics WHERE boardid = $1 LIMIT $2 OFFSET $3 ORDER BY created_at'
+        const q = 'SELECT * FROM topics WHERE boardid = $1  ORDER BY created_at LIMIT $2 OFFSET $3'
         const res = await pool.query(q, [id, end, start]);
         return res.rows
     },

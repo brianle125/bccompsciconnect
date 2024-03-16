@@ -35,7 +35,6 @@ app.set('view engine', 'jade');
 app.get('/', async (req, res) => {
   //CHANGE THIS
   const boards = await db.helpers.getBoards();
-  console.log(boards)
   res.json(boards)
 })
 
@@ -43,7 +42,6 @@ app.get('/', async (req, res) => {
 
 app.get('/boards', async (req, res) => {
   const boards = await db.helpers.getBoards();
-  console.log(boards)
   res.json(boards)
 })
 
@@ -118,7 +116,7 @@ app.get('/boards/:boardId/topics/:topicId', async (req, res) => {
   res.json({
     topic: topic,
     posts: posts,
-    postCount: postCount
+    postCount: postCount.rows[0].count
   })
 })
 
@@ -138,6 +136,8 @@ app.post('/boards/:boardId/topics/:topicId', async(req, res) => {
 
 //CHANGING THIS ENDPOINT LATER
 app.delete('/boards/:boardId/topics/:topicId/delete', async(req, res) => {
+  let boardId = req.params.boardId;
+  let topicId = req.params.topicId
   let postId = req.body.postId;
   await db.helpers.deletePost(postId);
   res.redirect(302, `/boards/${boardId}/topics/${topicId}`);
