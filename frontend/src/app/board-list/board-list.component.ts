@@ -1,5 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common'
+import { Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 @Component({
   selector: 'app-board-list',
   standalone: true,
@@ -11,9 +13,13 @@ import { CommonModule } from '@angular/common'
  * A list of boards for home-page
  */
 export class BoardList implements OnInit{
-  @Input() pages: PageBarData[] = [new PageBarData(), new PageBarData(), new PageBarData()]
+  @Input() pages: PageBarData[] = [
+    new PageBarData('Test', 'assets/page.png', 'Desc', 'board/0'), 
+    new PageBarData('Test', 'assets/page.png', 'Desc', 'board/1'), 
+    new PageBarData('Test', 'assets/page.png', 'Desc', 'board/2')
+  ]
 
-  constructor() {}
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
 
