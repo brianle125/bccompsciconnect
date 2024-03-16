@@ -104,7 +104,7 @@ const helpers = {
     },
 
     getPosts: async function(topicId) {
-        const q = 'SELECT * FROM posts WHERE topicid = $1';
+        const q = 'SELECT * FROM posts WHERE topicid = $1 ORDER BY created_at';
         const res = await pool.query(q, [topicId]);
         return res.rows
     },
@@ -123,12 +123,13 @@ const helpers = {
         const res = await pool.query(q, [topicId, text])
     },
 
-    editPost: async function(topicId, text) {
-        const q = 'UPDATE posts SET body = $1, last_modified = CURRENT_TIMESTAMP WHERE topicid = $2';
-        const res = await pool.query(q, [text, topicId])
+    editPost: async function(postId, text) {
+        const q = 'UPDATE posts SET body = $1, last_modified = CURRENT_TIMESTAMP WHERE id = $2';
+        const res = await pool.query(q, [text, postId])
     },
 
     deletePost: async function(postId) {
+        //Need to account for latest post field
         const res = await pool.query('DELETE from posts WHERE id = $1', [postId]);
     }
 }
