@@ -83,8 +83,8 @@ const helpers = {
     },
 
     getTopicsByRange: async function(id, start, end) {
-        const q = 'SELECT * FROM topics WHERE boardid = $1 LIMIT $2 OFFSET $3 ORDER BY created_at'
-        const res = await pool.query(q, [end, start]);
+        const q = 'SELECT * FROM topics WHERE boardid = $1  ORDER BY created_at LIMIT $2 OFFSET $3'
+        const res = await pool.query(q, [id, end, start]);
         return res.rows
     },
 
@@ -116,15 +116,15 @@ const helpers = {
     
     addPost: async function(topicId, text) {
         //update latest post in topic
-        const updated = 'UPDATE topics SET latest_post = CURRENT_TIMESTAMP';
-        const updateQuery = await pool.query(updated);
+        const updated = 'UPDATE topics SET latest_post = CURRENT_TIMESTAMP WHERE id = $1';
+        const updateQuery = await pool.query(updated, [topicId]);
         //add the post
         const q = `INSERT INTO posts VALUES(DEFAULT, $1, $2, 'status', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`;
         const res = await pool.query(q, [topicId, text])
     },
 
     editPost: async function(topicId, text) {
-        const q = 'UPDATE posts SET text = $1, last_modified = CURRENT_TIMESTAMP WHERE topicid = $2';
+        const q = 'UPDATE posts SET body = $1, last_modified = CURRENT_TIMESTAMP WHERE topicid = $2';
         const res = await pool.query(q, [text, topicId])
     },
 
