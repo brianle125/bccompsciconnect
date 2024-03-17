@@ -33,20 +33,19 @@ app.use(cors());
 app.set('view engine', 'jade');
 
 app.get('/', async (req, res) => {
-  //CHANGE THIS
   const boards = await db.helpers.getBoards();
   res.json(boards)
 })
 
 // BOARDS //
 
-app.get('/boards', async (req, res) => {
+app.get('/board', async (req, res) => {
   const boards = await db.helpers.getBoards();
   res.json(boards)
 })
 
 // Either id based params (the easy way) or hard coded board topics into url (e.g. /java or /algorithms, etc)
-app.get('/boards/:id', async(req, res) => {
+app.get('/board/:id', async(req, res) => {
   try {
     let id = req.params.id
     const board = await db.helpers.getBoard(id)
@@ -62,7 +61,7 @@ app.get('/boards/:id', async(req, res) => {
 })
 
 //could probably attach query string for further page calls
-app.get('/boards/:id/latest', async(req, res) => {
+app.get('/board/:id/latest', async(req, res) => {
   try {
     let id = req.params.id;
     let range = 10;
@@ -80,43 +79,43 @@ app.get('/boards/:id/latest', async(req, res) => {
 })
 
 
-app.post('/boards', async (req, res) => {
+app.post('/board', async (req, res) => {
   let boardTitle = req.body.boardTitle;
   const board = await db.helpers.addBoard(boardTitle);
-  res.redirect(303, '/boards')
+  res.redirect(303, '/board')
 })
 
-app.put('/boards/:boardId', async (req, res) => {
+app.put('/board/:boardId', async (req, res) => {
   let boardId = req.params.boardId;
   let boardTitle = req.body.boardTitle;
   await db.helpers.editBoard(boardId, boardTitle)
-  res.redirect(303, '/boards')
+  res.redirect(303, '/board')
 })
 
-app.delete('/boards/:boardId', async (req, res) => {
+app.delete('/board/:boardId', async (req, res) => {
   let boardId = req.params.boardId;
   const deletedBoard = await db.helpers.deleteBoard(boardId);
-  res.redirect(303, '/boards');
+  res.redirect(303, '/board');
 })
 
 // TOPICS AND POSTS //
 
-app.post('/boards/:boardId', async (req, res) => {
+app.post('/board/:boardId', async (req, res) => {
   let boardId = req.params.boardId;
   let question = req.body.question
   await db.helpers.addTopic(boardId, question);
-  res.redirect(`/boards/${boardId}`)
+  res.redirect(`/board/${boardId}`)
 })
 
-app.post('/boards/:boardId/latest', async (req, res) => {
+app.post('/board/:boardId/latest', async (req, res) => {
   let boardId = req.params.boardId;
   let question = req.body.question
   await db.helpers.addTopic(boardId, question);
-  res.redirect(`/boards/${boardId}`)
+  res.redirect(`/board/${boardId}`)
 })
 
 
-app.get('/boards/:boardId/topics/:topicId', async (req, res) => {
+app.get('/board/:boardId/topic/:topicId', async (req, res) => {
   let boardId = req.params.boardId;
   let topicId = req.params.topicId;
   const topic = await db.helpers.getTopic(topicId);
@@ -131,31 +130,31 @@ app.get('/boards/:boardId/topics/:topicId', async (req, res) => {
   })
 })
 
-app.delete('/boards/:boardId/topics/:topicId', async (req, res) => {
+app.delete('/board/:boardId/topic/:topicId', async (req, res) => {
   let boardId = req.params.boardId;
   let topicId = req.params.topicId
   await db.helpers.deleteTopic(topicId)
-  res.redirect(302, `/boards/${boardId}`)
+  res.redirect(302, `/board/${boardId}`)
 })
 
-app.post('/boards/:boardId/topics/:topicId', async(req, res) => {
+app.post('/board/:boardId/topic/:topicId', async(req, res) => {
   let boardId = req.params.boardId;
   let topicId = req.params.topicId
   let text = req.body.text
   await db.helpers.addPost(topicId, text)
-  res.redirect(302, `/boards/${boardId}/topics/${topicId}`);
+  res.redirect(302, `/board/${boardId}/topic/${topicId}`);
 })
 
-//CHANGING THESE ENDPOINT LATER IF NEEDED
-app.delete('/boards/:boardId/topics/:topicId/delete', async(req, res) => {
+//CHANGING THESE ENDPOINTS LATER IF NEEDED
+app.delete('/board/:boardId/topic/:topicId/delete', async(req, res) => {
   let boardId = req.params.boardId;
   let topicId = req.params.topicId
   let postId = req.body.postId;
   await db.helpers.deletePost(postId);
-  res.redirect(302, `/boards/${boardId}/topics/${topicId}`);
+  res.redirect(302, `/board/${boardId}/topic/${topicId}`);
 })
 
-app.put('/boards/:boardId/topics/:topicId/edit', async(req, res) => {
+app.put('/board/:boardId/topic/:topicId/edit', async(req, res) => {
   let boardId = req.params.boardId;
   let topicId = req.params.topicId
 
@@ -163,7 +162,7 @@ app.put('/boards/:boardId/topics/:topicId/edit', async(req, res) => {
   let postText = req.body.text;
 
   await db.helpers.editPost(postId, postText)
-  res.redirect(302, `/boards/${boardId}/topics/${topicId}`);
+  res.redirect(302, `/board/${boardId}/topic/${topicId}`);
 })
 
 
