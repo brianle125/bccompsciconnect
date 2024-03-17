@@ -1,4 +1,5 @@
 var express = require('express');
+var session = require('express-session')
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
@@ -31,6 +32,13 @@ app.use(cors());
 //prevent view engine complaints
 app.set('view engine', 'jade');
 
+app.use(session({
+  name: 'session',
+  secret: 'notagoodsecret',
+  resave: false,
+  saveUninitialized: false,
+}))
+
 app.get('/', async (req, res) => {
   const boards = await db.helpers.getBoards();
   res.json(boards)
@@ -47,8 +55,21 @@ app.get('/board', async (req, res) => {
 app.get('/board/:id', async(req, res) => {
   try {
     let id = req.params.id
+
+    // i.e. /board/:id/?page=<number>
+    let page = req.query.page
+    let offset = 0;
+    let range = 100;
+
+    //if there is a page number query grab associated topics
+    if(Object.keys(req.query).length !== 0) {
+      console.log('there is a query')
+      offset = (page - 1) * 10;
+      range = page * 10;
+    }
+    
     const board = await db.helpers.getBoard(id)
-    const topics = await db.helpers.getTopics(id);
+    const topics = await db.helpers.getTopicsByRange(id, offset, range);
     res.json({
       board: board,
       topics: topics
@@ -59,7 +80,6 @@ app.get('/board/:id', async(req, res) => {
   
 })
 
-//could probably attach query string for further page calls
 app.get('/board/:id/latest', async(req, res) => {
   try {
     let id = req.params.id;
@@ -76,6 +96,7 @@ app.get('/board/:id/latest', async(req, res) => {
     console.log("Redirect or 404 here")
   }
 })
+
 
 
 app.post('/board', async (req, res) => {
@@ -166,6 +187,17 @@ app.put('/board/:boardId/topic/:topicId/edit', async(req, res) => {
 
 
 //TODO: Socket connection
+
+function isLoggedIn(req, res, next) {
+  if(req.session.user) {
+    next()
+  }
+  else
+  {
+    //some login redirect
+  }
+}
+
 
 // Initialize the database
 async function InitDB() {
