@@ -1,4 +1,3 @@
-var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
@@ -22,8 +21,8 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use('/', express.static(path.join(__dirname, 'public'), { index: ['index.html'] }));
-//app.use(express.static('../frontend/dist'))
+//app.use('/', express.static(path.join(__dirname, 'public'), { index: ['index.html'] }));
+app.use(express.static('../frontend/dist/bccompsciconnect'))
 
 // internal modules
 const db = require('./models/db')
@@ -175,8 +174,9 @@ async function InitDB() {
 }
 
 InitDB().then(() => {
-  app.listen(port);
-  console.log(`Listening on port ${port}`)
+  app.listen(port, () => {
+    console.log(`Listening on port ${port}`)
+  })
 })
 .catch((err) => { console.log(err)})
 

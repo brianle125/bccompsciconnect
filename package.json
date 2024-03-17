@@ -6,6 +6,7 @@
     "tedious": "^18.1.0"
   },
   "scripts": {
+    "start": "node ./server/server.js",
     "server": "nodemon ./server/server.js",
     "client": "npm run start --prefix ./frontend"
   }

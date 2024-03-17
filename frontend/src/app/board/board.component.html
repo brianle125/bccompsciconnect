@@ -1,1 +1,6 @@
-<p>board works!</p>
+<div *ngIf="board">
+    <h1>{{ board?.board?.title }}</h1>
+    <p>{{ board?.board?.description }}</p>
+    <app-topic-list></app-topic-list>
+</div>
+

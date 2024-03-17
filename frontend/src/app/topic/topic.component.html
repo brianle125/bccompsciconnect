@@ -1,1 +1,7 @@
-<p>topic works!</p>
+<div *ngIf="topic">
+    <div *ngIf="posts.length > 0">
+        <div *ngFor="let post of posts">
+            <p>{{ post.body }}</p>
+        </div>
+    </div>
+</div>
