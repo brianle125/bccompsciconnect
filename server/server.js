@@ -48,8 +48,21 @@ app.get('/board', async (req, res) => {
 app.get('/board/:id', async(req, res) => {
   try {
     let id = req.params.id
+
+    // i.e. /board/:id/?page=<number>
+    let page = req.query.page
+    let offset = 0;
+    let range = 100;
+
+    //if there is a page number query grab associated topics
+    if(Object.keys(req.query).length !== 0) {
+      console.log('there is a query')
+      offset = (page - 1) * 10;
+      range = page * 10;
+    }
+    
     const board = await db.helpers.getBoard(id)
-    const topics = await db.helpers.getTopics(id);
+    const topics = await db.helpers.getTopicsByRange(id, offset, range);
     res.json({
       board: board,
       topics: topics
