@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
+import { PostListComponent } from '../post-list/post-list.component';
 
 @Component({
   selector: 'app-topic',
   standalone: true,
-  imports: [],
+  imports: [PostListComponent],
   templateUrl: './topic.component.html',
   styleUrl: './topic.component.css'
 })
