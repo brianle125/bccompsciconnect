@@ -1,7 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { BoardService } from '../board.service';
 import { CommonModule } from '@angular/common';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-topic-list',
@@ -10,42 +8,24 @@ import { CommonModule } from '@angular/common';
   templateUrl: './topic-list.component.html',
   styleUrl: './topic-list.component.css'
 })
-export class TopicListComponent implements OnInit {
-  board: any
-  topics: TopicListEntry[]
-  constructor(private route: ActivatedRoute, private boardService: BoardService) 
-  {
-    this.topics = []
-  }
-
-
-  ngOnInit(): void {
-    const routeParams = this.route.snapshot.paramMap;
-    const boardId = Number(routeParams.get('board-id'));
-  
-    console.log(boardId)
-    
-    this.board = this.boardService.getBoard(boardId).subscribe((data) => {
-      this.board = data as any;
-      for(let i = 0; i < this.board.topics.length; i++)
-      {
-        let t = this.board.topics[i]
-        let target = this.boardService.getTopic(boardId, t.id).subscribe((data) => {
-          let topic = data as any
-          this.topics[i] = new TopicListEntry(t.question, t.created_at, t.latest_post, topic.postCount, `/board/${boardId}/topic/${t.id}`)
-        })
-      }
-      console.log(this.topics);
-    })
-  }
+/**
+ * Component to list topics
+ */
+export class TopicListComponent {
+  @Input() topics: TopicListEntry[] = [
+    new TopicListEntry('topic 1', 'bob', 1, 1, '2023-12-13 1:00pm', '2023-12-13 1:00pm', '/board/0/topic/0'), 
+    new TopicListEntry('topic 1', 'joe', 1, 1, '2023-12-13 1:00pm', '2023-12-13 1:00pm', '/board/0/topic/0')
+  ]
 }
 
 class TopicListEntry {
   constructor(
-    public question: string = 'Question',
-    public created: string = 'Date',
-    public latestPost: string = 'Date',
-    public replies: Number = 0,
-    public goToOnClick: string = '/'
+    public title: string,
+    public originalPoster: string,
+    public views: number,
+    public numberOfReplies: number,
+    public created: string,
+    public lastUpdated: string,
+    public link: string
   ) {}
 }

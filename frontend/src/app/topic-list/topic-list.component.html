@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <div *ngIf="board.topics">
         <div *ngFor="let topic of topics" class="col-sm-12 topic-frame">
             <a [href]="topic.goToOnClick" >
@@ -7,3 +8,33 @@
             </a>
         </div>
     </div>
+=======
+
+<div *ngFor="let topic of topics" class="col-sm-12">
+    <div class="col-sm-2">
+        <div class="stats-label">
+            Replies: <br>
+            Views:
+        </div>
+        <div class="stats">
+            {{topic.numberOfReplies}} <br>
+            {{topic.views}}
+        </div>
+    </div>
+    <div class="col-sm-7">
+        <h2 class="title"><a [href]="topic.link">{{topic.title}}</a></h2>
+    </div>
+    <div class="col-sm-3">
+        <div class="stats-label">
+            Started by: <br>
+            Created: <br>
+            Updated:
+        </div>
+        <div class="stats">
+            {{topic.originalPoster}} <br>
+            {{topic.created}}<br>
+            {{topic.lastUpdated}}
+        </div>
+    </div>
+</div>
+>>>>>>> 4b84d5602e34e3dcaec66e66e28e0b183448a0e6
