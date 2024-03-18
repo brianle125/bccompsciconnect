@@ -1,7 +1,10 @@
 <div *ngIf="topic">
+    <h2>{{ topic?.topic?.question }}</h2>
     <div *ngIf="posts.length > 0">
-        <div *ngFor="let post of posts">
-            <p>{{ post.body }}</p>
+        <div class="post" *ngFor="let post of posts">
+            <div class="post-text">
+                <p>{{ post.body }}</p>
+            </div>
         </div>
     </div>
 </div>

@@ -109,6 +109,12 @@ const helpers = {
         return res.rows
     },
 
+    getPostsByRange: async function(topicId, start, end) {
+        const q = 'SELECT * from posts WHERE topicId = $1 ORDER BY created_at LIMIT $2 OFFSET $3';
+        const res = await pool.query(q, [topicId, end, start])
+        return res.rows
+    },
+
     getPostCount: async function(topicId) {
         const res = await pool.query('SELECT COUNT(*) FROM posts WHERE topicid = $1', [topicId])
         return res;

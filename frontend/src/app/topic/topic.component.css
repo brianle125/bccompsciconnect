@@ -1,0 +1,7 @@
+.post {
+    border: 1px solid black;
+}
+
+.post-text {
+    display: inline-block
+}
