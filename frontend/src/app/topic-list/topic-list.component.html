@@ -1,1 +1,28 @@
-<p>topic-list works!</p>
+
+<div *ngFor="let topic of topics" class="col-sm-12">
+    <div class="col-sm-2">
+        <div class="stats-label">
+            Replies: <br>
+            Views:
+        </div>
+        <div class="stats">
+            {{topic.numberOfReplies}} <br>
+            {{topic.views}}
+        </div>
+    </div>
+    <div class="col-sm-7">
+        <h2 class="title"><a [href]="topic.link">{{topic.title}}</a></h2>
+    </div>
+    <div class="col-sm-3">
+        <div class="stats-label">
+            Started by: <br>
+            Created: <br>
+            Updated:
+        </div>
+        <div class="stats">
+            {{topic.originalPoster}} <br>
+            {{topic.created}}<br>
+            {{topic.lastUpdated}}
+        </div>
+    </div>
+</div>

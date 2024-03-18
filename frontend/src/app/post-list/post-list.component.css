@@ -2,21 +2,29 @@ div {
     border: 1px solid blue;
 }
 
-.stats-label {
+.profile-pic-frame {
+    max-width: 50px;
+    max-height: 50px;
+}
+
+.profile-pic {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.dates-labels {
     width: fit-content;
     height: fit-content;
     float: left;
     border: 1px solid red;
 }
 
-.stats {
+.dates {
     float: left;
     padding-left: 10px;
     border: 1px solid red;
 }
 
-.title {
-    border: 0px 0px 0px 0px;
-    padding: 0px, 0px, 0px 0px;
-    margin: 0px, 0px, 0px 0px;
+.after-dates-section {
+    clear: both;
 }
