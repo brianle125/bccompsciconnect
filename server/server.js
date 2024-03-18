@@ -55,20 +55,26 @@ app.get('/', async (req, res) => {
   res.json(boards)
 })
 
+app.get('/usercheck', async (req, res) => {
+  let name = req.query.name
+  let exists = false;
+  const user = await db.helpers.getUser(name);
+  console.log('User length:' + user.length)
+  if(user.length !== 0) {
+    exists = true;
+  }
+  res.json({
+    exists: exists
+  })
+})
 
 app.post('/register', async (req, res) => {
   let name = req.body.name;
   let email = req.body.email;
-  let password = req.body.password;
+  let password = req.body.password
 
-  //if user exists in database, stop
-  const user = await db.helpers.getUser(name, email);
-  if(user.length !== 0) {
-    console.log("user already exists")
-  }
-  //elseadd user to database
-  console.log(name)
-
+  await db.helpers.addUser(name, email, password, 'user');
+  res.redirect(303, '/');
 })
 
 

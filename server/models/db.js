@@ -32,10 +32,15 @@ const helpers = {
      * USERS 
      */
 
-    getUser: async function(id, username, email) {
-        const q = 'SELECT * FROM users WHERE username=$2, email=$3';
-        const res = await pool.query(username, email);
+    getUser: async function(username) {
+        const q = 'SELECT * FROM users WHERE username=$1';
+        const res = await pool.query(q, [username]);
         return res.rows;
+    },
+
+    addUser: async function(username, email, password, role) {
+        const q = `INSERT INTO users VALUES(DEFAULT, $1, $2, $3, $4)`;
+        const query = await pool.query(q, [username, email, password, role]);
     },
 
     /**
