@@ -23,15 +23,10 @@ export class RegistrationComponent {
     this.form = new FormGroup(formControls);
   }
 
-  onSubmit() {
-    console.log(this.form.value.name)
-    console.log(this.form.value.email)
-    console.log(this.form.value.password)
-    
+  onSubmit() {    
     //CHECK IF USER EXITS IF THEY DO SEND BACK TO
     this.userService.getUser(this.form.value.name).subscribe((data) => {
       let exists = data as any;
-      console.log('Does it exist?' + exists.exists)
       if(exists.exists === true) {
         this.router.navigate(['/register'])
       } 
