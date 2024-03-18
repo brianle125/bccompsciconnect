@@ -1,0 +1,22 @@
+div {
+    border: 1px solid blue;
+}
+
+.stats-label {
+    width: fit-content;
+    height: fit-content;
+    float: left;
+    border: 1px solid red;
+}
+
+.stats {
+    float: left;
+    padding-left: 10px;
+    border: 1px solid red;
+}
+
+.title {
+    border: 0px 0px 0px 0px;
+    padding: 0px, 0px, 0px 0px;
+    margin: 0px, 0px, 0px 0px;
+}
