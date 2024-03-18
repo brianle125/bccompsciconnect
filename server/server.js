@@ -1,3 +1,5 @@
+var createError = require('http-errors');
+var session = require('express-session')
 var express = require('express');
 var session = require('express-session')
 var path = require('path');
@@ -29,6 +31,15 @@ app.use(express.static('../frontend/dist/bccompsciconnect'))
 const db = require('./models/db')
 app.use(cors());
 
+//user session
+app.use(session({
+  name: 'usersession',
+  secret: 'secret',
+  resave: false,
+  saveUninitialized: false,
+  maxAge: 1000*60*60
+}))
+
 //prevent view engine complaints
 app.set('view engine', 'jade');
 
@@ -43,6 +54,23 @@ app.get('/', async (req, res) => {
   const boards = await db.helpers.getBoards();
   res.json(boards)
 })
+
+
+app.post('/register', async (req, res) => {
+  let name = req.body.name;
+  let email = req.body.email;
+  let password = req.body.password;
+
+  //if user exists in database, stop
+  const user = await db.helpers.getUser(name, email);
+  if(user.length !== 0) {
+    console.log("user already exists")
+  }
+  //elseadd user to database
+  console.log(name)
+
+})
+
 
 // BOARDS //
 
