@@ -6,19 +6,20 @@ import { HttpClient } from '@angular/common/http';
 })
 export class BoardService {
 
+  api = 'https://bccompsciconnect-server-4w7ddycrna-uc.a.run.app';
   constructor(private http: HttpClient) { }
 
   getBoards() {
-    return this.http.get<any[]>('http://localhost:8080/', {withCredentials: true })
+    return this.http.get<any[]>(this.api, {withCredentials: true })
   }
 
   getBoard(id: any) {
-    return this.http.get<any>(`http://localhost:8080/board/${id}`, {withCredentials: true })
+    return this.http.get<any>(`${this.api}/board/${id}`, {withCredentials: true })
   }
 
   //probably move this to another service file if needed
   getTopic(boardId: any, topicId: any) {
-    return this.http.get<any>(`http://localhost:8080/board/${boardId}/topic/${topicId}`,{withCredentials: true })
+    return this.http.get<any>(`${this.api}/board/${boardId}/topic/${topicId}`,{withCredentials: true })
   }
 
   

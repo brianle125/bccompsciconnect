@@ -21,7 +21,7 @@ const io = new Server(server)
 const port = process.env.PORT || 8080;
 
 app.use(cors({
-  origin: 'http://localhost:4200',
+  origin: 'http://34.133.131.195',
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true, 
 }));

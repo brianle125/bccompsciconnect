@@ -6,17 +6,18 @@ import { Injectable } from '@angular/core';
 })
 export class UserService {
 
+  api = 'https://bccompsciconnect-server-4w7ddycrna-uc.a.run.app';
   constructor(private http: HttpClient) { }
 
   getUser(username: any) {
-    return this.http.get(`http://localhost:8080/usercheck?name=${username}`, {withCredentials:true})
+    return this.http.get(`${this.api}/usercheck?name=${username}`, {withCredentials:true})
   }
 
   addUser(user: any) {
-    return this.http.post<any>(`http://localhost:8080/register`, user, {observe: 'response', withCredentials: true});
+    return this.http.post<any>(`${this.api}/register`, user, {observe: 'response', withCredentials: true});
   }
 
   loginUser(user: any) {
-    return this.http.post<any>('http://localhost:8080/login', user, {observe: 'response', withCredentials: true});
+    return this.http.post<any>(`${this.api}/login`, user, {observe: 'response', withCredentials: true});
   }
 }
