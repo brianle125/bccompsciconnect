@@ -3,11 +3,11 @@ var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser')
 var logger = require('morgan');
 
 // var indexRouter = require('./routes/index');
 // var usersRouter = require('./routes/users');
-
 
 var app = express();
 const cors = require('cors')
@@ -15,33 +15,45 @@ const server = require('http').createServer(app)
 const fs = require("fs");
 //for future automatic refreshing
 const { Server } = require("socket.io")
+const jwt = require('jsonwebtoken')
+
 const io = new Server(server)
 const port = process.env.PORT || 8080;
 
+app.use(cors({
+  origin: 'http://localhost:4200',
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true, 
+}));
+
+app.use(cookieParser('secret'));
+
 app.use(session({
-  name: 'usersession',
+  cookie: { secure: false, sameSite: 'none' },
+  name: 'session',
   secret: 'secret',
-  resave: true,
+  resave: false,
   saveUninitialized: true,
-  maxAge: 1000*60*60
+  maxAge: 1000*60*60,
 }))
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(bodyParser.json());
 //app.use('/', express.static(path.join(__dirname, 'public'), { index: ['index.html'] }));
 
-//app.use('/', express.static('../frontend/dist/bccompsciconnect/browser'))
+// app.use('/', express.static(path.join(__dirname, '../frontend/dist/bccompsciconnect/browser')));
+// app.get('/*', function(req, res) {
+//   res.sendFile(path.join(__dirname, '../frontend/dist/bccompsciconnect/browser/index.html'));
+// });
+
 // internal modules
 const db = require('./models/db')
-app.use(cors({credentials: true, origin: '*'}));
 
 
 app.get('/', async (req, res) => {
-  if(!req.session.user) {
-    console.log('session failed to init')
-  }
+  console.log(req.session.user)
   const boards = await db.helpers.getBoards();
   res.json(boards)
 })
@@ -76,14 +88,16 @@ app.post('/login', async (req, res) => {
   if(targetUser.length === 0)
   {
     console.log('Account not found')
+    res.send({"status": "failed"})
   }
   else if(username === targetUser[0].username && password === targetUser[0].password)
   {
     req.session.user = {username: username, password: password}
     if(req.session.user) {
-      console.log('user is defined here')
+      console.log(req.session.id)
     }
-    res.redirect('/')
+    req.session.save();
+    res.send({"status": "success"})
   }
 })
 

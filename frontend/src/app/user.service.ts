@@ -9,14 +9,14 @@ export class UserService {
   constructor(private http: HttpClient) { }
 
   getUser(username: any) {
-    return this.http.get(`http://localhost:8080/usercheck?name=${username}`)
+    return this.http.get(`http://localhost:8080/usercheck?name=${username}`, {withCredentials:true})
   }
 
   addUser(user: any) {
-    return this.http.post(`http://localhost:8080/register`, user, {withCredentials: true});
+    return this.http.post<any>(`http://localhost:8080/register`, user, {observe: 'response', withCredentials: true});
   }
 
   loginUser(user: any) {
-    return this.http.post('http://localhost:8080/login', user, {withCredentials: true});
+    return this.http.post<any>('http://localhost:8080/login', user, {observe: 'response', withCredentials: true});
   }
 }
