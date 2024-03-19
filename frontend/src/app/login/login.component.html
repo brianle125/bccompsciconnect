@@ -6,15 +6,23 @@
             <label for="exampleFormControlInput1" class="form-label">Username</label>
             <input type="text" name="name" placeholder="Username :" formControlName="name" class="form-control"/>
         </div>
+        <div *ngIf="form.get('name')?.invalid && (form.get('name')?.dirty || form.get('name')?.touched)" id="errorDiv">
+            <div *ngIf="form.get('name')?.errors?.['required']">Name is required.</div>
+            <div *ngIf="form.get('name')?.errors?.['minlength']">Name must be at least 5 characters long.</div>
+        </div>
         <div class="mb-3">
             <label for="exampleFormControlInput1" class="form-label">Password</label>
             <input type="password" name="password" placeholder="Password :" formControlName="password" class="form-control"/>
+            <div *ngIf="form.get('password')?.invalid && (form.get('password')?.dirty || form.get('password')?.touched)" id="errorDiv">
+                <div *ngIf="form.get('password')?.errors?.['required']">Password is required.</div>
+                <div *ngIf="form.get('password')?.errors?.['minlength']">Password must be a valid email!</div>
+            </div>
         </div>
         <button class="btn btn-outline-primary" [disabled]="!form.valid">
             Login
         </button>
     </form>
-    <button class="btn btn-outline-primary" id="registerButton" (onClick)="registerUser()">
+    <button class="btn btn-primary" id="registerButton" (click)="registerUser()">
         Register
     </button>
 </main>

@@ -28,6 +28,8 @@ export class RegistrationComponent {
     console.log(this.form.value.password)
 
     //CHECK IF USER EXITS IF THEY DO SEND BACK TO
+
+    
     this.router.navigate(['/register'])
   }
 
