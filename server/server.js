@@ -1,7 +1,6 @@
+var session = require('express-session')
 var createError = require('http-errors');
-var session = require('express-session')
 var express = require('express');
-var session = require('express-session')
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
@@ -19,38 +18,30 @@ const { Server } = require("socket.io")
 const io = new Server(server)
 const port = process.env.PORT || 8080;
 
+app.use(session({
+  name: 'usersession',
+  secret: 'secret',
+  resave: true,
+  saveUninitialized: true,
+  maxAge: 1000*60*60
+}))
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 //app.use('/', express.static(path.join(__dirname, 'public'), { index: ['index.html'] }));
-app.use(express.static('../frontend/dist/bccompsciconnect'))
 
+//app.use('/', express.static('../frontend/dist/bccompsciconnect/browser'))
 // internal modules
 const db = require('./models/db')
-app.use(cors());
+app.use(cors({credentials: true, origin: '*'}));
 
-//user session
-app.use(session({
-  name: 'usersession',
-  secret: 'secret',
-  resave: false,
-  saveUninitialized: false,
-  maxAge: 1000*60*60
-}))
-
-//prevent view engine complaints
-app.set('view engine', 'jade');
-
-app.use(session({
-  name: 'session',
-  secret: 'notagoodsecret',
-  resave: false,
-  saveUninitialized: false,
-}))
 
 app.get('/', async (req, res) => {
+  if(!req.session.user) {
+    console.log('session failed to init')
+  }
   const boards = await db.helpers.getBoards();
   res.json(boards)
 })
@@ -77,6 +68,26 @@ app.post('/register', async (req, res) => {
   res.redirect(303, '/');
 })
 
+app.post('/login', async (req, res) => {
+  let username = req.body.name
+  let password = req.body.password
+
+  const targetUser = await db.helpers.getUser(username);
+  if(targetUser.length === 0)
+  {
+    console.log('Account not found')
+  }
+  else if(username === targetUser[0].username && password === targetUser[0].password)
+  {
+    req.session.user = {username: username, password: password}
+    if(req.session.user) {
+      console.log('user is defined here')
+    }
+    res.redirect('/')
+  }
+})
+
+
 
 // BOARDS //
 
@@ -97,7 +108,6 @@ app.get('/board/:id', async(req, res) => {
 
     //if there is a page number query grab associated topics
     if(Object.keys(req.query).length !== 0) {
-      console.log('there is a query')
       offset = (page - 1) * 10;
       range = page * 10;
     }

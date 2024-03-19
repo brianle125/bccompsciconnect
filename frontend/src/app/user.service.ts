@@ -13,6 +13,10 @@ export class UserService {
   }
 
   addUser(user: any) {
-    return this.http.post(`http://localhost:8080/register`, user);
+    return this.http.post(`http://localhost:8080/register`, user, {withCredentials: true});
+  }
+
+  loginUser(user: any) {
+    return this.http.post('http://localhost:8080/login', user, {withCredentials: true});
   }
 }
