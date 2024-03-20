@@ -6,7 +6,7 @@ import { Injectable } from '@angular/core';
 })
 export class UserService {
 
-  api = 'https://bccompsciconnect-server-4w7ddycrna-uc.a.run.app/api';
+  api = 'http://localhost:8080/api';
   constructor(private http: HttpClient) { }
 
   getUser(username: any) {
