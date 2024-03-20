@@ -1,1 +1,5 @@
-<p>post works!</p>
+<!-- post.component.html -->
+<form (ngSubmit)="onSubmit()">
+  <textarea [(ngModel)]="newPostBody" name="postBody" required></textarea>
+  <button type="submit">Submit Post</button>
+</form>
