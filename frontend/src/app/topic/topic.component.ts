@@ -1,16 +1,15 @@
 import { Component } from '@angular/core';
 import { PostListComponent } from '../post-list/post-list.component';
+import { PostCreateComponent } from '../post-create/post-create.component';
 
 @Component({
   selector: 'app-topic',
   standalone: true,
-  imports: [PostListComponent],
   templateUrl: './topic.component.html',
-  styleUrl: './topic.component.css'
+  styleUrl: './topic.component.css',
+  imports: [PostListComponent, PostCreateComponent],
 })
 /**
  * The main page for a topic (ie a post to a board)
  */
-export class TopicComponent {
-
-}
+export class TopicComponent {}
