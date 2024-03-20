@@ -1,1 +1,6 @@
 <p>topic-create works!</p>
+<form (ngSubmit)="onSubmit(form)" #form="ngForm">
+  <label>Write your question</label>
+  <textarea name="question" ngModel required></textarea>
+  <button type="submit">Create Topic</button>
+</form>
