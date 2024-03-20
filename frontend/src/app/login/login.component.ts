@@ -3,11 +3,12 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UserService } from '../user.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
@@ -29,12 +30,14 @@ export class LoginComponent {
       let response = data as any;
       console.log(response)
       if(response.body.status === "success") {
-        this.router.navigate(['/'])
+        // Navigate to the home page if the user is found
+        this.router.navigate(['/']);
+      } else if(response.body.status === "failed") {
+        alert("User/pass not found.");
+        this.router.navigate(['/register']);
       }
     })
 
-    //CHECK IF USER EXITS IF THEY DO SEND BACK TO
-    this.router.navigate(['/login'])
   }
 
   registerUser() {
