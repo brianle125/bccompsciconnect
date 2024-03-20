@@ -6,17 +6,18 @@ import { Injectable } from '@angular/core';
 })
 export class UserService {
 
+  api = 'http://localhost:8080/api';
   constructor(private http: HttpClient) { }
 
   getUser(username: any) {
-    return this.http.get(`http://localhost:8080/usercheck?name=${username}`)
+    return this.http.get(`${this.api}/usercheck?name=${username}`, {withCredentials:true})
   }
 
   addUser(user: any) {
-    return this.http.post(`http://localhost:8080/register`, user, {withCredentials: true});
+    return this.http.post<any>(`${this.api}/register`, user, {observe: 'response', withCredentials: true});
   }
 
   loginUser(user: any) {
-    return this.http.post('http://localhost:8080/login', user, {withCredentials: true});
+    return this.http.post<any>(`${this.api}/login`, user, {observe: 'response', withCredentials: true});
   }
 }

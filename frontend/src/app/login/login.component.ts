@@ -26,7 +26,11 @@ export class LoginComponent {
     // console.log(this.form.value.password)
 
     this.userService.loginUser(this.form.value).subscribe((data) => {
-      this.router.navigate(['/'])
+      let response = data as any;
+      console.log(response)
+      if(response.body.status === "success") {
+        this.router.navigate(['/'])
+      }
     })
 
     //CHECK IF USER EXITS IF THEY DO SEND BACK TO

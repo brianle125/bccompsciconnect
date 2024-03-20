@@ -6,8 +6,8 @@ const {Connector} = require('@google-cloud/cloud-sql-connector');
 const pool = new Pool({
     database: 'testing',
     user: 'postgres',
-    host: 'localhost' || process.env.DB_HOST,
-    password: process.env.LOCAL_PASS
+    host: process.env.DB_HOST,
+    password: process.env.DB_PASS
 })
 
 const helpers = {
@@ -124,12 +124,6 @@ const helpers = {
         return res.rows
     },
     
-    getPostsByRange: async function(topicId, start, end) {
-        const q = 'SELECT * from posts WHERE topicId = $1 ORDER BY created_at LIMIT $2 OFFSET $3';
-        const res = await pool.query(q, [topicId, end, start])
-        return res.rows
-    },
-
     getPostsByRange: async function(topicId, start, end) {
         const q = 'SELECT * from posts WHERE topicId = $1 ORDER BY created_at LIMIT $2 OFFSET $3';
         const res = await pool.query(q, [topicId, end, start])

@@ -13,6 +13,7 @@ export class PostListComponent {
     new PostData('message', 'bob', 'link/to/profile','assets/page.png', '2023-12-13 1:00pm', null, null),
     new PostData('message', 'joe', 'link/to/profile', 'assets/page.png', '2023-12-13 1:00pm', '2023-12-13 1:00pm', 'link/to/edit/')
   ]
+
 }
 
 export class PostData {
