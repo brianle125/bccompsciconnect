@@ -6,11 +6,11 @@ import { HttpClient } from '@angular/common/http';
 })
 export class BoardService {
 
-  api = 'https://bccompsciconnect-server-4w7ddycrna-uc.a.run.app';
+  api = 'http://localhost:8080/api';
   constructor(private http: HttpClient) { }
 
   getBoards() {
-    return this.http.get<any[]>(this.api, {withCredentials: true })
+    return this.http.get<any[]>(`${this.api}/boards`, {withCredentials: true })
   }
 
   getBoard(id: any) {
