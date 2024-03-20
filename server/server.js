@@ -165,7 +165,6 @@ app.get('/api/board/:id/latest', async(req, res) => {
 })
 
 
-
 app.post('/api/board', async (req, res) => {
   let boardTitle = req.body.boardTitle;
   const board = await db.helpers.addBoard(boardTitle);
