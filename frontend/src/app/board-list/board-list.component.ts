@@ -3,14 +3,13 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { RouterLink } from '@angular/router';
 import { BoardService } from '../board.service';
-import { PostComponent } from '../post/post.component';
 
 @Component({
   selector: 'app-board-list',
   standalone: true,
   templateUrl: './board-list.component.html',
   styleUrl: './board-list.component.css',
-  imports: [CommonModule, PostComponent],
+  imports: [CommonModule],
 })
 /**
  * A list of boards for home-page
