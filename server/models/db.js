@@ -14,9 +14,9 @@ const helpers = {
     //database queries
     init: async function() {
         //create tables
-        const board = 'CREATE TABLE IF NOT EXISTS boards (id SERIAL, title character varying(255), PRIMARY KEY(id))'
+        const board = 'CREATE TABLE IF NOT EXISTS boards (id SERIAL, title character varying(255), description varchar(255), PRIMARY KEY(id))'
         const topics = 'CREATE TABLE IF NOT EXISTS topics (id SERIAL, boardid integer, question varchar(1000), created_at timestamp, last_modified timestamp, latest_post timestamp, PRIMARY KEY(id), CONSTRAINT fk_board FOREIGN KEY (boardid) REFERENCES boards(id) ON DELETE CASCADE)'
-        const users = 'CREATE TABLE IF NOT EXISTS users (id SERIAL, username varchar(255), role varchar(255), created_at timestamp, PRIMARY KEY(id))'
+        const users = 'CREATE TABLE IF NOT EXISTS users (id SERIAL, username varchar(255), email varchar(255), password varchar(1000), role varchar(255), created_at timestamp, PRIMARY KEY(id))'
         const posts = 'CREATE TABLE IF NOT EXISTS posts (id SERIAL, topicid integer, body text, status varchar(255), created_at timestamp, last_modified timestamp, PRIMARY KEY(id), CONSTRAINT fk_topic FOREIGN KEY(topicid) REFERENCES topics(id) ON DELETE CASCADE)'
         const login = 'CREATE TABLE IF NOT EXISTS login (id SERIAL, username varchar(255), password varchar(1000), PRIMARY KEY(id))'
 
@@ -26,6 +26,21 @@ const helpers = {
         await pool.query(users);
         await pool.query(posts);
         await pool.query(login);
+    },
+
+    /**
+     * USERS 
+     */
+
+    getUser: async function(username) {
+        const q = 'SELECT * FROM users WHERE username=$1';
+        const res = await pool.query(q, [username]);
+        return res.rows;
+    },
+
+    addUser: async function(username, email, password, role) {
+        const q = `INSERT INTO users VALUES(DEFAULT, $1, $2, $3, $4)`;
+        const query = await pool.query(q, [username, email, password, role]);
     },
 
     /**
@@ -106,6 +121,18 @@ const helpers = {
     getPosts: async function(topicId) {
         const q = 'SELECT * FROM posts WHERE topicid = $1 ORDER BY created_at';
         const res = await pool.query(q, [topicId]);
+        return res.rows
+    },
+    
+    getPostsByRange: async function(topicId, start, end) {
+        const q = 'SELECT * from posts WHERE topicId = $1 ORDER BY created_at LIMIT $2 OFFSET $3';
+        const res = await pool.query(q, [topicId, end, start])
+        return res.rows
+    },
+
+    getPostsByRange: async function(topicId, start, end) {
+        const q = 'SELECT * from posts WHERE topicId = $1 ORDER BY created_at LIMIT $2 OFFSET $3';
+        const res = await pool.query(q, [topicId, end, start])
         return res.rows
     },
 
