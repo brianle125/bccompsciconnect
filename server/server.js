@@ -21,7 +21,7 @@ const io = new Server(server)
 const port = process.env.PORT || 8080;
 
 app.use(cors({
-  origin: "http://34.170.50.182/",
+  origin: "http://34.41.233.158",
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true, 
 }));
@@ -47,7 +47,7 @@ app.use(bodyParser.json());
 // app.get('/*', function(req, res) {
 //   res.sendFile(path.join(__dirname, '../frontend/dist/bccompsciconnect/browser/index.html'));
 // });
-app.use(express.static(path.join(__dirname, 'static')));
+// app.use(express.static(path.join(__dirname, 'static')));
 // app.get("/", (req, res) =>{
 //   res.sendFile(path.join(__dirname, "static/index.html"));
 // });
