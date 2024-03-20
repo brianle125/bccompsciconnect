@@ -9,7 +9,7 @@ import { Component, Input } from '@angular/core';
   styleUrl: './top-bar.component.css'
 })
 export class TopBarComponent {
-  loggedIn: boolean = true;
+  loggedIn: boolean = false;
   username: string = 'user'
   profilePic: string = 'assets/user.png'
   profileLink: string = ''
