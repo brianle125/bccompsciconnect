@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { PostListComponent } from '../post-list/post-list.component';
+import { FormattedTextComponent } from '../formatted-text/formatted-text.component';
 
 @Component({
   selector: 'app-topic',
   standalone: true,
-  imports: [PostListComponent],
+  imports: [PostListComponent, FormattedTextComponent],
   templateUrl: './topic.component.html',
   styleUrl: './topic.component.css'
 })
