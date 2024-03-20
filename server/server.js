@@ -47,7 +47,7 @@ app.use(bodyParser.json());
 // app.get('/*', function(req, res) {
 //   res.sendFile(path.join(__dirname, '../frontend/dist/bccompsciconnect/browser/index.html'));
 // });
-// app.use(express.static(path.join(__dirname, 'static')));
+app.use(express.static(path.join(__dirname, 'static')));
 // app.get("/", (req, res) =>{
 //   res.sendFile(path.join(__dirname, "static/index.html"));
 // });
@@ -246,6 +246,10 @@ app.put('/api/board/:boardId/topic/:topicId/edit', async(req, res) => {
   await db.helpers.editPost(postId, postText)
   res.redirect(302, `/api/board/${boardId}/topic/${topicId}`);
 })
+
+app.get("*", (req, res) =>{
+  res.sendFile(path.join(__dirname, "static/index.html"));
+});
 
 
 //TODO: Socket connection
