@@ -21,7 +21,7 @@ const io = new Server(server)
 const port = process.env.PORT || 8080;
 
 app.use(cors({
-  origin: "http://34.41.233.158",
+  origin: "http://localhost:4200",
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true, 
 }));
@@ -103,6 +103,11 @@ app.post('/api/login', async (req, res) => {
     req.session.save();
     res.send({"status": "success"})
   }
+  else
+  {
+    console.log('Invalid password')
+    res.send({"status": "failed"})
+  }
 })
 
 
@@ -158,7 +163,6 @@ app.get('/api/board/:id/latest', async(req, res) => {
     console.log("Redirect or 404 here")
   }
 })
-
 
 
 app.post('/api/board', async (req, res) => {
