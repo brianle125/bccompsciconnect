@@ -10,8 +10,8 @@ var logger = require('morgan');
 // var usersRouter = require('./routes/users');
 
 var app = express();
-const cors = require('cors')
-const server = require('http').createServer(app)
+const cors = require("cors");
+const server = require("http").createServer(app);
 const fs = require("fs");
 //for future automatic refreshing
 const { Server } = require("socket.io")
@@ -40,7 +40,7 @@ app.use(session({
   httpOnly: false,
 }))
 
-app.use(logger('dev'));
+app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -97,14 +97,14 @@ app.get('/api/usercheck', async (req, res) => {
   let name = req.query.name
   let exists = false;
   const user = await db.helpers.getUser(name);
-  console.log('User length:' + user.length)
-  if(user.length !== 0) {
+  console.log("User length:" + user.length);
+  if (user.length !== 0) {
     exists = true;
   }
   res.json({
-    exists: exists
-  })
-})
+    exists: exists,
+  });
+});
 
 
 
@@ -118,36 +118,35 @@ app.get('/api/boards', isLoggedIn, async (req, res) => {
 
 app.get('/api/board', async (req, res) => {
   const boards = await db.helpers.getBoards();
-  res.json(boards)
-})
+  res.json(boards);
+});
 
 // Either id based params (the easy way) or hard coded board topics into url (e.g. /java or /algorithms, etc)
 app.get('/api/board/:id', async(req, res) => {
   try {
-    let id = req.params.id
+    let id = req.params.id;
 
     // i.e. /board/:id/?page=<number>
-    let page = req.query.page
+    let page = req.query.page;
     let offset = 0;
     let range = 100;
 
     //if there is a page number query grab associated topics
-    if(Object.keys(req.query).length !== 0) {
+    if (Object.keys(req.query).length !== 0) {
       offset = (page - 1) * 10;
       range = page * 10;
     }
-    
-    const board = await db.helpers.getBoard(id)
+
+    const board = await db.helpers.getBoard(id);
     const topics = await db.helpers.getTopicsByRange(id, offset, range);
     res.json({
       board: board,
-      topics: topics
-    })
+      topics: topics,
+    });
   } catch (err) {
-    console.log("Redirect or 404 here")
+    console.log("Redirect or 404 here");
   }
-  
-})
+});
 
 app.get('/api/board/:id/latest', async(req, res) => {
   try {
@@ -155,16 +154,16 @@ app.get('/api/board/:id/latest', async(req, res) => {
     let range = 10;
     let offset = 0;
 
-    const board = await db.helpers.getBoard(id)
+    const board = await db.helpers.getBoard(id);
     const topics = await db.helpers.getTopicsByRange(id, offset, range);
     res.json({
       board: board,
-      topics: topics
-    })
+      topics: topics,
+    });
   } catch (err) {
-    console.log("Redirect or 404 here")
+    console.log("Redirect or 404 here");
   }
-})
+});
 
 
 app.post('/api/board', async (req, res) => {
@@ -194,14 +193,14 @@ app.delete('/api/board/:boardId', async (req, res) => {
 
 app.post('/api/board/:boardId', async (req, res) => {
   let boardId = req.params.boardId;
-  let question = req.body.question
+  let question = req.body.question;
   await db.helpers.addTopic(boardId, question);
   res.redirect(`/api/board/${boardId}`)
 })
 
 app.post('/api/board/:boardId/latest', async (req, res) => {
   let boardId = req.params.boardId;
-  let question = req.body.question
+  let question = req.body.question;
   await db.helpers.addTopic(boardId, question);
   res.redirect(`/api/board/${boardId}`)
 })
@@ -218,9 +217,9 @@ app.get('/api/board/:boardId/topic/:topicId', async (req, res) => {
   res.json({
     topic: topic,
     posts: posts,
-    postCount: postCount.rows[0].count
-  })
-})
+    postCount: postCount.rows[0].count,
+  });
+});
 
 app.delete('/api/board/:boardId/topic/:topicId', async (req, res) => {
   let boardId = req.params.boardId;
@@ -240,7 +239,7 @@ app.post('/api/board/:boardId/topic/:topicId', async(req, res) => {
 //CHANGING THESE ENDPOINTS LATER IF NEEDED
 app.delete('/api/board/:boardId/topic/:topicId/delete', async(req, res) => {
   let boardId = req.params.boardId;
-  let topicId = req.params.topicId
+  let topicId = req.params.topicId;
   let postId = req.body.postId;
   await db.helpers.deletePost(postId);
   res.redirect(302, `/api/board/${boardId}/topic/${topicId}`);
@@ -248,7 +247,7 @@ app.delete('/api/board/:boardId/topic/:topicId/delete', async(req, res) => {
 
 app.put('/api/board/:boardId/topic/:topicId/edit', async(req, res) => {
   let boardId = req.params.boardId;
-  let topicId = req.params.topicId
+  let topicId = req.params.topicId;
 
   let postId = req.body.postId;
   let postText = req.body.text;
@@ -293,21 +292,20 @@ function isLoggedIn(req, res, next) {
   }
 }
 
-
 // Initialize the database
 async function InitDB() {
-  await db.helpers.init()
-  console.log("Successfully init db")
+  await db.helpers.init();
+  console.log("Successfully init db");
 }
 
-InitDB().then(() => {
-  app.listen(port, () => {
-    console.log(`Listening on port ${port}`)
+InitDB()
+  .then(() => {
+    app.listen(port, () => {
+      console.log(`Listening on port ${port}`);
+    });
   })
-})
-.catch((err) => { console.log(err)})
-
-
-
+  .catch((err) => {
+    console.log(err);
+  });
 
 module.exports = app;
