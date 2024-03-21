@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { api } from './common-strings';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TopicService {
   constructor(private http: HttpClient) { }
@@ -16,7 +16,4 @@ export class TopicService {
     console.log(topic)
     return this.http.post<any>(`${api}/board/${topic.boardId}/addtopic`, topic,  {withCredentials: true});
   }
-
-
-
 }
