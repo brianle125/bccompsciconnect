@@ -3,11 +3,12 @@ import { Component } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService } from '../user.service';
+import { TopBarComponent } from '../top-bar/top-bar.component';
 
 @Component({
   selector: 'app-registration',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, TopBarComponent],
   templateUrl: './registration.component.html',
   styleUrl: './registration.component.css'
 })
@@ -36,6 +37,7 @@ export class RegistrationComponent {
         this.router.navigate(['/register'])
       } 
       else {
+        console.log("ADDING USER")
         this.userService.addUser(this.form.value).subscribe((data) => {
           this.router.navigate(['/']);
         })
