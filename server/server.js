@@ -169,7 +169,7 @@ app.post('/api/board', async (req, res) => {
   let boardTitle = req.body.boardTitle;
   let boardDescription = req.body.boardDescription;
   const board = await db.helpers.addBoard(boardTitle, boardDescription);
-  res.redirect(303, '/board')
+  res.redirect(303, '/api/boards')
 })
 
 app.put('/api/board/:boardId', async (req, res) => {
