@@ -266,12 +266,13 @@ app.put('/api/board/:boardId/topic/:topicId/edit', async(req, res) => {
 
 function isLoggedIn(req, res, next) {
   if(req.session.user) {
+    //permit the user the resource
     console.log('Logged in.')
     next()
   }
   else
   {
-    //some login redirect
+    //Otherwise send response to frontend; todo
     console.log('Not logged in.')
     next()
   }
