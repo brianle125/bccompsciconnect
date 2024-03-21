@@ -1,2 +1,23 @@
-<p>topic works!</p>
+<div *ngFor="let topic of topics">
+    <h2>{{ topic.title }}</h2>
+    <h4>{{ topic.description }}</h4>
+</div>
+
+<form>
+    <h1>BCCompsciConnect</h1>
+    <h2>Login</h2>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+            <label for="exampleFormControlInput1" class="form-label">Username</label>
+            <input type="number" name="boardid" placeholder="BoardId :" formControlName="boardid" class="form-control"/>
+        </div>
+        <div class="mb-3">
+            <label for="exampleFormControlInput1" class="form-label">Password</label>
+            <input type="textarea" name="question" placeholder="Question :" formControlName="question" class="form-control"/>
+        </div>
+        <button class="btn btn-outline-primary" [disabled]="!form.valid">
+            Submit
+        </button>
+    </form>
+</form>
 

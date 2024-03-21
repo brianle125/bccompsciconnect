@@ -104,8 +104,8 @@ const helpers = {
     },
 
     addTopic: async function(boardid, question) {
-        const q = 'INSERT INTO topics VALUES(DEFAULT, $1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL)'
-        const res = await pool.query(q, [boardid, question])
+        const q = 'INSERT INTO topics (boardid, question, created_at, last_modified, latest_post) VALUES ($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL)';
+        const res = await pool.query(q, [boardid, question]);
     },
 
     editTopic: async function(boardid, question) {

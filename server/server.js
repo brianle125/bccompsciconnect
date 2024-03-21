@@ -258,6 +258,14 @@ app.get('/api/board/:boardId', async (req, res) => {
   res.json(topics);
 })
 
+app.post('/api/board/addtopic', async (req, res) => {
+  let boardid = Number(req.body.boardid);
+  let question = req.body.question;
+  console.log("HERE " + boardid + " question: " + question);
+  await db.helpers.addTopic(boardid, question)
+  res.redirect(303, '/');
+})
+
 
 //TODO: Socket connection
 
