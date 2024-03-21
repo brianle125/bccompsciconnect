@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common'
 import { Router } from '@angular/router';
 import { RouterLink } from '@angular/router';
-import { BoardService } from '../board.service';
+import { BoardResponse, BoardService } from '../board.service';
 
 @Component({
   selector: 'app-board-list',
@@ -15,25 +15,33 @@ import { BoardService } from '../board.service';
  * A list of boards for home-page
  */
 export class BoardList implements OnInit{
-  boards: any[]
   @Input() pages: PageBarData[] = [
     new PageBarData('Test', 'assets/page.png', 'Desc', 'board/0'), 
     new PageBarData('Test', 'assets/page.png', 'Desc', 'board/1'), 
     new PageBarData('Test', 'assets/page.png', 'Desc', 'board/2')
   ]
 
-  constructor(private router: Router, private boardService: BoardService) {
-    this.boards = []
-  }
+  constructor(private router: Router, private boardService: BoardService) {}
 
   ngOnInit(): void {
-    this.boardService.getBoards().subscribe((data) => {
-      this.boards = data as any[]
-      for(let i = 0; i < this.boards.length; i++) {
-        this.pages[i] = new PageBarData(this.boards[i].title, 'assets/page.png', this.boards[i].description, `board/${this.boards[i].id}`)
+    this.boardService.getBoards().subscribe({
+      next:(data) => {
+        let boards: PageBarData[] = []
+        data.forEach((val) => {
+          boards.push(new PageBarData(val.title, 'assets/page.png', val.description, `board/${val.id}`, Number.parseInt(val.ordering)))
+        })
+        boards.sort((a: PageBarData, b: PageBarData) => {
+          if(a.order < b.order) {
+            return -1
+          } else if(a.order > b.order) {
+            return 1
+          } else {
+            return 0
+          }
+        })
+        this.pages = boards
       }
     })
-    
   }
 }
 
@@ -42,7 +50,8 @@ export class PageBarData {
     public title: string = 'Title',
     public icon: string = 'assets/page.png',
     public description: string = 'Description',
-    public goToOnClick: string = ''
+    public goToOnClick: string = '',
+    public order: number = 0
   ) {}
 }
 

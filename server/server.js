@@ -167,14 +167,18 @@ app.get('/api/board/:id/latest', async(req, res) => {
 
 app.post('/api/board', async (req, res) => {
   let boardTitle = req.body.boardTitle;
-  const board = await db.helpers.addBoard(boardTitle);
-  res.redirect(303, '/board')
+  let boardDescription = req.body.boardDescription;
+  let ordering = req.body.ordering;
+  const board = await db.helpers.addBoard(boardTitle, boardDescription, ordering);
+  res.redirect(303, '/api/boards')
 })
 
 app.put('/api/board/:boardId', async (req, res) => {
   let boardId = req.params.boardId;
   let boardTitle = req.body.boardTitle;
-  await db.helpers.editBoard(boardId, boardTitle)
+  let boardDescription = req.body.boardDescription;
+  let ordering = req.body.ordering;
+  await db.helpers.editBoard(boardId, boardTitle, boardDescription, ordering)
   res.redirect(303, '/api/boards')
 })
 
