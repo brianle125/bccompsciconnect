@@ -251,6 +251,13 @@ app.put('/api/board/:boardId/topic/:topicId/edit', async(req, res) => {
   res.redirect(302, `/api/board/${boardId}/topic/${topicId}`);
 })
 
+//NOLAN NEW
+app.get('/api/board/:boardId', async (req, res) => {
+  let boardId = req.params.boardId;
+  const topics = await db.helpers.getTopic(boardId);
+  res.json(topics);
+})
+
 
 //TODO: Socket connection
 

@@ -11,4 +11,5 @@ export const routes: Routes = [
     {path:'board/:board-id/topic/:topic-id', component:TopicComponent},
     {path: 'login', component: LoginComponent},
     {path: 'register', component: RegistrationComponent},
+    {path: 'topic', component: TopicComponent},
 ];
