@@ -30,6 +30,15 @@ export class BoardList implements OnInit{
         data.forEach((val) => {
           boards.push(new PageBarData(val.title, 'assets/page.png', val.description, `board/${val.id}`, Number.parseInt(val.ordering)))
         })
+        boards.sort((a: PageBarData, b: PageBarData) => {
+          if(a.order < b.order) {
+            return -1
+          } else if(a.order > b.order) {
+            return 1
+          } else {
+            return 0
+          }
+        })
         this.pages = boards
       }
     })
