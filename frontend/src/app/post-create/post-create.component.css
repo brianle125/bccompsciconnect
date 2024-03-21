@@ -1,0 +1,40 @@
+/* Styles for the form itself */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Adjust the space between form elements */
+  max-width: 500px; /* Or any other max-width or width */
+  margin: auto; /* Center the form */
+}
+
+/* Styles for the textarea */
+textarea {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc; /* Light grey border */
+  resize: vertical; /* Allow only vertical resizing */
+  min-height: 100px; /* Minimum height */
+  font-family: Arial, sans-serif; /* Use a common font stack */
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #007bff; /* Focus color - Bootstrap primary blue */
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Slight glow effect */
+}
+
+/* Styles for the submit button */
+button {
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  background-color: #007bff; /* Bootstrap primary blue */
+  color: white; /* White text */
+  cursor: pointer; /* Pointer cursor on hover */
+  font-size: 16px; /* Slightly larger font size */
+  transition: background-color 0.2s; /* Smooth background color transition */
+}
+
+button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}

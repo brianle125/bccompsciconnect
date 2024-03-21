@@ -15,7 +15,7 @@ export class UserService {
   }
 
   addUser(user: any) {
-    return this.http.post<any>(`${api}/register`, user, {observe: 'response', withCredentials: true});
+    return this.http.post<any>(`${api}/register`, user, {withCredentials: true});
   }
 
   loginUser(user: any) {

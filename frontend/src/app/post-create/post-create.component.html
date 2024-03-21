@@ -1,0 +1,7 @@
+<p>post-create works!</p>
+
+<form (ngSubmit)="onSubmit(form)" #form="ngForm">
+  <label> Write your message</label>
+  <textarea name="body" ngModel required></textarea>
+  <button type="submit">Post message to this topic</button>
+</form>

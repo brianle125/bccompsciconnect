@@ -19,7 +19,7 @@ export class BoardService {
   }
 
   getBoard(id: any) {
-    return this.http.get<any>(`${api}/board/${id}`, {withCredentials: true })
+    return this.http.get<any>(`${api}/board/${id}`, { withCredentials: true })
   }
 
   addBoard(title: string, description: string, ordering: number) {
