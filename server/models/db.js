@@ -5,10 +5,9 @@ const { Connector } = require("@google-cloud/cloud-sql-connector");
 
 const pool = new Pool({
   user: "postgres",
-  host: "localhost",
+  host: "localhost" || process.env.DB_HOST,
   database: "testing",
-  password: "Ntare100",
-  port: 5432,
+  password: process.env.LOCAL_PASS,
 });
 
 const helpers = {
@@ -111,16 +110,10 @@ const helpers = {
     return res.rows;
   },
 
-  addTopic: async function (boardid, question) {
-    const q =
-      "INSERT INTO topics VALUES(DEFAULT, $1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL)";
-    const res = await pool.query(q, [boardid, question]);
+  addTopic: async function(boardid, question) {
+      const q = 'INSERT INTO topics VALUES (DEFAULT, $1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL)';
+      const res = await pool.query(q, [boardid, question]);
   },
-
-    addTopic: async function(boardid, question) {
-        const q = 'INSERT INTO topics (boardid, question, created_at, last_modified, latest_post) VALUES ($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL)';
-        const res = await pool.query(q, [boardid, question]);
-    },
 
   deleteTopic: async function (topicId) {
     const q = "DELETE FROM topics WHERE id = $1";
