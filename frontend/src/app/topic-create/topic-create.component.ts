@@ -20,6 +20,7 @@ export class TopicCreateComponent {
     const boardId = Number(routeParams.get('board-id'));
 
 
+
     if (form.valid) {
       const newTopic: Topic = {
         question: form.value.question,
@@ -29,6 +30,7 @@ export class TopicCreateComponent {
       this.topicService.addTopic(newTopic).subscribe({
         next: (topic) => {
           console.log('Topic created', topic);
+          this.router.navigate([`/board/${boardId}`]);
         },
         error: (error) => {
           console.error('There was an error!', error);

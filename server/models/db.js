@@ -5,10 +5,9 @@ const { Connector } = require("@google-cloud/cloud-sql-connector");
 
 const pool = new Pool({
   user: "postgres",
-  host: "localhost",
+  host: "localhost" || process.env.DB_HOST,
   database: "testing",
-  password: "Ntare100",
-  port: 5432,
+  password: process.env.LOCAL_PASS,
 });
 
 const helpers = {
