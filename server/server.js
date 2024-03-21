@@ -20,22 +20,24 @@ const jwt = require('jsonwebtoken')
 const io = new Server(server)
 const port = process.env.PORT || 8080;
 
-app.use(cors({
+const corsOptions = cors({
   origin: "http://localhost:4200",
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  // allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true, 
-}));
+})
+
+app.use(corsOptions);
+app.options('*', corsOptions)
 
 app.use(cookieParser('secret'));
 
 app.use(session({
-  cookie: { secure: false, sameSite: 'none' },
+  cookie: { maxAge: 1000*60*60 },
   name: 'session',
   secret: 'secret',
   resave: false,
   saveUninitialized: true,
-  httpOnly:false,
-  maxAge: 1000*60*60,
+  httpOnly: false,
 }))
 
 app.use(logger('dev'));
@@ -60,8 +62,11 @@ app.post('/api/register', async (req, res) => {
   let password = req.body.password
 
   await db.helpers.addUser(name, email, password, 'user');
-  res.redirect(303, '/');
 })
+
+// app.get('/login', async (req, res) => {
+//   req.session.user ? res.status(200).send({loggedIn: true}) : res.status(200).send({loggedIn: false});
+// })
 
 app.post('/api/login', async (req, res) => {
   let username = req.body.name
@@ -88,13 +93,6 @@ app.post('/api/login', async (req, res) => {
   }
 })
 
-
-app.get('/api/boards', async (req, res) => {
-  console.log(req.session.user)
-  const boards = await db.helpers.getBoards();
-  res.json(boards)
-})
-
 app.get('/api/usercheck', async (req, res) => {
   let name = req.query.name
   let exists = false;
@@ -111,6 +109,12 @@ app.get('/api/usercheck', async (req, res) => {
 
 
 // BOARDS //
+
+app.get('/api/boards', isLoggedIn, async (req, res) => {
+  console.log(req.session.user)
+  const boards = await db.helpers.getBoards();
+  res.json(boards)
+})
 
 app.get('/api/board', async (req, res) => {
   const boards = await db.helpers.getBoards();
@@ -166,7 +170,6 @@ app.get('/api/board/:id/latest', async(req, res) => {
 app.post('/api/board', async (req, res) => {
   let boardTitle = req.body.boardTitle;
   const board = await db.helpers.addBoard(boardTitle);
-  res.redirect(303, '/board')
 })
 
 app.put('/api/board/:boardId', async (req, res) => {
@@ -258,11 +261,14 @@ app.put('/api/board/:boardId/topic/:topicId/edit', async(req, res) => {
 
 function isLoggedIn(req, res, next) {
   if(req.session.user) {
+    console.log('Logged in.')
     next()
   }
   else
   {
     //some login redirect
+    console.log('Not logged in.')
+    next()
   }
 }
 

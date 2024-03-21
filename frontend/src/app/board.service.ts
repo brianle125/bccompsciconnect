@@ -9,11 +9,11 @@ export class BoardService {
   constructor(private http: HttpClient) { }
 
   getBoards() {
-    return this.http.get<any[]>(`${api}/boards`, {withCredentials: true })
+    return this.http.get<any[]>(`${api}/boards`, { withCredentials: true })
   }
 
   getBoard(id: any) {
-    return this.http.get<any>(`${api}/board/${id}`, {withCredentials: true })
+    return this.http.get<any>(`${api}/board/${id}`, { withCredentials: true })
   }
 
   //probably move this to another service file if needed

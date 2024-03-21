@@ -39,8 +39,8 @@ export class RegistrationComponent {
       else {
         console.log("ADDING USER")
         this.userService.addUser(this.form.value).subscribe((data) => {
-          this.router.navigate(['/']);
         })
+        this.router.navigate(['/']);
       }
     })
 
