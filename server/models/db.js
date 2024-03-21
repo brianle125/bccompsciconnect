@@ -11,19 +11,14 @@ const pool = new Pool({
 });
 
 const helpers = {
-  //database queries
-  init: async function () {
-    //create tables
-    const board =
-      "CREATE TABLE IF NOT EXISTS boards (id SERIAL, title character varying(255), description varchar(255), PRIMARY KEY(id))";
-    const topics =
-      "CREATE TABLE IF NOT EXISTS topics (id SERIAL, boardid integer, question varchar(1000), created_at timestamp, last_modified timestamp, latest_post timestamp, PRIMARY KEY(id), CONSTRAINT fk_board FOREIGN KEY (boardid) REFERENCES boards(id) ON DELETE CASCADE)";
-    const users =
-      "CREATE TABLE IF NOT EXISTS users (id SERIAL, username varchar(255), email varchar(255), password varchar(1000), role varchar(255), created_at timestamp, PRIMARY KEY(id))";
-    const posts =
-      "CREATE TABLE IF NOT EXISTS posts (id SERIAL, topicid integer, body text, status varchar(255), created_at timestamp, last_modified timestamp, PRIMARY KEY(id), CONSTRAINT fk_topic FOREIGN KEY(topicid) REFERENCES topics(id) ON DELETE CASCADE)";
-    const login =
-      "CREATE TABLE IF NOT EXISTS login (id SERIAL, username varchar(255), password varchar(1000), PRIMARY KEY(id))";
+    //database queries
+    init: async function() {
+        //create tables
+        const board = 'CREATE TABLE IF NOT EXISTS boards (id SERIAL, title character varying(255), description varchar(255), ordering integer, PRIMARY KEY(id))'
+        const topics = 'CREATE TABLE IF NOT EXISTS topics (id SERIAL, boardid integer, question varchar(1000), created_at timestamp, last_modified timestamp, latest_post timestamp, PRIMARY KEY(id), CONSTRAINT fk_board FOREIGN KEY (boardid) REFERENCES boards(id) ON DELETE CASCADE)'
+        const users = 'CREATE TABLE IF NOT EXISTS users (id SERIAL, username varchar(255), email varchar(255), password varchar(1000), role varchar(255), created_at timestamp, PRIMARY KEY(id))'
+        const posts = 'CREATE TABLE IF NOT EXISTS posts (id SERIAL, topicid integer, body text, status varchar(255), created_at timestamp, last_modified timestamp, PRIMARY KEY(id), CONSTRAINT fk_topic FOREIGN KEY(topicid) REFERENCES topics(id) ON DELETE CASCADE)'
+        const login = 'CREATE TABLE IF NOT EXISTS login (id SERIAL, username varchar(255), password varchar(1000), PRIMARY KEY(id))'
 
     //call queries
     await pool.query(board);
@@ -65,18 +60,17 @@ const helpers = {
     return res.rows[0];
   },
 
-  //Add a board
-  addBoard: async function (boardTitle) {
-    const res = await pool.query("INSERT INTO boards VALUES (DEFAULT, $1)", [
-      boardTitle,
-    ]);
-  },
+    //Add a board
+    addBoard: async function(boardTitle, boardDescription, ordering) {
+        // const res = await pool.query('INSERT INTO boards VALUES (DEFAULT, $1)', [boardTitle]);
+        const res = await pool.query('INSERT INTO boards(id, title, description, ordering) VALUES (DEFAULT, $1, $2, $3)', [boardTitle, boardDescription, ordering]);
+    },
 
-  //Edit a board
-  editBoard: async function (boardId, boardTitle) {
-    const q = "UPDATE boards SET title = $1 WHERE id = $2";
-    const res = await pool.query(q, [boardTitle, boardId]);
-  },
+    //Edit a board
+    editBoard: async function(boardId, boardTitle, boardDescription, ordering) {
+        const q = 'UPDATE boards SET title = $1 description = $2 ordering = $3 WHERE id = $2';
+        const res = await pool.query(q, [boardTitle, boardDescription, ordering,boardId]);
+    },
 
   //Delete a board
   deleteBoard: async function (boardId) {
