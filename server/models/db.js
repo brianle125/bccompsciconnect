@@ -61,8 +61,9 @@ const helpers = {
     },
 
     //Add a board
-    addBoard: async function(boardTitle) {
-        const res = await pool.query('INSERT INTO boards VALUES (DEFAULT, $1)', [boardTitle]);
+    addBoard: async function(boardTitle, boardDescription) {
+        // const res = await pool.query('INSERT INTO boards VALUES (DEFAULT, $1)', [boardTitle]);
+        const res = await pool.query('INSERT INTO boards(id, title, description) VALUES (DEFAULT, $1, $2)', [boardTitle, boardDescription]);
     },
 
     //Edit a board
