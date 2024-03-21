@@ -28,7 +28,7 @@ export class LoginComponent {
     this.userService.loginUser(this.form.value).subscribe((data) => {
       let response = data as any;
       console.log(response)
-      if(response.body.status === "success") {
+      if(response.status === "success") {
         this.router.navigate(['/'])
       }
     })

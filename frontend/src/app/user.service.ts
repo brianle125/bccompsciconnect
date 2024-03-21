@@ -14,10 +14,10 @@ export class UserService {
   }
 
   addUser(user: any) {
-    return this.http.post<any>(`${this.api}/register`, user, {observe: 'response', withCredentials: true});
+    return this.http.post<any>(`${this.api}/register`, user, {withCredentials: true});
   }
 
   loginUser(user: any) {
-    return this.http.post<any>(`${this.api}/login`, user, {observe: 'response', withCredentials: true});
+    return this.http.post<any>(`${this.api}/login`, user, {withCredentials: true});
   }
 }

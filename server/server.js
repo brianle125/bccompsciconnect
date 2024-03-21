@@ -21,7 +21,7 @@ const io = new Server(server)
 const port = process.env.PORT || 8080;
 
 app.use(cors({
-  origin: "http://34.41.233.158",
+  origin: true,
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true, 
 }));
@@ -34,6 +34,7 @@ app.use(session({
   secret: 'secret',
   resave: false,
   saveUninitialized: true,
+  httpOnly:false,
   maxAge: 1000*60*60,
 }))
 
@@ -47,33 +48,11 @@ app.use(bodyParser.json());
 // app.get('/*', function(req, res) {
 //   res.sendFile(path.join(__dirname, '../frontend/dist/bccompsciconnect/browser/index.html'));
 // });
-app.use(express.static(path.join(__dirname, 'static')));
-// app.get("/", (req, res) =>{
-//   res.sendFile(path.join(__dirname, "static/index.html"));
-// });
+// app.use(express.static(path.join(__dirname, 'static')));
 
 // internal modules
 const db = require('./models/db')
 
-
-app.get('/api/boards', async (req, res) => {
-  console.log(req.session.user)
-  const boards = await db.helpers.getBoards();
-  res.json(boards)
-})
-
-app.get('/api/usercheck', async (req, res) => {
-  let name = req.query.name
-  let exists = false;
-  const user = await db.helpers.getUser(name);
-  console.log('User length:' + user.length)
-  if(user.length !== 0) {
-    exists = true;
-  }
-  res.json({
-    exists: exists
-  })
-})
 
 app.post('/api/register', async (req, res) => {
   let name = req.body.name;
@@ -97,12 +76,31 @@ app.post('/api/login', async (req, res) => {
   else if(username === targetUser[0].username && password === targetUser[0].password)
   {
     req.session.user = {username: username, password: password}
-    if(req.session.user) {
-      console.log(req.session.id)
-    }
+    console.log(req.session.id)
+    req.session.loggedIn = true;
     req.session.save();
     res.send({"status": "success"})
   }
+})
+
+
+app.get('/api/boards', async (req, res) => {
+  console.log(req.session.user)
+  const boards = await db.helpers.getBoards();
+  res.json(boards)
+})
+
+app.get('/api/usercheck', async (req, res) => {
+  let name = req.query.name
+  let exists = false;
+  const user = await db.helpers.getUser(name);
+  console.log('User length:' + user.length)
+  if(user.length !== 0) {
+    exists = true;
+  }
+  res.json({
+    exists: exists
+  })
 })
 
 
@@ -247,9 +245,9 @@ app.put('/api/board/:boardId/topic/:topicId/edit', async(req, res) => {
   res.redirect(302, `/api/board/${boardId}/topic/${topicId}`);
 })
 
-app.get("*", (req, res) =>{
-  res.sendFile(path.join(__dirname, "static/index.html"));
-});
+// app.get("*", (req, res) =>{
+//   res.sendFile(path.join(__dirname, "static/index.html"));
+// });
 
 
 //TODO: Socket connection
