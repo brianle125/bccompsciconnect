@@ -1,0 +1,26 @@
+<header class="col-sm-12">
+
+    <h1><a href="/">BcCompSciConnect</a></h1>
+    <a *ngIf="!loggedIn" class="top-bar-button btn btn-secondary" href="register">register</a>
+    <a *ngIf="!loggedIn" class="top-bar-button btn btn-primary" href="login">login</a>
+
+    <a *ngIf="loggedIn" class="top-bar-button btn btn-secondary" href="register">logout</a>
+    <div *ngIf="loggedIn" class="profile">
+        <a [href]="profileLink" class="profile-pic-link">
+            <div class="pic-frame">
+                <img class="profile-pic" [src]="profilePic" [alt]="username">
+            </div>
+        </a>
+        <a [href]="profileLink" class="profile-link">{{username}}</a>
+    </div>
+    <div *ngIf="loggedIn" class="messages">
+        <a [href]="messagesLink" class="profile-pic-link">
+            <div class="pic-frame">
+                <img class="profile-pic" src="assets/bell.png" alt="messages">
+            </div>
+        </a>
+        <a [href]="messagesLink" class="profile-link">messages ({{numUnReads}})</a>
+    </div>
+
+    
+</header>

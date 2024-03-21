@@ -1,1 +1,3 @@
 page.png: https://www.flaticon.com/free-icon/page_1250680
+user.png: https://www.flaticon.com/free-icon/user_456212
+bell.png: https://www.flaticon.com/free-icon/bell_2529521?term=notification+bell&page=1&position=3&origin=tag&related_id=2529521

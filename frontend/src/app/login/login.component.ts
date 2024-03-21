@@ -4,11 +4,12 @@ import { Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UserService } from '../user.service';
 import { CommonModule } from '@angular/common';
+import { TopBarComponent } from '../top-bar/top-bar.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, TopBarComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
