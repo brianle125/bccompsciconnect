@@ -116,11 +116,10 @@ const helpers = {
     const res = await pool.query(q, [boardid, question]);
   },
 
-  editTopic: async function (boardid, question) {
-    const q =
-      "UPDATE topics SET question = $1, last_modified=CURRENT_TIMESTAMP WHERE id = $2";
-    const res = await pool.query(q, [question, boardid]);
-  },
+    addTopic: async function(boardid, question) {
+        const q = 'INSERT INTO topics (boardid, question, created_at, last_modified, latest_post) VALUES ($1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL)';
+        const res = await pool.query(q, [boardid, question]);
+    },
 
   deleteTopic: async function (topicId) {
     const q = "DELETE FROM topics WHERE id = $1";

@@ -257,6 +257,21 @@ app.put('/api/board/:boardId/topic/:topicId/edit', async(req, res) => {
   res.redirect(302, `/api/board/${boardId}/topic/${topicId}`);
 })
 
+//NOLAN NEW
+app.get('/api/board/:boardId', async (req, res) => {
+  let boardId = req.params.boardId;
+  const topics = await db.helpers.getTopic(boardId);
+  res.json(topics);
+})
+
+app.post('/api/board/addtopic', async (req, res) => {
+  let boardid = Number(req.body.boardid);
+  let question = req.body.question;
+  console.log("HERE " + boardid + " question: " + question);
+  await db.helpers.addTopic(boardid, question)
+  res.redirect(303, '/');
+})
+
 // app.get("*", (req, res) =>{
 //   res.sendFile(path.join(__dirname, "static/index.html"));
 // });
