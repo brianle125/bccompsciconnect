@@ -6,7 +6,12 @@ import { api } from './common-strings'
   providedIn: 'root'
 })
 export class BoardService {
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) { 
+    // put service in console for debugging
+    console.log('injecting BoardService into window')
+    let temp: any = window as any
+    temp['BoardService'] = this;
+  }
 
   getBoards() {
     return this.http.get<any[]>(`${api}/boards`, {withCredentials: true })
