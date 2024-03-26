@@ -1,7 +1,9 @@
 {
   "dependencies": {
+    "@datastructures-js/queue": "^4.2.3",
     "@google-cloud/cloud-sql-connector": "^1.2.3",
     "jsonwebtoken": "^9.0.2",
+    "marked": "^12.0.1",
     "socket-io": "^1.0.0",
     "socket.io": "^4.7.4",
     "tedious": "^18.1.0"
