@@ -5,11 +5,13 @@ import { TopicComponent } from './topic/topic.component';
 import { LoginComponent } from './login/login.component';
 import { RegistrationComponent } from './registration/registration.component';
 import { TopicCreateComponent } from './topic-create/topic-create.component';
+import { CreatePostComponent } from './create-post/create-post.component';
 
 export const routes: Routes = [
   { path: '', component: HomePageComponent },
   { path: 'board/:board-id', component: BoardComponent },
   { path: 'board/:board-id/topic/:topic-id', component: TopicComponent },
+  { path: 'board/:board-id/topic/:topic-id/create-post', component: CreatePostComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegistrationComponent },
   { path: 'create-topic', component: TopicCreateComponent },
