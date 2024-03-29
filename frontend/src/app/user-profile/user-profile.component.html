@@ -1,0 +1,17 @@
+<app-top-bar></app-top-bar>
+<h1>{{ userData.username }}</h1>
+<div class="profile">
+    <div class="col-sm-2">
+        <div class="image-profile">
+            <img src="{{ userData.icon }}" class="icon">   
+        </div>
+        <p>{{userData.email || 'none' }}</p>
+        <p>View posts</p>
+    </div>
+    <div class="col-sm-10 description">
+        <p>{{userData.description}}</p>
+    </div>
+</div>
+<div *ngIf="user">
+    <app-user-edit></app-user-edit>
+</div>

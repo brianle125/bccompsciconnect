@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TopicListComponent } from '../topic-list/topic-list.component';
 import { TopicCreateComponent } from '../topic-create/topic-create.component';
 import { TopBarComponent } from '../top-bar/top-bar.component';
+import { BoardService } from '../board.service';
 
 @Component({
   selector: 'app-board',
@@ -14,10 +15,19 @@ import { TopBarComponent } from '../top-bar/top-bar.component';
 /**
  * The main page for a board
  */
-export class BoardComponent {
+export class BoardComponent implements OnInit {
   // constructor for the route that creates topics
-  constructor(private router: Router) {}
+  constructor(private boardService : BoardService, private route: ActivatedRoute, private router: Router) {}
 
+  ngOnInit(): void {
+    const routeParams = this.route.snapshot.paramMap;
+    const boardId = Number(routeParams.get('board-id'));
+
+    //Get board title and description for display
+    this.boardService.getBoard(boardId)
+
+  }
+  
   navigateToTopicCreate() {
     this.router.navigate(['/create-topic']);
   }

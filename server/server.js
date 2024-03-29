@@ -17,11 +17,16 @@ const fs = require("fs");
 const { Server } = require("socket.io")
 const jwt = require('jsonwebtoken')
 
-const io = new Server(server)
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:4200',
+    methods:['GET','POST']
+  }
+})
 const port = process.env.PORT || 8080;
 
 const corsOptions = cors({
-  origin: "http://localhost:4200",
+  origin: ["bccompsciconnect-server-4w7ddycrna-uc.a.run.app", "http://localhost:4200"],
   // allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true, 
 })
@@ -44,17 +49,19 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-//app.use('/', express.static(path.join(__dirname, 'public'), { index: ['index.html'] }));
-
-// app.use('/', express.static(path.join(__dirname, '../frontend/dist/bccompsciconnect/browser')));
-// app.get('/*', function(req, res) {
-//   res.sendFile(path.join(__dirname, '../frontend/dist/bccompsciconnect/browser/index.html'));
-// });
 // app.use(express.static(path.join(__dirname, 'static')));
 
 // internal modules
 const db = require('./models/db')
 
+//Sockets
+io.on('connection', (socket) => {
+  console.log("a user connected")
+  //send client updates
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
+})
 
 app.post('/api/register', async (req, res) => {
   let name = req.body.name;
@@ -64,9 +71,9 @@ app.post('/api/register', async (req, res) => {
   await db.helpers.addUser(name, email, password, 'user');
 })
 
-// app.get('/login', async (req, res) => {
-//   req.session.user ? res.status(200).send({loggedIn: true}) : res.status(200).send({loggedIn: false});
-// })
+app.get('/api/login', async (req, res) => {
+  req.session.user ? res.status(200).send({loggedIn: true}) : res.status(200).send({loggedIn: false});
+})
 
 app.post('/api/login', async (req, res) => {
   let username = req.body.name
@@ -80,7 +87,7 @@ app.post('/api/login', async (req, res) => {
   }
   else if(username === targetUser[0].username && password === targetUser[0].password)
   {
-    req.session.user = {username: username, password: password}
+    req.session.user = {username: username}
     console.log(req.session.id)
     req.session.loggedIn = true;
     req.session.save();
@@ -90,6 +97,13 @@ app.post('/api/login', async (req, res) => {
   {
     console.log('Invalid password')
     res.send({"status": "failed"})
+  }
+})
+
+app.get('/api/logout', async (req, res) => {
+  if(req.session.user) {
+    req.session.destroy();
+    res.send({"status": "loggedout"})
   }
 })
 
@@ -106,12 +120,27 @@ app.get('/api/usercheck', async (req, res) => {
   });
 });
 
+// USERS //
+
+app.get('/api/user/:username', async (req, res) => {
+  let username = req.params.username
+  const user = await db.helpers.getUser(username);
+  res.json(user);
+})
+
+app.put('/api/user/:username', async (req, res) => {
+  let username = req.params.username
+  let email = req.body.email
+  let password = req.body.password
+  let description = req.body.description
+
+  const user = await db.helpers.editUser(username, email, password, description);
+})
 
 
 // BOARDS //
 
-app.get('/api/boards', isLoggedIn, async (req, res) => {
-  console.log(req.session.user)
+app.get('/api/boards', async (req, res) => {
   const boards = await db.helpers.getBoards();
   res.json(boards)
 })
@@ -171,7 +200,6 @@ app.post('/api/board', async (req, res) => {
   let boardDescription = req.body.boardDescription;
   let ordering = req.body.ordering;
   const board = await db.helpers.addBoard(boardTitle, boardDescription, ordering);
-  res.redirect(303, '/api/boards')
 })
 
 app.put('/api/board/:boardId', async (req, res) => {
@@ -299,7 +327,7 @@ async function InitDB() {
 
 InitDB()
   .then(() => {
-    app.listen(port, () => {
+    server.listen(port, () => {
       console.log(`Listening on port ${port}`);
     });
   })

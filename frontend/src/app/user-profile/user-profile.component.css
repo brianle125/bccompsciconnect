@@ -1,0 +1,24 @@
+div {
+    border: 1px solid black;
+}
+
+.description {
+    display: flex;
+    min-height: 200px;
+}
+
+
+.profile {
+    min-height: 200px;
+}
+
+.image-profile {
+    float: center;
+    border: none;
+    max-width: 120px;
+}
+
+.icon {
+    max-width: 120px;
+    max-height: 120px;
+}

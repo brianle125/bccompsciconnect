@@ -19,8 +19,6 @@ export class TopicCreateComponent {
     const routeParams = this.route.snapshot.paramMap;
     const boardId = Number(routeParams.get('board-id'));
 
-
-
     if (form.valid) {
       const newTopic: Topic = {
         question: form.value.question,

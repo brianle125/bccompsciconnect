@@ -10,8 +10,16 @@ export class UserService {
   // api = 'http://localhost:8080/api';
   constructor(private http: HttpClient) { }
 
-  getUser(username: any) {
+  checkUserExists(username: any) {
     return this.http.get(`${api}/usercheck?name=${username}`, {withCredentials:true})
+  }
+
+  isLoggedIn() {
+    return this.http.get(`${api}/login`, {withCredentials: true})
+  }
+
+  getUser(username: any) {
+    return this.http.get(`${api}/user/${username}`, {withCredentials: true})
   }
 
   addUser(user: any) {

@@ -4,6 +4,7 @@ import { NgForm } from '@angular/forms';
 import { Message } from '../post-create/post-create.model';
 import { PostService } from '../post.service';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-post-create',
@@ -13,16 +14,19 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './post-create.component.css',
 })
 export class PostCreateComponent {
-  constructor(private postService: PostService) {}
+  constructor(private route: ActivatedRoute, private postService: PostService) {}
 
   onSubmit(form: NgForm) {
+    const routeParams = this.route.snapshot.paramMap;
+    const topicId = Number(routeParams.get('topic-id'));
+
     if (form.invalid) {
       return;
     }
     const newMessage: Message = {
       body: form.value.body,
       // Assign the other properties as needed
-      topicId: 1,
+      topicId: topicId,
       userId: 1,
       status: 'active',
     };
