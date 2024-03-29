@@ -54,6 +54,7 @@ app.use(bodyParser.json());
 
 // internal modules
 const db = require('./models/db')
+const helpers = require('./helpers')
 
 
 app.post('/api/register', async (req, res) => {
@@ -232,6 +233,7 @@ app.post('/api/board/:boardId/topic/:topicId', async(req, res) => {
   let boardId = req.params.boardId;
   let topicId = req.params.topicId
   let text = req.body.text
+  text = helpers.sanitizePost(text)
   await db.helpers.addPost(topicId, text)
   res.redirect(302, `/api/board/${boardId}/topic/${topicId}`);
 })
@@ -251,6 +253,7 @@ app.put('/api/board/:boardId/topic/:topicId/edit', async(req, res) => {
 
   let postId = req.body.postId;
   let postText = req.body.text;
+  postText = helpers.sanitizePost(postText)
 
   await db.helpers.editPost(postId, postText)
   res.redirect(302, `/api/board/${boardId}/topic/${topicId}`);
