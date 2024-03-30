@@ -1,6 +1,20 @@
-<form (ngSubmit)="onSubmit(form)" #form="ngForm">
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <label>Change username</label>
+    <input type="text" name="username" formControlName="username" value="Default"  required>
+    <div *ngIf="form.get('username')?.invalid && (form.get('username')?.dirty || form.get('username')?.touched)" id="errorDiv">
+        <div *ngIf="form.get('username')?.errors?.['required']">Name is required.</div>
+        <div *ngIf="form.get('username')?.errors?.['minlength']">Name must be at least 5 characters long.</div>
+    </div>
+    <label>Change email</label>
+    <input type="text" name="email" formControlName="email" required>
+    <div *ngIf="form.get('email')?.invalid && (form.get('email')?.dirty || form.get('email')?.touched)" id="errorDiv">
+        <div *ngIf="form.get('email')?.errors?.['required']">Email is required.</div>
+        <div *ngIf="form.get('email')?.errors?.['email']">Email must be valid.</div>
+    </div>
+    <label>Change password</label>
+    <input type="text" name="password" formControlName="password" required>
     <label>Edit bio</label>
-    <textarea name="question" ngModel required></textarea>
+    <textarea name="description" formControlName="description" ngModel required></textarea>
     <button type="submit">Save</button>
 </form>
   

@@ -6,6 +6,8 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser')
 var logger = require('morgan');
 
+
+
 // var indexRouter = require('./routes/index');
 // var usersRouter = require('./routes/users');
 
@@ -53,6 +55,54 @@ app.use(bodyParser.json());
 
 // internal modules
 const db = require('./models/db')
+
+
+////////////////////////////
+/*  Google AUTH  */
+ 
+var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+var passport = require('passport');
+var userProfile;
+ 
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser(function(user, cb) {
+  cb(null, user);
+});
+ 
+passport.deserializeUser(function(obj, cb) {
+  cb(null, obj);
+});
+
+passport.use(new GoogleStrategy({
+    clientID: '1076223145981-qe6hrco26qg188quchbsaffmf9q3requ.apps.googleusercontent.com',
+    clientSecret: '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',
+    callbackURL: "http://localhost:8080/api/google/callback"
+  },
+  function(accessToken, refreshToken, profile, done) {
+      userProfile=profile;
+      return done(null, userProfile);
+  }
+));
+app.get('/api/google', 
+  passport.authenticate('google', { scope : ['profile', 'email'] }));
+
+app.get('/api/google/error', (req, res) => {
+  res.send({"status": "failure"})
+})
+
+app.get('/api/google/callback', passport.authenticate('google', { failureRedirect: '/auth/google/error' }),
+  async (req, res) => {
+  // Successful authentication, redirect success.
+  console.log(userProfile.emails[0].value)
+  req.session.user = userProfile.displayName;
+  req.session.loggedIn = true;
+  req.session.save();
+  res.send({"status": "success"})
+});
+
+////////////////////////////
 
 //Sockets
 io.on('connection', (socket) => {

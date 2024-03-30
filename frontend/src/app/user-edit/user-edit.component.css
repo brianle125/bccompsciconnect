@@ -34,6 +34,18 @@ button {
   font-size: 16px;
 }
 
+#errorDiv {
+  background-color: rgba(255, 0, 0, 0.5);
+  box-shadow: 0 0 0 2px red;
+  color: white;
+  display: flex;
+  text-align: center;
+  border-radius: 3px;
+  justify-content: center;
+  padding: 5px;
+  margin: 5px;
+}
+
 button:hover {
   background-color: #0056b3;
 }

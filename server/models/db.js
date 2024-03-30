@@ -45,7 +45,7 @@ const helpers = {
   },
 
   addUser: async function (username, email, password, role) {
-    const q = `INSERT INTO users VALUES(DEFAULT, $1, $2, $3, '', $4)`;
+    const q = `INSERT INTO users VALUES(DEFAULT, $1, $2, $3, 'User has not changed bio', $4, CURRENT_TIMESTAMP)`;
     const query = await pool.query(q, [username, email, password, role]);
   },
 
