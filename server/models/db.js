@@ -153,9 +153,16 @@ const helpers = {
     return res.rows;
   },
 
-  addTopic: async function(boardid, question) {
-      const q = 'INSERT INTO topics VALUES (DEFAULT, $1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL)';
-      const res = await pool.query(q, [boardid, question]);
+  addTopic: async function(boardID, question, createdBy, body) {
+    try {
+      const createTopicQuery = `INSERT INTO topics VALUES (DEFAULT, $1, $2, $3, CURRENT_TIMESTAMP, NUll, CURRENT_TIMESTAMP) RETURNING id`
+      const createTopicRes = await pool.query(createTopicQuery, [boardID, question, createdBy]);
+      const topicID = createTopicRes.rows[0].id
+      const createPostQuery = `INSERT INTO posts VALUES (DEFAULT, $1, $2, $3, '', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`
+      const createPostRes = await pool.query(createPostQuery, [createdBy, topicID, body])
+    } catch(e) {
+      console.log(e)
+    }
   },
 
   deleteTopic: async function (topicId) {

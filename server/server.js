@@ -5,6 +5,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser')
 var logger = require('morgan');
+const joi = require('joi') // schema validation
 
 // var indexRouter = require('./routes/index');
 // var usersRouter = require('./routes/users');
@@ -192,17 +193,19 @@ app.delete('/api/board/:boardId', async (req, res) => {
 
 // TOPICS AND POSTS //
 
+// TODO: are these still needed
 app.post('/api/board/:boardId', async (req, res) => {
-  let boardId = req.params.boardId;
-  let question = req.body.question;
-  await db.helpers.addTopic(boardId, question);
+let boardId = req.params.boardId;
+let question = req.body.question;
+await db.helpers.addTopic(boardId, question, null);
   res.redirect(`/api/board/${boardId}`)
 })
 
+// TODO: are these still needed
 app.post('/api/board/:boardId/latest', async (req, res) => {
   let boardId = req.params.boardId;
   let question = req.body.question;
-  await db.helpers.addTopic(boardId, question);
+  await db.helpers.addTopic(boardId, question, null);
   res.redirect(`/api/board/${boardId}`)
 })
 
@@ -265,11 +268,25 @@ app.get('/api/board/:boardId', async (req, res) => {
   res.json(topics);
 })
 
-app.post('/api/board/:boardId/addtopic', async (req, res) => {
-  let boardid = req.body.boardId;
-  let question = req.body.question;
-  console.log("HERE " + boardid + " question: " + question);
-  await db.helpers.addTopic(boardid, question)
+const postTopicAndFirstPostSchema = joi.object({
+  boardid:joi.number().integer().required(),
+  question:joi.string().required(), // ie the title
+  created_by:joi.number().integer().required(),
+  body:joi.string().required(), // of the first post of the topic
+})
+
+app.post('/api/board/addtopic', async (req, res) => {
+  let valid = postTopicAndFirstPostSchema.validate(req.body)
+  if(valid.error == null) {
+    // let boardid = req.body.boardId;
+    // let question = req.body.question;
+    // console.log("HERE " + boardid + " question: " + question);
+    let body = req.body
+    await db.helpers.addTopic(body.boardid, body.question, body.created_by, body.body)
+    res.json({message:'success'})
+  } else {
+    res.status(400).json({error:{code:400, message:'invalid schema'}})
+  }
 })
 
 // app.get("*", (req, res) =>{
