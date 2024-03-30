@@ -278,9 +278,6 @@ const postTopicAndFirstPostSchema = joi.object({
 app.post('/api/board/addtopic', async (req, res) => {
   let valid = postTopicAndFirstPostSchema.validate(req.body)
   if(valid.error == null) {
-    // let boardid = req.body.boardId;
-    // let question = req.body.question;
-    // console.log("HERE " + boardid + " question: " + question);
     let body = req.body
     await db.helpers.addTopic(body.boardid, body.question, body.created_by, body.body)
     res.json({message:'success'})
