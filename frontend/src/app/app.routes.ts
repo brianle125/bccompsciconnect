@@ -4,7 +4,6 @@ import { BoardComponent } from './board/board.component';
 import { TopicComponent } from './topic/topic.component';
 import { LoginComponent } from './login/login.component';
 import { RegistrationComponent } from './registration/registration.component';
-import { TopicCreateComponent } from './topic-create/topic-create.component';
 import { CreatePostComponent } from './create-post/create-post.component';
 import { CreateTopicComponent } from './create-topic/create-topic.component';
 
@@ -16,5 +15,5 @@ export const routes: Routes = [
   { path: 'board/:board-id/create-topic', component: CreateTopicComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegistrationComponent },
-  { path: 'create-topic', component: TopicCreateComponent },
+  { path: 'create-topic', component: CreateTopicComponent },
 ];
