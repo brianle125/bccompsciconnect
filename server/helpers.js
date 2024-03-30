@@ -76,6 +76,4 @@ const helpers = {
     }
 }
 
-console.log(helpers.sanitizePost("<script>console.log(\"hello world\")</script> <markdown>hello world</markdown>>>s"))
-
 module.exports = helpers

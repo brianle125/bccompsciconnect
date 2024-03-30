@@ -22,11 +22,15 @@ const helpers = {
       PRIMARY KEY(id)
     )`
     const topics = `CREATE TABLE IF NOT EXISTS topics (
-      id SERIAL, boardid integer, question varchar(1000), 
+      id SERIAL, 
+      boardid integer, 
+      question varchar(1000),
+      created_by integer, 
       created_at timestamp, 
       last_modified timestamp, 
       latest_post timestamp, 
       PRIMARY KEY(id), 
+      CONSTRAINT fk_user FOREIGN KEY (created_by) REFERENCES users(id), 
       CONSTRAINT fk_board FOREIGN KEY (boardid) REFERENCES boards(id) 
       ON DELETE CASCADE
     )`
@@ -41,12 +45,14 @@ const helpers = {
     )`
     const posts = `CREATE TABLE IF NOT EXISTS posts (
       id SERIAL, 
+      created_by integer,
       topicid integer, 
       body text, 
       status varchar(255), 
       created_at timestamp, 
       last_modified timestamp, 
       PRIMARY KEY(id), 
+      CONSTRAINT fk_user FOREIGN KEY (created_by) REFERENCES users(id),
       CONSTRAINT fk_topic FOREIGN KEY(topicid) REFERENCES topics(id) 
       ON DELETE CASCADE
     )`
@@ -58,11 +64,11 @@ const helpers = {
     )`
 
     //call queries
+    await pool.query(users);
+    await pool.query(login);
     await pool.query(board);
     await pool.query(topics);
-    await pool.query(users);
     await pool.query(posts);
-    await pool.query(login);
   },
 
   /**
