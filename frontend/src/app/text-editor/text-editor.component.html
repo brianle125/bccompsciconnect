@@ -1,1 +1,20 @@
-<p>text-editor works!</p>
+<form [formGroup]="form" (ngSubmit)="onSubmit(form.value)">
+    <fieldset>
+        <div class="field">
+            <!-- <label for="text-editor-form-text-input" class="col-sm-12">Write Message</label> -->
+            <textarea cols="30" rows="10" class="col-sm-12" id="text-editor-form-text-input"
+                name="text-input" placeholder="" formControlName="text-input"></textarea>
+        </div>
+
+        <div>
+            <button class="btn btn-primary col-sm-2" [disabled]="!form.valid">
+                SUBMIT
+            </button>
+            <button type="button" class="btn btn-primary col-sm-2" [disabled]="!form.valid"
+                (click)="onPreviewClicked()"
+            >
+                PREVIEW
+            </button>
+        </div>
+    </fieldset>
+</form>
