@@ -125,7 +125,7 @@ app.post('/api/register', async (req, res) => {
 })
 
 app.get('/api/login', async (req, res) => {
-  req.session.user ? res.status(200).send({loggedIn: true, user: req.session.user}) : res.status(200).send({loggedIn: false});
+  req.session.user ? res.status(200).send({loggedIn: true, user: req.session.user.username}) : res.status(200).send({loggedIn: false});
 })
 
 app.post('/api/login', async (req, res) => {

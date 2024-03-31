@@ -23,8 +23,9 @@ export class TopBarComponent implements OnInit {
   ngOnInit(): void {
     this.userService.isLoggedIn().subscribe((data) => {
       let response = data as any
-      console.log(response)
       this.loggedIn = response.loggedIn;
+      this.username = response.user;
+      this.profileLink = `/user/${this.username}`
     })
   }
   
