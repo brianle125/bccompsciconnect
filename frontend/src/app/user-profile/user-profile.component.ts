@@ -14,7 +14,7 @@ import { PostListComponent } from '../post-list/post-list.component';
   styleUrl: './user-profile.component.css'
 })
 export class UserProfileComponent implements OnInit {
-  userData: UserProfileData = new UserProfileData('User not found', 'assets/user.png', '', 'Desc', '')
+  userData: UserProfileData = new UserProfileData('Invalid user', 'assets/user.png', '', 'Desc', '')
   user: any
   //Session user
   constructor(private userService: UserService, private route: ActivatedRoute) {}

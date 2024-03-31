@@ -94,9 +94,12 @@ app.get('/api/google/error', (req, res) => {
 
 app.get('/api/google/callback', passport.authenticate('google', { failureRedirect: '/auth/google/error' }),
   async (req, res) => {
-  // Successful authentication, redirect success.
+  // Successful authentication
   console.log(userProfile.emails[0].value)
+  //load session parameters from payload
   req.session.user = userProfile.displayName;
+  req.session.username = userProfile.displayName
+  
   req.session.loggedIn = true;
   req.session.save();
   res.send({"status": "success"})
@@ -122,7 +125,7 @@ app.post('/api/register', async (req, res) => {
 })
 
 app.get('/api/login', async (req, res) => {
-  req.session.user ? res.status(200).send({loggedIn: true}) : res.status(200).send({loggedIn: false});
+  req.session.user ? res.status(200).send({loggedIn: true, user: req.session.user}) : res.status(200).send({loggedIn: false});
 })
 
 app.post('/api/login', async (req, res) => {
@@ -190,7 +193,7 @@ app.put('/api/user/:username', async (req, res) => {
 
 // BOARDS //
 
-app.get('/api/boards', async (req, res) => {
+app.get('/api/boards', isLoggedIn, async (req, res) => {
   const boards = await db.helpers.getBoards();
   res.json(boards)
 })

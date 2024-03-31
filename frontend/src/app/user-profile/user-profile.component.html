@@ -5,8 +5,10 @@
         <div class="image-profile">
             <img src="{{ userData.icon }}" class="icon">   
         </div>
-        <p>{{userData.email || 'none' }}</p>
-        <p><a href="{{ userData.postsLink }}">View posts</a></p>
+        <p>{{userData.email || '' }}</p>
+        <div *ngIf="userData.postsLink; then hasPosts else noPosts"></div>
+        <ng-template #hasPosts><p><a href="{{ userData.postsLink }}">View posts</a></p></ng-template>
+        <ng-template #noPosts>User has not posted</ng-template>
     </div>
     <div class="col-sm-10 description">
         <div class="description-text">
