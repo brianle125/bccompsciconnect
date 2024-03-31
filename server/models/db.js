@@ -158,7 +158,7 @@ const helpers = {
       const createTopicQuery = `INSERT INTO topics VALUES (DEFAULT, $1, $2, $3, CURRENT_TIMESTAMP, NUll, CURRENT_TIMESTAMP) RETURNING id`
       const createTopicRes = await pool.query(createTopicQuery, [boardID, question, createdBy]);
       const topicID = createTopicRes.rows[0].id
-      const createPostQuery = `INSERT INTO posts VALUES (DEFAULT, $1, $2, $3, '', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`
+      const createPostQuery = `INSERT INTO posts VALUES (DEFAULT, $1, $2, $3, 'status', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`
       const createPostRes = await pool.query(createPostQuery, [createdBy, topicID, body])
     } catch(e) {
       console.log(e)
@@ -188,13 +188,13 @@ const helpers = {
       return res;
   },
   
-  addPost: async function(topicId, text) {
+  addPost: async function(topicId, text, userId) {
       //update latest post in topic
       const updated = 'UPDATE topics SET latest_post = CURRENT_TIMESTAMP WHERE id = $1';
       const updateQuery = await pool.query(updated, [topicId]);
       //add the post
-      const q = `INSERT INTO posts VALUES(DEFAULT, $1, $2, 'status', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`;
-      const res = await pool.query(q, [topicId, text])
+      const q = `INSERT INTO posts VALUES(DEFAULT, $1, $2, $3, 'status', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`;
+      const res = await pool.query(q, [userId, topicId, text])
   },
 
   editPost: async function (postId, text) {
