@@ -69,18 +69,18 @@ app.post('/api/register', async (req, res) => {
 // })
 
 app.post('/api/login', async (req, res) => {
-  let username = req.body.name
+  let email = req.body.email
   let password = req.body.password
 
-  const targetUser = await db.helpers.getUser(username);
+  const targetUser = await db.helpers.getUser(email);
   if(targetUser.length === 0)
   {
     console.log('Account not found')
     res.send({"status": "failed"})
   }
-  else if(username === targetUser[0].username && password === targetUser[0].password)
+  else if(email === targetUser[0].email && password === targetUser[0].password)
   {
-    req.session.user = {username: username, password: password}
+    req.session.user = {email: email, password: password}
     console.log(req.session.id)
     req.session.loggedIn = true;
     req.session.save();

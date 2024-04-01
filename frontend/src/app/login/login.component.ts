@@ -17,16 +17,13 @@ export class LoginComponent {
   form: FormGroup;
   constructor(private router:Router, private userService: UserService) {
     let formControls = {
-      name: new FormControl('',[ Validators.required, Validators.nullValidator, Validators.minLength(5)]),
+      email: new FormControl('',[ Validators.required, Validators.nullValidator, Validators.email]),
       password: new FormControl('',[ Validators.required, Validators.nullValidator])
     }
     this.form = new FormGroup(formControls);
   }
 
   onSubmit() {
-    // console.log(this.form.value.name)
-    // console.log(this.form.value.password)
-
     this.userService.loginUser(this.form.value).subscribe((data) => {
       let response = data as any;
       console.log(response)

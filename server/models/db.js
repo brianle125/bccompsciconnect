@@ -7,7 +7,7 @@ const pool = new Pool({
   user: "postgres",
   host: "localhost" || process.env.DB_HOST,
   database: "testing",
-  password: process.env.LOCAL_PASS,
+  password: "thunder43",
 });
 
 const helpers = {
@@ -32,9 +32,9 @@ const helpers = {
    * USERS
    */
 
-  getUser: async function (username) {
-    const q = "SELECT * FROM users WHERE username=$1";
-    const res = await pool.query(q, [username]);
+  getUser: async function (email) {
+    const q = "SELECT * FROM users WHERE email=$1";
+    const res = await pool.query(q, [email]);
     return res.rows;
   },
 
