@@ -192,8 +192,7 @@ app.put('/api/user/:username', async (req, res) => {
   let email = req.body.email
   let password = req.body.password
   let description = req.body.description
-
-  console.log('Editing user...')
+  
   const user = await db.helpers.editUser(newUsername, email, password, description, oldUsername);
   req.session.user = {username: newUsername}
   req.session.save()
