@@ -34,6 +34,8 @@ export class RegistrationComponent {
       let exists = data as any;
       console.log('Does it exist?' + exists.exists)
       if(exists.exists === true) {
+        alert('Username is taken')
+        this.form.reset();
         this.router.navigate(['/register'])
       } 
       else {
