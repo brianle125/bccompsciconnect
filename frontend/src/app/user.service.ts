@@ -34,11 +34,12 @@ export class UserService {
     return this.http.post<any>(`${api}/login`, user, {observe: 'response', withCredentials: true});
   }
 
-  googleAuthUser() {
-    return this.http.get(`${api}/google/`, {withCredentials: true})
-  }
-
   logoutUser() {
     return this.http.get(`${api}/logout`, {withCredentials: true})
+  }
+
+  //google auth
+  googleAuthUser() {
+    return this.http.get(`${api}/google/`, {withCredentials: true})
   }
 }

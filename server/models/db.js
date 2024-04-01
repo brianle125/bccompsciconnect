@@ -37,6 +37,7 @@ const helpers = {
       username varchar(255), 
       email varchar(255), 
       password varchar(1000), 
+      description varchar(500),
       role varchar(255), 
       created_at timestamp, 
       PRIMARY KEY(id)
@@ -96,8 +97,9 @@ const helpers = {
     const query = await pool.query(q, [username, email, password, role]);
   },
 
-  editUser: async function(username, email, password, description) {
-    const q = `UPDATE users SET username=$1, email=$2, password=$3, description=$4 WHERE username = ${username}`;
+  editUser: async function(username, email, password, description, oldUsername) {
+    const q = `UPDATE users SET username=$1, email=$2, password=$3, description=$4 WHERE username = '${oldUsername}'`;
+    const query = await pool.query(q, [username, email, password, description])
   },
 
   /**

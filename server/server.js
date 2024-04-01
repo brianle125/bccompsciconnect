@@ -1,3 +1,4 @@
+require('dotenv').config({path:__dirname+'.env'})
 var session = require('express-session')
 var createError = require('http-errors');
 var express = require('express');
@@ -78,8 +79,8 @@ passport.deserializeUser(function(obj, cb) {
 });
 
 passport.use(new GoogleStrategy({
-    clientID: '1076223145981-qe6hrco26qg188quchbsaffmf9q3requ.apps.googleusercontent.com',
-    clientSecret: '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',
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: "http://localhost:8080/api/google/callback"
   },
   function(accessToken, refreshToken, profile, done) {
@@ -186,12 +187,16 @@ app.get('/api/user/:username', async (req, res) => {
 })
 
 app.put('/api/user/:username', async (req, res) => {
-  let username = req.params.username
+  let oldUsername = req.params.username
+  let newUsername = req.body.username
   let email = req.body.email
   let password = req.body.password
   let description = req.body.description
 
-  const user = await db.helpers.editUser(username, email, password, description);
+  console.log('Editing user...')
+  const user = await db.helpers.editUser(newUsername, email, password, description, oldUsername);
+  req.session.user = {username: newUsername}
+  req.session.save()
 })
 
 
