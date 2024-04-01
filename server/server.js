@@ -95,10 +95,12 @@ app.get('/api/google/error', (req, res) => {
 app.get('/api/google/callback', passport.authenticate('google', { failureRedirect: '/auth/google/error' }),
   async (req, res) => {
   // Successful authentication
-  console.log(userProfile.emails[0].value)
+  console.log(userProfile)
   //load session parameters from payload
-  req.session.user = userProfile.displayName;
+  req.session.user = {username: userProfile.displayName};
   req.session.username = userProfile.displayName
+
+  //if user does not exist, add to database?
   
   req.session.loggedIn = true;
   req.session.save();
