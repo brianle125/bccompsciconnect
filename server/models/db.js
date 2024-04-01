@@ -1,11 +1,9 @@
 const { Pool } = require("pg");
 require("dotenv").config();
-const connect = require("./connector");
-const { Connector } = require("@google-cloud/cloud-sql-connector");
 
 const pool = new Pool({
   user: "postgres",
-  host: "localhost" || process.env.DB_HOST,
+  host: 'localhost' || process.env.DB_HOST,
   database: "testing",
   password: process.env.LOCAL_PASS,
 });
@@ -39,6 +37,7 @@ const helpers = {
       username varchar(255), 
       email varchar(255), 
       password varchar(1000), 
+      description varchar(500),
       role varchar(255), 
       created_at timestamp, 
       PRIMARY KEY(id)
@@ -62,6 +61,11 @@ const helpers = {
       password varchar(1000), 
       PRIMARY KEY(id)
     )`
+    const userProfiles = `CREATE TABLE IF NOT EXISTS userprofiles (
+      id integer, 
+      filename varchar(400), 
+      image bytea
+    )`
 
     //call queries
     await pool.query(users);
@@ -69,11 +73,18 @@ const helpers = {
     await pool.query(board);
     await pool.query(topics);
     await pool.query(posts);
+    await pool.query(userProfiles)
   },
 
   /**
    * USERS
    */
+
+  getUserById: async function (id) {
+    const q = "SELECT * FROM users WHERE id=$1";
+    const res = await pool.query(q, [id]);
+    return res.rows;
+  },
 
   getUser: async function (username) {
     const q = "SELECT * FROM users WHERE username=$1";
@@ -82,8 +93,13 @@ const helpers = {
   },
 
   addUser: async function (username, email, password, role) {
-    const q = `INSERT INTO users VALUES(DEFAULT, $1, $2, $3, $4)`;
+    const q = `INSERT INTO users VALUES(DEFAULT, $1, $2, $3, 'User has not changed bio', $4, CURRENT_TIMESTAMP)`;
     const query = await pool.query(q, [username, email, password, role]);
+  },
+
+  editUser: async function(username, email, password, description, oldUsername) {
+    const q = `UPDATE users SET username=$1, email=$2, password=$3, description=$4 WHERE username = '${oldUsername}'`;
+    const query = await pool.query(q, [username, email, password, description])
   },
 
   /**
@@ -103,17 +119,17 @@ const helpers = {
     return res.rows[0];
   },
 
-    //Add a board
-    addBoard: async function(boardTitle, boardDescription, ordering) {
-        // const res = await pool.query('INSERT INTO boards VALUES (DEFAULT, $1)', [boardTitle]);
-        const res = await pool.query('INSERT INTO boards(id, title, description, ordering) VALUES (DEFAULT, $1, $2, $3)', [boardTitle, boardDescription, ordering]);
-    },
+  //Add a board
+  addBoard: async function(boardTitle, boardDescription, ordering) {
+      // const res = await pool.query('INSERT INTO boards VALUES (DEFAULT, $1)', [boardTitle]);
+      const res = await pool.query('INSERT INTO boards(id, title, description, ordering) VALUES (DEFAULT, $1, $2, $3)', [boardTitle, boardDescription, ordering]);
+  },
 
-    //Edit a board
-    editBoard: async function(boardId, boardTitle, boardDescription, ordering) {
-        const q = 'UPDATE boards SET title = $1 description = $2 ordering = $3 WHERE id = $2';
-        const res = await pool.query(q, [boardTitle, boardDescription, ordering,boardId]);
-    },
+  //Edit a board
+  editBoard: async function(boardId, boardTitle, boardDescription, ordering) {
+      const q = 'UPDATE boards SET title = $1 description = $2 ordering = $3 WHERE id = $2';
+      const res = await pool.query(q, [boardTitle, boardDescription, ordering,boardId]);
+  },
 
   //Delete a board
   deleteBoard: async function (boardId) {

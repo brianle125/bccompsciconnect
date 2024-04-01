@@ -30,10 +30,12 @@ export class RegistrationComponent {
     console.log(this.form.value.password)
     
     //CHECK IF USER EXITS IF THEY DO SEND BACK TO
-    this.userService.getUser(this.form.value.name).subscribe((data) => {
+    this.userService.checkUserExists(this.form.value.name).subscribe((data) => {
       let exists = data as any;
       console.log('Does it exist?' + exists.exists)
       if(exists.exists === true) {
+        alert('Username is taken')
+        this.form.reset();
         this.router.navigate(['/register'])
       } 
       else {

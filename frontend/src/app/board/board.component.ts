@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TopicListComponent } from '../topic-list/topic-list.component';
 import { TopBarComponent } from '../top-bar/top-bar.component';
+import { BoardService } from '../board.service';
 
 @Component({
   selector: 'app-board',
