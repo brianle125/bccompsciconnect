@@ -12,7 +12,7 @@ import { UserProfileData } from '../user-profile/user-profile.component';
   templateUrl: './user-edit.component.html',
   styleUrl: './user-edit.component.css'
 })
-export class UserEditComponent {
+export class UserEditComponent implements OnInit {
   form: FormGroup
   constructor(private route: ActivatedRoute, private router: Router, private userService: UserService) {
     //Will more than likely need a cleaner way of loading default values into form
@@ -28,6 +28,19 @@ export class UserEditComponent {
     this.form = new FormGroup(formControls)
   }
 
+  ngOnInit(): void {
+    //Navigate to login if user doesn't exist in database
+    const routeParams = this.route.snapshot.paramMap;
+    const username = routeParams.get('username');
+    this.userService.checkUserExists(username).subscribe((data) => {
+      let response = data as any
+      console.log(response.exists)
+      if(!response.exists) {
+        this.router.navigate(['/login'])
+      }
+    })
+  }
+
   onSubmit() {
     const routeParams = this.route.snapshot.paramMap;
     const username = routeParams.get('username');
@@ -40,6 +53,7 @@ export class UserEditComponent {
     //Update user's info
     this.userService.editUser(username, this.form.value).subscribe()
     this.router.navigate([`/user/${this.form.value.username}`]).then(() => {
+      alert("User details successfully edited!");
       window.location.reload();
     });
   }

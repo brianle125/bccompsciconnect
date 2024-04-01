@@ -103,7 +103,7 @@ app.get('/api/google/callback', passport.authenticate('google', { failureRedirec
   req.session.user = {username: userProfile.displayName};
   req.session.username = userProfile.displayName
 
-  //if user does not exist, add to database?
+  //TODO: handle how it interacts with user database
   
   req.session.loggedIn = true;
   req.session.save();

@@ -12,13 +12,13 @@
         <div *ngIf="form.get('email')?.errors?.['email']">Email must be valid.</div>
     </div>
     <label>Change password</label>
-    <input type="text" name="password" formControlName="password" required>
+    <input type="password" name="password" formControlName="password" required>
     <div *ngIf="form.get('password')?.invalid && (form.get('password')?.dirty || form.get('password')?.touched)" id="errorDiv">
         <div *ngIf="form.get('password')?.errors?.['required']">Password is required.</div>
         <div *ngIf="form.get('password')?.errors?.['minlength']">Password must be at least 5 characters long.</div>
     </div>
     <label>Edit bio</label>
-    <textarea name="description" formControlName="description" ngModel required></textarea>
+    <textarea name="description" formControlName="description"></textarea>
     <button type="submit">Save</button>
 </form>
   
