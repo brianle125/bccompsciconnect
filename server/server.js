@@ -5,6 +5,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser')
 var logger = require('morgan');
+const joi = require('joi') // schema validation
 
 
 
@@ -55,6 +56,7 @@ app.use(bodyParser.json());
 
 // internal modules
 const db = require('./models/db')
+const helpers = require('./helpers')
 
 
 ////////////////////////////
@@ -274,17 +276,19 @@ app.delete('/api/board/:boardId', async (req, res) => {
 
 // TOPICS AND POSTS //
 
+// TODO: are these still needed
 app.post('/api/board/:boardId', async (req, res) => {
-  let boardId = req.params.boardId;
-  let question = req.body.question;
-  await db.helpers.addTopic(boardId, question);
+let boardId = req.params.boardId;
+let question = req.body.question;
+await db.helpers.addTopic(boardId, question, null);
   res.redirect(`/api/board/${boardId}`)
 })
 
+// TODO: are these still needed
 app.post('/api/board/:boardId/latest', async (req, res) => {
   let boardId = req.params.boardId;
   let question = req.body.question;
-  await db.helpers.addTopic(boardId, question);
+  await db.helpers.addTopic(boardId, question, null);
   res.redirect(`/api/board/${boardId}`)
 })
 
@@ -311,12 +315,22 @@ app.delete('/api/board/:boardId/topic/:topicId', async (req, res) => {
   res.redirect(302, `/api/board/${boardId}`)
 })
 
+const postPostSchema = joi.object({
+  created_by:joi.number().integer().required(),
+  text:joi.string().required(),
+})
+
 app.post('/api/board/:boardId/topic/:topicId', async(req, res) => {
   let boardId = req.params.boardId;
-  let topicId = req.params.topicId
-  let text = req.body.text
-  await db.helpers.addPost(topicId, text)
-  res.redirect(302, `/api/board/${boardId}/topic/${topicId}`);
+  let topicId = req.params.topicId;
+  let body = req.body
+  let valid = postPostSchema.validate(body)
+  if(valid.error == null) {
+    await db.helpers.addPost(topicId, text, body.created_by)
+    res.redirect(302, `/api/board/${boardId}/topic/${topicId}`);
+  } else {
+    res.status(400).json({error:{code:400, message:'invalid schema'}})
+  }
 })
 
 //CHANGING THESE ENDPOINTS LATER IF NEEDED
@@ -334,6 +348,7 @@ app.put('/api/board/:boardId/topic/:topicId/edit', async(req, res) => {
 
   let postId = req.body.postId;
   let postText = req.body.text;
+  postText = helpers.sanitizePost(postText)
 
   await db.helpers.editPost(postId, postText)
   res.redirect(302, `/api/board/${boardId}/topic/${topicId}`);
@@ -346,11 +361,22 @@ app.get('/api/board/:boardId', async (req, res) => {
   res.json(topics);
 })
 
-app.post('/api/board/:boardId/addtopic', async (req, res) => {
-  let boardid = req.body.boardId;
-  let question = req.body.question;
-  console.log("HERE " + boardid + " question: " + question);
-  await db.helpers.addTopic(boardid, question)
+const postTopicAndFirstPostSchema = joi.object({
+  boardid:joi.number().integer().required(),
+  question:joi.string().required(), // ie the title
+  created_by:joi.number().integer().required(),
+  body:joi.string().required(), // of the first post of the topic
+})
+
+app.post('/api/board/addtopic', async (req, res) => {
+  let valid = postTopicAndFirstPostSchema.validate(req.body)
+  if(valid.error == null) {
+    let body = req.body
+    await db.helpers.addTopic(body.boardid, body.question, body.created_by, body.body)
+    res.json({message:'success'})
+  } else {
+    res.status(400).json({error:{code:400, message:'invalid schema'}})
+  }
 })
 
 // app.get("*", (req, res) =>{

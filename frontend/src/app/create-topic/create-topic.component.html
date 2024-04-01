@@ -1,0 +1,4 @@
+<app-top-bar></app-top-bar>
+<h2>Create Topic</h2>
+<app-topic-text-editor (formSubmitted)="onSubmit($event)" (previewClicked)="onPreview($event)"></app-topic-text-editor>
+<app-formatted-text [text]="preview"></app-formatted-text>
