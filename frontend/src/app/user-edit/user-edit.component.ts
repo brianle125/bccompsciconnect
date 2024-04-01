@@ -22,6 +22,7 @@ export class UserEditComponent implements OnInit {
     let formControls = {
       username: new FormControl(username,[ Validators.required, Validators.nullValidator, Validators.minLength(5)]),
       email: new FormControl('',[ Validators.required, Validators.nullValidator, Validators.email]),
+      currentPassword: new FormControl('', [ Validators.required, Validators.nullValidator]),
       password: new FormControl('',[ Validators.required, Validators.nullValidator, Validators.minLength(5)]),
       description: new FormControl('',[ Validators.required, Validators.nullValidator, Validators.minLength(0)])
     }
@@ -48,6 +49,8 @@ export class UserEditComponent implements OnInit {
     if (this.form.invalid) {
       return;
     }
+
+    //TODO: If currentPassword doesn't match the user's password, edit fails
 
     console.log(this.form.value)
     //Update user's info
