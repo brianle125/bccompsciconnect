@@ -11,21 +11,64 @@ const pool = new Pool({
 });
 
 const helpers = {
-    //database queries
-    init: async function() {
-        //create tables
-        const board = 'CREATE TABLE IF NOT EXISTS boards (id SERIAL, title character varying(255), description varchar(255), ordering integer, PRIMARY KEY(id))'
-        const topics = 'CREATE TABLE IF NOT EXISTS topics (id SERIAL, boardid integer, question varchar(1000), created_at timestamp, last_modified timestamp, latest_post timestamp, PRIMARY KEY(id), CONSTRAINT fk_board FOREIGN KEY (boardid) REFERENCES boards(id) ON DELETE CASCADE)'
-        const users = 'CREATE TABLE IF NOT EXISTS users (id SERIAL, username varchar(255), email varchar(255), password varchar(1000), role varchar(255), created_at timestamp, PRIMARY KEY(id))'
-        const posts = 'CREATE TABLE IF NOT EXISTS posts (id SERIAL, topicid integer, body text, status varchar(255), created_at timestamp, last_modified timestamp, PRIMARY KEY(id), CONSTRAINT fk_topic FOREIGN KEY(topicid) REFERENCES topics(id) ON DELETE CASCADE)'
-        const login = 'CREATE TABLE IF NOT EXISTS login (id SERIAL, username varchar(255), password varchar(1000), PRIMARY KEY(id))'
+  //database queries
+  init: async function() {
+    //create tables
+    const board = `CREATE TABLE IF NOT EXISTS boards (
+      id SERIAL, 
+      title character varying(255), 
+      description varchar(255), 
+      ordering integer, 
+      PRIMARY KEY(id)
+    )`
+    const topics = `CREATE TABLE IF NOT EXISTS topics (
+      id SERIAL, 
+      boardid integer, 
+      question varchar(1000),
+      created_by integer, 
+      created_at timestamp, 
+      last_modified timestamp, 
+      latest_post timestamp, 
+      PRIMARY KEY(id), 
+      CONSTRAINT fk_user FOREIGN KEY (created_by) REFERENCES users(id), 
+      CONSTRAINT fk_board FOREIGN KEY (boardid) REFERENCES boards(id) 
+      ON DELETE CASCADE
+    )`
+    const users = `CREATE TABLE IF NOT EXISTS users (
+      id SERIAL, 
+      username varchar(255), 
+      email varchar(255), 
+      password varchar(1000), 
+      role varchar(255), 
+      created_at timestamp, 
+      PRIMARY KEY(id)
+    )`
+    const posts = `CREATE TABLE IF NOT EXISTS posts (
+      id SERIAL, 
+      created_by integer,
+      topicid integer, 
+      body text, 
+      status varchar(255), 
+      created_at timestamp, 
+      last_modified timestamp, 
+      PRIMARY KEY(id), 
+      CONSTRAINT fk_user FOREIGN KEY (created_by) REFERENCES users(id),
+      CONSTRAINT fk_topic FOREIGN KEY(topicid) REFERENCES topics(id) 
+      ON DELETE CASCADE
+    )`
+    const login = `CREATE TABLE IF NOT EXISTS login (
+      id SERIAL, 
+      username varchar(255), 
+      password varchar(1000), 
+      PRIMARY KEY(id)
+    )`
 
     //call queries
+    await pool.query(users);
+    await pool.query(login);
     await pool.query(board);
     await pool.query(topics);
-    await pool.query(users);
     await pool.query(posts);
-    await pool.query(login);
   },
 
   /**
@@ -110,9 +153,16 @@ const helpers = {
     return res.rows;
   },
 
-  addTopic: async function(boardid, question) {
-      const q = 'INSERT INTO topics VALUES (DEFAULT, $1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL)';
-      const res = await pool.query(q, [boardid, question]);
+  addTopic: async function(boardID, question, createdBy, body) {
+    try {
+      const createTopicQuery = `INSERT INTO topics VALUES (DEFAULT, $1, $2, $3, CURRENT_TIMESTAMP, NUll, CURRENT_TIMESTAMP) RETURNING id`
+      const createTopicRes = await pool.query(createTopicQuery, [boardID, question, createdBy]);
+      const topicID = createTopicRes.rows[0].id
+      const createPostQuery = `INSERT INTO posts VALUES (DEFAULT, $1, $2, $3, 'status', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`
+      const createPostRes = await pool.query(createPostQuery, [createdBy, topicID, body])
+    } catch(e) {
+      console.log(e)
+    }
   },
 
   deleteTopic: async function (topicId) {
@@ -138,13 +188,13 @@ const helpers = {
       return res;
   },
   
-  addPost: async function(topicId, text) {
+  addPost: async function(topicId, text, userId) {
       //update latest post in topic
       const updated = 'UPDATE topics SET latest_post = CURRENT_TIMESTAMP WHERE id = $1';
       const updateQuery = await pool.query(updated, [topicId]);
       //add the post
-      const q = `INSERT INTO posts VALUES(DEFAULT, $1, $2, 'status', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`;
-      const res = await pool.query(q, [topicId, text])
+      const q = `INSERT INTO posts VALUES(DEFAULT, $1, $2, $3, 'status', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`;
+      const res = await pool.query(q, [userId, topicId, text])
   },
 
   editPost: async function (postId, text) {
