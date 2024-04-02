@@ -1,0 +1,29 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <label>Change username</label>
+    <input type="text" name="username" formControlName="username"  required>
+    <div *ngIf="form.get('username')?.invalid && (form.get('username')?.dirty || form.get('username')?.touched)" id="errorDiv">
+        <div *ngIf="form.get('username')?.errors?.['required']">Name is required.</div>
+        <div *ngIf="form.get('username')?.errors?.['minlength']">Name must be at least 5 characters long.</div>
+    </div>
+    <label>Change email</label>
+    <input type="text" name="email" formControlName="email" required>
+    <div *ngIf="form.get('email')?.invalid && (form.get('email')?.dirty || form.get('email')?.touched)" id="errorDiv">
+        <div *ngIf="form.get('email')?.errors?.['required']">Email is required.</div>
+        <div *ngIf="form.get('email')?.errors?.['email']">Email must be valid.</div>
+    </div>
+    <label>Current password</label>
+    <input type="password" name="currentPassword" formControlName="currentPassword" required>
+    <div *ngIf="form.get('currentPassword')?.invalid && (form.get('password')?.dirty || form.get('password')?.touched)" id="errorDiv">
+        <div *ngIf="form.get('currentPassword')?.errors?.['required']">Password is required.</div>
+    </div>
+    <label>Change password</label>
+    <input type="password" name="password" formControlName="password" required>
+    <div *ngIf="form.get('password')?.invalid && (form.get('password')?.dirty || form.get('password')?.touched)" id="errorDiv">
+        <div *ngIf="form.get('password')?.errors?.['required']">Password is required.</div>
+        <div *ngIf="form.get('password')?.errors?.['minlength']">Password must be at least 5 characters long.</div>
+    </div>
+    <label>Edit bio</label>
+    <textarea name="description" formControlName="description"></textarea>
+    <button type="submit">Save</button>
+</form>
+  

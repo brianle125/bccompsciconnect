@@ -1,3 +1,4 @@
+require('dotenv').config({path:__dirname+'.env'})
 var session = require('express-session')
 var createError = require('http-errors');
 var express = require('express');
@@ -5,6 +6,9 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser')
 var logger = require('morgan');
+const joi = require('joi') // schema validation
+
+
 
 // var indexRouter = require('./routes/index');
 // var usersRouter = require('./routes/users');
@@ -17,12 +21,17 @@ const fs = require("fs");
 const { Server } = require("socket.io")
 const jwt = require('jsonwebtoken')
 
-const io = new Server(server)
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:4200',
+    methods:['GET','POST']
+  }
+})
 const port = process.env.PORT || 8080;
 
 const corsOptions = cors({
-  origin: "http://localhost:4200",
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  origin: ["bccompsciconnect-server-4w7ddycrna-uc.a.run.app", "http://localhost:4200"],
+  // allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true, 
 })
 
@@ -44,16 +53,30 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-//app.use('/', express.static(path.join(__dirname, 'public'), { index: ['index.html'] }));
-
-// app.use('/', express.static(path.join(__dirname, '../frontend/dist/bccompsciconnect/browser')));
-// app.get('/*', function(req, res) {
-//   res.sendFile(path.join(__dirname, '../frontend/dist/bccompsciconnect/browser/index.html'));
-// });
 // app.use(express.static(path.join(__dirname, 'static')));
 
 // internal modules
 const db = require('./models/db')
+const helpers = require('./helpers')
+
+
+////////////////////////////
+/*  Google AUTH  */
+ 
+var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+var passport = require('passport');
+var userProfile;
+ 
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser(function(user, cb) {
+  cb(null, user);
+});
+ 
+passport.deserializeUser(function(obj, cb) {
+  cb(null, obj);
+});
 
 const auth = (req, res, next) => {
   const token = req.cookies.jwt;
@@ -72,6 +95,49 @@ const auth = (req, res, next) => {
   }
 };
 
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: "http://localhost:8080/api/google/callback"
+  },
+  function(accessToken, refreshToken, profile, done) {
+      userProfile=profile;
+      return done(null, userProfile);
+  }
+));
+app.get('/api/google', 
+  passport.authenticate('google', { scope : ['profile', 'email'] }));
+
+app.get('/api/google/error', (req, res) => {
+  res.send({"status": "failure"})
+})
+
+app.get('/api/google/callback', passport.authenticate('google', { failureRedirect: '/auth/google/error' }),
+  async (req, res) => {
+  // Successful authentication
+  console.log(userProfile)
+  //load session parameters from payload
+  req.session.user = {username: userProfile.displayName};
+  req.session.username = userProfile.displayName
+
+  //TODO: handle how it interacts with user database
+  
+  req.session.loggedIn = true;
+  req.session.save();
+  res.send({"status": "success"})
+});
+
+////////////////////////////
+
+//Sockets
+io.on('connection', (socket) => {
+  console.log("a user connected")
+  //send client updates
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
+})
+
 app.post('/api/register', async (req, res) => {
   let name = req.body.name;
   let email = req.body.email;
@@ -80,9 +146,9 @@ app.post('/api/register', async (req, res) => {
   await db.helpers.addUser(name, email, password, 'user');
 })
 
-// app.get('/login', async (req, res) => {
-//   req.session.user ? res.status(200).send({loggedIn: true}) : res.status(200).send({loggedIn: false});
-// })
+app.get('/api/login', async (req, res) => {
+  req.session.user ? res.status(200).send({loggedIn: true, user: req.session.user.username}) : res.status(200).send({loggedIn: false});
+})
 
 app.post('/api/login', async (req, res) => {
   let email = req.body.email
@@ -96,7 +162,7 @@ app.post('/api/login', async (req, res) => {
   }
   else if(email === targetUser[0].email && password === targetUser[0].password)
   {
-    req.session.user = {email: email, password: password}
+    req.session.user = {username: username, email: email, password: password}
     console.log(req.session.id)
     req.session.loggedIn = true;
     req.session.save();
@@ -118,8 +184,6 @@ app.post('/api/logout', async (req, res) => {
     httpOnly: true, 
     secure: false
   });
-  
-})
 
 app.get('/api/usercheck', async (req, res) => {
   let name = req.query.name
@@ -134,12 +198,30 @@ app.get('/api/usercheck', async (req, res) => {
   });
 });
 
+// USERS //
+
+app.get('/api/user/:username', async (req, res) => {
+  let username = req.params.username
+  const user = await db.helpers.getUser(username);
+  res.json(user);
+})
+
+app.put('/api/user/:username', async (req, res) => {
+  let oldUsername = req.params.username
+  let newUsername = req.body.username
+  let email = req.body.email
+  let password = req.body.password
+  let description = req.body.description
+  
+  const user = await db.helpers.editUser(newUsername, email, password, description, oldUsername);
+  req.session.user = {username: newUsername}
+  req.session.save()
+})
 
 
 // BOARDS //
 
 app.get('/api/boards', isLoggedIn, async (req, res) => {
-  console.log(req.session.user)
   const boards = await db.helpers.getBoards();
   
   res.json(boards)
@@ -200,7 +282,6 @@ app.post('/api/board', async (req, res) => {
   let boardDescription = req.body.boardDescription;
   let ordering = req.body.ordering;
   const board = await db.helpers.addBoard(boardTitle, boardDescription, ordering);
-  res.redirect(303, '/api/boards')
 })
 
 app.put('/api/board/:boardId', async (req, res) => {
@@ -220,17 +301,19 @@ app.delete('/api/board/:boardId', async (req, res) => {
 
 // TOPICS AND POSTS //
 
+// TODO: are these still needed
 app.post('/api/board/:boardId', async (req, res) => {
-  let boardId = req.params.boardId;
-  let question = req.body.question;
-  await db.helpers.addTopic(boardId, question);
+let boardId = req.params.boardId;
+let question = req.body.question;
+await db.helpers.addTopic(boardId, question, null);
   res.redirect(`/api/board/${boardId}`)
 })
 
+// TODO: are these still needed
 app.post('/api/board/:boardId/latest', async (req, res) => {
   let boardId = req.params.boardId;
   let question = req.body.question;
-  await db.helpers.addTopic(boardId, question);
+  await db.helpers.addTopic(boardId, question, null);
   res.redirect(`/api/board/${boardId}`)
 })
 
@@ -257,12 +340,22 @@ app.delete('/api/board/:boardId/topic/:topicId', async (req, res) => {
   res.redirect(302, `/api/board/${boardId}`)
 })
 
+const postPostSchema = joi.object({
+  created_by:joi.number().integer().required(),
+  text:joi.string().required(),
+})
+
 app.post('/api/board/:boardId/topic/:topicId', async(req, res) => {
   let boardId = req.params.boardId;
-  let topicId = req.params.topicId
-  let text = req.body.text
-  await db.helpers.addPost(topicId, text)
-  res.redirect(302, `/api/board/${boardId}/topic/${topicId}`);
+  let topicId = req.params.topicId;
+  let body = req.body
+  let valid = postPostSchema.validate(body)
+  if(valid.error == null) {
+    await db.helpers.addPost(topicId, text, body.created_by)
+    res.redirect(302, `/api/board/${boardId}/topic/${topicId}`);
+  } else {
+    res.status(400).json({error:{code:400, message:'invalid schema'}})
+  }
 })
 
 //CHANGING THESE ENDPOINTS LATER IF NEEDED
@@ -280,6 +373,7 @@ app.put('/api/board/:boardId/topic/:topicId/edit', async(req, res) => {
 
   let postId = req.body.postId;
   let postText = req.body.text;
+  postText = helpers.sanitizePost(postText)
 
   await db.helpers.editPost(postId, postText)
   res.redirect(302, `/api/board/${boardId}/topic/${topicId}`);
@@ -291,12 +385,23 @@ app.get('/api/board/:boardId', async (req, res) => {
   const topics = await db.helpers.getTopic(boardId);
   res.json(topics);
 })
+  
+const postTopicAndFirstPostSchema = joi.object({
+  boardid:joi.number().integer().required(),
+  question:joi.string().required(), // ie the title
+  created_by:joi.number().integer().required(),
+  body:joi.string().required(), // of the first post of the topic
+})
 
-app.post('/api/board/:boardId/addtopic', auth, async (req, res) => {
-  let boardid = req.body.boardId;
-  let question = req.body.question;
-  console.log("HERE " + boardid + " question: " + question);
-  await db.helpers.addTopic(boardid, question)
+app.post('/api/board/addtopic', async (req, res) => {
+  let valid = postTopicAndFirstPostSchema.validate(req.body)
+  if(valid.error == null) {
+    let body = req.body
+    await db.helpers.addTopic(body.boardid, body.question, body.created_by, body.body)
+    res.json({message:'success'})
+  } else {
+    res.status(400).json({error:{code:400, message:'invalid schema'}})
+  }
 })
 
 // app.get("*", (req, res) =>{
@@ -329,7 +434,7 @@ async function InitDB() {
 
 InitDB()
   .then(() => {
-    app.listen(port, () => {
+    server.listen(port, () => {
       console.log(`Listening on port ${port}`);
     });
   })

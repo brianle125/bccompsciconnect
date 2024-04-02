@@ -6,12 +6,12 @@
             Views:
         </div>
         <div class="stats">
-            {{topic.numberOfReplies}} <br>
-            {{topic.views}}
+            {{topic?.numberOfReplies}} <br>
+            {{topic?.views}}
         </div>
     </div>
     <div class="col-sm-7">
-        <h2 class="title"><a [href]="topic.link">{{topic.title}}</a></h2>
+        <h2 class="title"><a [href]="topic.link">{{topic?.title}}</a></h2>
     </div>
     <div class="col-sm-3">
         <div class="stats-label">
@@ -20,9 +20,9 @@
             Updated:
         </div>
         <div class="stats">
-            {{topic.originalPoster}} <br>
-            {{topic.created}}<br>
-            {{topic.lastUpdated}}
+            {{topic?.originalPoster}} <br>
+            {{topic?.created}}<br>
+            {{topic?.lastUpdated}}
         </div>
     </div>
 </div>

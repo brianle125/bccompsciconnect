@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { UserService } from '../user.service';
 
 @Component({
   selector: 'app-top-bar',
@@ -8,7 +9,7 @@ import { Component, Input } from '@angular/core';
   templateUrl: './top-bar.component.html',
   styleUrl: './top-bar.component.css'
 })
-export class TopBarComponent {
+export class TopBarComponent implements OnInit {
   loggedIn: boolean = false;
   username: string = 'user'
   profilePic: string = 'assets/user.png'
@@ -17,5 +18,19 @@ export class TopBarComponent {
   logoutLink: string = ''
   numUnReads: number = 0
 
-  constructor(){}
+  constructor(private userService: UserService){}
+
+  ngOnInit(): void {
+    this.userService.isLoggedIn().subscribe((data) => {
+      let response = data as any
+      this.loggedIn = response.loggedIn;
+      this.username = response.user;
+      this.profileLink = `/user/${this.username}`
+    })
+  }
+  
+  logOut() {
+    this.userService.logoutUser().subscribe((data) => {
+    })
+  }
 }

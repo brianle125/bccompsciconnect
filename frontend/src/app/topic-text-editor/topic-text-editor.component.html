@@ -1,0 +1,26 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit(form.value)">
+    <fieldset>
+        <div class="field">
+            <!-- <label for="text-editor-form-text-input" class="col-sm-12">Write Message</label> -->
+            <label for="topic-text-editor-form-topic-title">Title</label>
+            <div></div>
+            <input type="text" class="col-sm-12" name="topic-title" formControlName="topic-title" id="topic-text-editor-form-topic-title">
+            <div></div>
+            <label for="topic-text-editor-form-text-input">Post</label>
+            <div></div>
+            <textarea cols="30" rows="10" class="col-sm-12" id="topic-text-editor-form-text-input"
+                name="text-input" placeholder="" formControlName="text-input"></textarea>
+        </div>
+
+        <div>
+            <button class="btn btn-primary col-sm-2" [disabled]="!form.valid">
+                SUBMIT
+            </button>
+            <button type="button" class="btn btn-primary col-sm-2" [disabled]="!form.valid"
+                (click)="onPreviewClicked()"
+            >
+                PREVIEW
+            </button>
+        </div>
+    </fieldset>
+</form>
