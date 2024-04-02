@@ -110,6 +110,17 @@ app.get('/api/google/callback', passport.authenticate('google', { failureRedirec
   res.send({"status": "success"})
 });
 
+
+//USING THE GENERATED BUTTON
+app.post('/api/google/', async (req, res) => {
+  const payload = req.body
+  req.session.user = {username: payload.email}
+  req.session.loggedIn = true
+  req.session.save();
+
+  //add user to database somehow
+})
+
 ////////////////////////////
 
 //Sockets

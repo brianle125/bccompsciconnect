@@ -86,7 +86,7 @@ const helpers = {
     return res.rows;
   },
 
-  getUser: async function (username) {
+  getUserByUsername: async function (username) {
     const q = "SELECT * FROM users WHERE username=$1";
     const res = await pool.query(q, [username]);
     return res.rows;

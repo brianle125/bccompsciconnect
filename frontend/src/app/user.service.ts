@@ -39,7 +39,7 @@ export class UserService {
   }
 
   //google auth
-  googleAuthUser() {
-    return this.http.get(`${api}/google/`, {withCredentials: true})
+  googleAuthUser(user: any) {
+    return this.http.post(`${api}/google/`, user, {observe: 'response', withCredentials: true})
   }
 }
