@@ -30,7 +30,7 @@ export class TopicListComponent implements OnInit {
         let target = board.topics[i]
         this.boardService.getTopic(boardId, target.id).subscribe((data) => {
           let topic = data as any
-          console.log(topic)
+          //console.log(topic)
           this.topics[i] = new TopicListEntry(target.question, 'user', 1, topic.postCount, target.created_at, target.last_modified, `/board/${boardId}/topic/${target.id}`)
         })
       }

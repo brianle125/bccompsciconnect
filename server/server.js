@@ -78,6 +78,23 @@ passport.deserializeUser(function(obj, cb) {
   cb(null, obj);
 });
 
+const auth = (req, res, next) => {
+  const token = req.cookies.jwt;
+  if (!token) {
+    return res.status(401).send('Unauthorized Authentication');
+  }
+
+  try {
+    const decoded = jwt.verify(token, "secret_string");
+    req.user = decoded;
+    console.log("User making request: ")
+    console.log(req.user)
+    next();
+  } catch (error) {
+    res.status(400).send('Invalid token');
+  }
+};
+
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -145,22 +162,24 @@ app.get('/api/login', async (req, res) => {
 })
 
 app.post('/api/login', async (req, res) => {
-  let username = req.body.name
+  let email = req.body.email
   let password = req.body.password
 
-  const targetUser = await db.helpers.getUser(username);
+  const targetUser = await db.helpers.getUser(email);
   if(targetUser.length === 0)
   {
     console.log('Account not found')
     res.send({"status": "failed"})
   }
-  else if(username === targetUser[0].username && password === targetUser[0].password)
+  else if(email === targetUser[0].email && password === targetUser[0].password)
   {
-    req.session.user = {username: username}
+    req.session.user = {username: targetUser[0].username, email: email, password: password}
     console.log(req.session.id)
     req.session.loggedIn = true;
     req.session.save();
-    res.send({"status": "success"})
+    const token = jwt.sign({email: email, password: password}, "secret_string", {expiresIn:"1h"});
+    res.cookie('jwt', token, {httpOnly:true, secure:false})
+    res.json({ status: "success", token: token });
   }
   else
   {
@@ -169,9 +188,27 @@ app.post('/api/login', async (req, res) => {
   }
 })
 
-app.get('/api/logout', async (req, res) => {
+//For some reason it isnt working / Not calling but the clear cookie works.
+app.post('/api/logout', async (req, res) => {
+  console.log(req.session.user)
   if(req.session.user) {
     req.session.destroy();
+    res.clearCookie('jwt', {
+      httpOnly: true, 
+      secure: false
+    });
+    res.send({"status": "loggedout"})
+  }
+})
+
+app.get('/api/logout', async (req, res) => {
+  console.log(req.session.user)
+  if(req.session.user) {
+    req.session.destroy();
+    res.clearCookie('jwt', {
+      httpOnly: true, 
+      secure: false
+    });
     res.send({"status": "loggedout"})
   }
 })
@@ -179,7 +216,7 @@ app.get('/api/logout', async (req, res) => {
 app.get('/api/usercheck', async (req, res) => {
   let name = req.query.name
   let exists = false;
-  const user = await db.helpers.getUser(name);
+  const user = await db.helpers.getUserByUsername(name);
   console.log("User length:" + user.length);
   if (user.length !== 0) {
     exists = true;
@@ -193,7 +230,7 @@ app.get('/api/usercheck', async (req, res) => {
 
 app.get('/api/user/:username', async (req, res) => {
   let username = req.params.username
-  const user = await db.helpers.getUser(username);
+  const user = await db.helpers.getUserByUsername(username);
   res.json(user);
 })
 
@@ -214,6 +251,7 @@ app.put('/api/user/:username', async (req, res) => {
 
 app.get('/api/boards', isLoggedIn, async (req, res) => {
   const boards = await db.helpers.getBoards();
+  console.log(req.session.user)
   res.json(boards)
 })
 
@@ -375,7 +413,7 @@ app.get('/api/board/:boardId', async (req, res) => {
   const topics = await db.helpers.getTopic(boardId);
   res.json(topics);
 })
-
+  
 const postTopicAndFirstPostSchema = joi.object({
   boardid:joi.number().integer().required(),
   question:joi.string().required(), // ie the title
@@ -414,6 +452,7 @@ function isLoggedIn(req, res, next) {
     next()
   }
 }
+
 
 // Initialize the database
 async function InitDB() {

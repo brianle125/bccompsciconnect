@@ -35,7 +35,8 @@ export class UserService {
   }
 
   logoutUser() {
-    return this.http.get(`${api}/logout`, {withCredentials: true})
+    console.log("Calling logout");
+    return this.http.get(`${api}/logout`, {withCredentials: true});
   }
 
   //google auth

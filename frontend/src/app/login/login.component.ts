@@ -17,7 +17,7 @@ export class LoginComponent implements OnInit {
   form: FormGroup;
   constructor(private router:Router, private userService: UserService) {
     let formControls = {
-      name: new FormControl('',[ Validators.required, Validators.nullValidator, Validators.minLength(5)]),
+      email: new FormControl('',[ Validators.required, Validators.nullValidator, Validators.email]),
       password: new FormControl('',[ Validators.required, Validators.nullValidator])
     }
     this.form = new FormGroup(formControls);
@@ -69,6 +69,9 @@ export class LoginComponent implements OnInit {
   }
 
   registerUser() {
+    this.userService.logoutUser();
+    console.log("logged out");
     this.router.navigate(['/register'])
   }
+
 }
