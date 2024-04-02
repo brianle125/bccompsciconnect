@@ -127,6 +127,17 @@ app.get('/api/google/callback', passport.authenticate('google', { failureRedirec
   res.send({"status": "success"})
 });
 
+
+//USING THE GENERATED BUTTON
+app.post('/api/google/', async (req, res) => {
+  const payload = req.body
+  req.session.user = {username: payload.email}
+  req.session.loggedIn = true
+  req.session.save();
+
+  //add user to database somehow
+})
+
 ////////////////////////////
 
 //Sockets
@@ -162,7 +173,7 @@ app.post('/api/login', async (req, res) => {
   }
   else if(email === targetUser[0].email && password === targetUser[0].password)
   {
-    req.session.user = {username: username, email: email, password: password}
+    req.session.user = {username: targetUser[0].username, email: email, password: password}
     console.log(req.session.id)
     req.session.loggedIn = true;
     req.session.save();
@@ -179,16 +190,33 @@ app.post('/api/login', async (req, res) => {
 
 //For some reason it isnt working / Not calling but the clear cookie works.
 app.post('/api/logout', async (req, res) => {
-  console.log("Logged out - Node.js")
-  res.clearCookie('jwt', {
-    httpOnly: true, 
-    secure: false
-  });
+  console.log(req.session.user)
+  if(req.session.user) {
+    req.session.destroy();
+    res.clearCookie('jwt', {
+      httpOnly: true, 
+      secure: false
+    });
+    res.send({"status": "loggedout"})
+  }
+})
+
+app.get('/api/logout', async (req, res) => {
+  console.log(req.session.user)
+  if(req.session.user) {
+    req.session.destroy();
+    res.clearCookie('jwt', {
+      httpOnly: true, 
+      secure: false
+    });
+    res.send({"status": "loggedout"})
+  }
+})
 
 app.get('/api/usercheck', async (req, res) => {
   let name = req.query.name
   let exists = false;
-  const user = await db.helpers.getUser(name);
+  const user = await db.helpers.getUserByUsername(name);
   console.log("User length:" + user.length);
   if (user.length !== 0) {
     exists = true;
@@ -202,7 +230,7 @@ app.get('/api/usercheck', async (req, res) => {
 
 app.get('/api/user/:username', async (req, res) => {
   let username = req.params.username
-  const user = await db.helpers.getUser(username);
+  const user = await db.helpers.getUserByUsername(username);
   res.json(user);
 })
 
@@ -223,7 +251,7 @@ app.put('/api/user/:username', async (req, res) => {
 
 app.get('/api/boards', isLoggedIn, async (req, res) => {
   const boards = await db.helpers.getBoards();
-  
+  console.log(req.session.user)
   res.json(boards)
 })
 
