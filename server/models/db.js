@@ -7,7 +7,7 @@ const pool = new Pool({
   user: "postgres",
   host: "localhost" || process.env.DB_HOST,
   database: "testing",
-  password: process.env.DB_PASS,
+  password: process.env.LOCAL_PASS,
 });
 
 const helpers = {
