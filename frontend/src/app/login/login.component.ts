@@ -39,6 +39,9 @@ export class LoginComponent {
   }
 
   registerUser() {
+    this.userService.logoutUser();
+    console.log("logged out");
     this.router.navigate(['/register'])
   }
+
 }

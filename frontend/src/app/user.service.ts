@@ -21,4 +21,10 @@ export class UserService {
   loginUser(user: any) {
     return this.http.post<any>(`${api}/login`, user, {observe: 'response', withCredentials: true});
   }
+
+  logoutUser() {
+    console.log("Calling logout");
+    this.http.post<any>(`${api}/logout`, {withCredentials: true});
+  }
+
 }

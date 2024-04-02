@@ -22,7 +22,7 @@ const port = process.env.PORT || 8080;
 
 const corsOptions = cors({
   origin: "http://localhost:4200",
-  // allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true, 
 })
 
@@ -55,6 +55,22 @@ app.use(bodyParser.json());
 // internal modules
 const db = require('./models/db')
 
+const auth = (req, res, next) => {
+  const token = req.cookies.jwt;
+  if (!token) {
+    return res.status(401).send('Unauthorized Authentication');
+  }
+
+  try {
+    const decoded = jwt.verify(token, "secret_string");
+    req.user = decoded;
+    console.log("User making request: ")
+    console.log(req.user)
+    next();
+  } catch (error) {
+    res.status(400).send('Invalid token');
+  }
+};
 
 app.post('/api/register', async (req, res) => {
   let name = req.body.name;
@@ -84,13 +100,25 @@ app.post('/api/login', async (req, res) => {
     console.log(req.session.id)
     req.session.loggedIn = true;
     req.session.save();
-    res.send({"status": "success"})
+    const token = jwt.sign({email: email, password: password}, "secret_string", {expiresIn:"1h"});
+    res.cookie('jwt', token, {httpOnly:true, secure:false})
+    res.json({ status: "success", token: token });
   }
   else
   {
     console.log('Invalid password')
     res.send({"status": "failed"})
   }
+})
+
+//For some reason it isnt working / Not calling but the clear cookie works.
+app.post('/api/logout', async (req, res) => {
+  console.log("Logged out - Node.js")
+  res.clearCookie('jwt', {
+    httpOnly: true, 
+    secure: false
+  });
+  
 })
 
 app.get('/api/usercheck', async (req, res) => {
@@ -113,6 +141,7 @@ app.get('/api/usercheck', async (req, res) => {
 app.get('/api/boards', isLoggedIn, async (req, res) => {
   console.log(req.session.user)
   const boards = await db.helpers.getBoards();
+  
   res.json(boards)
 })
 
@@ -263,7 +292,7 @@ app.get('/api/board/:boardId', async (req, res) => {
   res.json(topics);
 })
 
-app.post('/api/board/:boardId/addtopic', async (req, res) => {
+app.post('/api/board/:boardId/addtopic', auth, async (req, res) => {
   let boardid = req.body.boardId;
   let question = req.body.question;
   console.log("HERE " + boardid + " question: " + question);
@@ -290,6 +319,7 @@ function isLoggedIn(req, res, next) {
     next()
   }
 }
+
 
 // Initialize the database
 async function InitDB() {

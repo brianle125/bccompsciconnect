@@ -13,7 +13,6 @@ export class TopicService {
   }
 
   addTopic(topic: any) {
-    console.log(topic)
     return this.http.post<any>(`${api}/board/${topic.boardId}/addtopic`, topic,  {withCredentials: true});
   }
 }
