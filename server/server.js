@@ -246,6 +246,29 @@ app.put('/api/user/:username', async (req, res) => {
   req.session.save()
 })
 
+app.put('/api/edituser/', async (req, res) => {
+  let username = req.body.username
+  let role = req.body.role
+  let id = req.body.id
+  const user = await db.helpers.editUserById(id, username, role);
+})
+
+app.get('/api/users', isLoggedIn, async (req, res) => {
+  const users = await db.helpers.getUsers();
+  res.json(users)
+})
+
+app.post('/api/delete', async (req, res) => {
+  try {
+    let id = req.body.id;
+    await db.helpers.deleteUser(id);
+    res.status(200).send("User deleted successfully");
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).send("Internal Server Error"); 
+  }
+});
+
 // BOARDS //
 
 app.get('/api/boards', isLoggedIn, async (req, res) => {
