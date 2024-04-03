@@ -35,11 +35,12 @@ export class UserService {
   }
 
   logoutUser() {
-    return this.http.get(`${api}/logout`, {withCredentials: true})
+    console.log("Calling logout");
+    return this.http.get(`${api}/logout`, {withCredentials: true});
   }
 
   //google auth
-  googleAuthUser() {
-    return this.http.get(`${api}/google/`, {withCredentials: true})
+  googleAuthUser(user: any) {
+    return this.http.post(`${api}/google/`, user, {observe: 'response', withCredentials: true})
   }
 }

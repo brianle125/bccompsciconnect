@@ -84,6 +84,23 @@ passport.deserializeUser(function (obj, cb) {
   cb(null, obj);
 });
 
+const auth = (req, res, next) => {
+  const token = req.cookies.jwt;
+  if (!token) {
+    return res.status(401).send("Unauthorized Authentication");
+  }
+
+  try {
+    const decoded = jwt.verify(token, "secret_string");
+    req.user = decoded;
+    console.log("User making request: ");
+    console.log(req.user);
+    next();
+  } catch (error) {
+    res.status(400).send("Invalid token");
+  }
+};
+
 passport.use(
   new GoogleStrategy(
     {
@@ -124,6 +141,23 @@ app.get(
     res.send({ status: "success" });
   }
 );
+  //TODO: handle how it interacts with user database
+  
+  req.session.loggedIn = true;
+  req.session.save();
+  res.send({"status": "success"})
+});
+
+
+//USING THE GENERATED BUTTON
+app.post('/api/google/', async (req, res) => {
+  const payload = req.body
+  req.session.user = {username: payload.email}
+  req.session.loggedIn = true
+  req.session.save();
+
+  //add user to database somehow
+})
 
 ////////////////////////////
 
@@ -153,6 +187,9 @@ app.get("/api/login", async (req, res) => {
 app.post("/api/login", async (req, res) => {
   let username = req.body.name;
   let password = req.body.password;
+app.post('/api/login', async (req, res) => {
+  let email = req.body.email
+  let password = req.body.password
 
   const targetUser = await db.helpers.getUser(username);
   if (targetUser.length === 0) {
@@ -164,26 +201,66 @@ app.post("/api/login", async (req, res) => {
   ) {
     req.session.user = { username: username };
     console.log(req.session.id);
+  const targetUser = await db.helpers.getUser(email);
+  if(targetUser.length === 0)
+  {
+    console.log('Account not found')
+    res.send({"status": "failed"})
+  }
+  else if(email === targetUser[0].email && password === targetUser[0].password)
+  {
+    req.session.user = {username: targetUser[0].username, email: email, password: password}
+    console.log(req.session.id)
     req.session.loggedIn = true;
     req.session.save();
     res.send({ status: "success" });
   } else {
     console.log("Invalid password");
     res.send({ status: "failed" });
+    const token = jwt.sign({email: email, password: password}, "secret_string", {expiresIn:"1h"});
+    res.cookie('jwt', token, {httpOnly:true, secure:false})
+    res.json({ status: "success", token: token });
+  }
+  else
+  {
+    console.log('Invalid password')
+    res.send({"status": "failed"})
   }
 });
+})
+
+//For some reason it isnt working / Not calling but the clear cookie works.
+app.post('/api/logout', async (req, res) => {
+  console.log(req.session.user)
+  if(req.session.user) {
+    req.session.destroy();
+    res.clearCookie('jwt', {
+      httpOnly: true, 
+      secure: false
+    });
+    res.send({"status": "loggedout"})
+  }
+})
 
 app.get("/api/logout", async (req, res) => {
   if (req.session.user) {
+app.get('/api/logout', async (req, res) => {
+  console.log(req.session.user)
+  if(req.session.user) {
     req.session.destroy();
     res.send({ status: "loggedout" });
+    res.clearCookie('jwt', {
+      httpOnly: true, 
+      secure: false
+    });
+    res.send({"status": "loggedout"})
   }
 });
 
 app.get("/api/usercheck", async (req, res) => {
   let name = req.query.name;
   let exists = false;
-  const user = await db.helpers.getUser(name);
+  const user = await db.helpers.getUserByUsername(name);
   console.log("User length:" + user.length);
   if (user.length !== 0) {
     exists = true;
@@ -198,6 +275,9 @@ app.get("/api/usercheck", async (req, res) => {
 app.get("/api/user/:username", async (req, res) => {
   let username = req.params.username;
   const user = await db.helpers.getUser(username);
+app.get('/api/user/:username', async (req, res) => {
+  let username = req.params.username
+  const user = await db.helpers.getUserByUsername(username);
   res.json(user);
 });
 
@@ -223,6 +303,7 @@ app.put("/api/user/:username", async (req, res) => {
 
 app.get("/api/boards", isLoggedIn, async (req, res) => {
   const boards = await db.helpers.getBoards();
+  console.log(req.session.user)
   res.json(boards);
 });
 
@@ -387,6 +468,8 @@ app.get("/api/board/:boardId", async (req, res) => {
   res.json(topics);
 });
 
+})
+  
 const postTopicAndFirstPostSchema = joi.object({
   boardid: joi.number().integer().required(),
   question: joi.string().required(), // ie the title
