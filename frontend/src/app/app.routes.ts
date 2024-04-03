@@ -9,6 +9,8 @@ import { CreateTopicComponent } from './create-topic/create-topic.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
 import { UserEditComponent } from './user-edit/user-edit.component';
 import { PostListComponent } from './post-list/post-list.component';
+import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
+import { authGuard } from './auth.guard';
 
 export const routes: Routes = [
   { path: '', component: HomePageComponent },
@@ -20,6 +22,7 @@ export const routes: Routes = [
   { path: 'register', component: RegistrationComponent },
   { path: 'create-topic', component: CreateTopicComponent },
   { path: 'user/:username', component: UserProfileComponent},
+  {path: 'admin/dashboard', component: AdminDashboardComponent, canActivate: [authGuard]},
   // tentative
   { path: 'user/:username/edit', component: UserEditComponent}
 ];

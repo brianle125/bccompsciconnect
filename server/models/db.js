@@ -86,6 +86,12 @@ const helpers = {
     return res.rows;
   },
 
+  getUsers: async function () {
+    const q = "SELECT * FROM users";
+    const res = await pool.query(q);
+    return res.rows;
+  },
+
   getUserByUsername: async function (username) {
     const q = "SELECT * FROM users WHERE username=$1";
     const res = await pool.query(q, [username]);
@@ -100,6 +106,17 @@ const helpers = {
   editUser: async function(username, email, password, description, oldUsername) {
     const q = `UPDATE users SET username=$1, email=$2, password=$3, description=$4 WHERE username = '${oldUsername}'`;
     const query = await pool.query(q, [username, email, password, description])
+  },
+
+  editUserById: async function(id, username, role) {
+    const q = `UPDATE users SET username=$2, role=$3 WHERE id = $1 RETURNING *`;
+    const queryResult = await pool.query(q, [id, username, role]);
+    return queryResult.rows[0];
+  },
+
+  deleteUser: async function(id) {
+    const q = 'DELETE FROM users WHERE id = $1';
+    const queryResult = await pool.query(q, [id]);
   },
 
   /**
