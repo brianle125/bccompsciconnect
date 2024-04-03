@@ -101,20 +101,19 @@ const auth = (req, res, next) => {
   }
 };
 
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://localhost:8080/api/google/callback",
-    },
-    function (accessToken, refreshToken, profile, done) {
-      userProfile = profile;
-      return done(null, userProfile);
-    }
-  )
-);
-
+// passport.use(
+//   new GoogleStrategy(
+//     {
+//       clientID: process.env.GOOGLE_CLIENT_ID,
+//       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+//       callbackURL: "http://localhost:8080/api/google/callback",
+//     },
+//     function (accessToken, refreshToken, profile, done) {
+//       userProfile = profile;
+//       return done(null, userProfile);
+//     }
+//   )
+// );
 app.get(
   "/api/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
@@ -141,23 +140,16 @@ app.get(
     res.send({ status: "success" });
   }
 );
-  //TODO: handle how it interacts with user database
-  
-  req.session.loggedIn = true;
-  req.session.save();
-  res.send({"status": "success"})
-});
-
 
 //USING THE GENERATED BUTTON
-app.post('/api/google/', async (req, res) => {
-  const payload = req.body
-  req.session.user = {username: payload.email}
-  req.session.loggedIn = true
+app.post("/api/google/", async (req, res) => {
+  const payload = req.body;
+  req.session.user = { username: payload.email };
+  req.session.loggedIn = true;
   req.session.save();
 
   //add user to database somehow
-})
+});
 
 ////////////////////////////
 
@@ -185,75 +177,60 @@ app.get("/api/login", async (req, res) => {
 });
 
 app.post("/api/login", async (req, res) => {
-  let username = req.body.name;
+  let email = req.body.email;
   let password = req.body.password;
-app.post('/api/login', async (req, res) => {
-  let email = req.body.email
-  let password = req.body.password
 
-  const targetUser = await db.helpers.getUser(username);
+  const targetUser = await db.helpers.getUser(email);
   if (targetUser.length === 0) {
     console.log("Account not found");
     res.send({ status: "failed" });
   } else if (
-    username === targetUser[0].username &&
+    email === targetUser[0].email &&
     password === targetUser[0].password
   ) {
-    req.session.user = { username: username };
+    req.session.user = {
+      username: targetUser[0].username,
+      email: email,
+      password: password,
+    };
     console.log(req.session.id);
-  const targetUser = await db.helpers.getUser(email);
-  if(targetUser.length === 0)
-  {
-    console.log('Account not found')
-    res.send({"status": "failed"})
-  }
-  else if(email === targetUser[0].email && password === targetUser[0].password)
-  {
-    req.session.user = {username: targetUser[0].username, email: email, password: password}
-    console.log(req.session.id)
     req.session.loggedIn = true;
     req.session.save();
-    res.send({ status: "success" });
+    const token = jwt.sign(
+      { email: email, password: password },
+      "secret_string",
+      { expiresIn: "1h" }
+    );
+    res.cookie("jwt", token, { httpOnly: true, secure: false });
+    res.json({ status: "success", token: token });
   } else {
     console.log("Invalid password");
     res.send({ status: "failed" });
-    const token = jwt.sign({email: email, password: password}, "secret_string", {expiresIn:"1h"});
-    res.cookie('jwt', token, {httpOnly:true, secure:false})
-    res.json({ status: "success", token: token });
-  }
-  else
-  {
-    console.log('Invalid password')
-    res.send({"status": "failed"})
   }
 });
-})
 
 //For some reason it isnt working / Not calling but the clear cookie works.
-app.post('/api/logout', async (req, res) => {
-  console.log(req.session.user)
-  if(req.session.user) {
+app.post("/api/logout", async (req, res) => {
+  console.log(req.session.user);
+  if (req.session.user) {
     req.session.destroy();
-    res.clearCookie('jwt', {
-      httpOnly: true, 
-      secure: false
+    res.clearCookie("jwt", {
+      httpOnly: true,
+      secure: false,
     });
-    res.send({"status": "loggedout"})
+    res.send({ status: "loggedout" });
   }
-})
+});
 
 app.get("/api/logout", async (req, res) => {
+  console.log(req.session.user);
   if (req.session.user) {
-app.get('/api/logout', async (req, res) => {
-  console.log(req.session.user)
-  if(req.session.user) {
     req.session.destroy();
-    res.send({ status: "loggedout" });
-    res.clearCookie('jwt', {
-      httpOnly: true, 
-      secure: false
+    res.clearCookie("jwt", {
+      httpOnly: true,
+      secure: false,
     });
-    res.send({"status": "loggedout"})
+    res.send({ status: "loggedout" });
   }
 });
 
@@ -274,9 +251,6 @@ app.get("/api/usercheck", async (req, res) => {
 
 app.get("/api/user/:username", async (req, res) => {
   let username = req.params.username;
-  const user = await db.helpers.getUser(username);
-app.get('/api/user/:username', async (req, res) => {
-  let username = req.params.username
   const user = await db.helpers.getUserByUsername(username);
   res.json(user);
 });
@@ -303,7 +277,7 @@ app.put("/api/user/:username", async (req, res) => {
 
 app.get("/api/boards", isLoggedIn, async (req, res) => {
   const boards = await db.helpers.getBoards();
-  console.log(req.session.user)
+  console.log(req.session.user);
   res.json(boards);
 });
 
@@ -468,8 +442,6 @@ app.get("/api/board/:boardId", async (req, res) => {
   res.json(topics);
 });
 
-})
-  
 const postTopicAndFirstPostSchema = joi.object({
   boardid: joi.number().integer().required(),
   question: joi.string().required(), // ie the title
@@ -530,26 +502,6 @@ app.post("/api/upload", upload.single("image"), async (req, res) => {
   } catch (err) {
     console.error("Failed to upload image:", err);
     res.status(500).send("Failed to upload image.");
-  }
-});
-
-app.get("/api/images/user/:userid", async (req, res) => {
-  const { userid } = req.params;
-
-  // Optional: Validate userid if needed
-  if (!userid || isNaN(Number(userid))) {
-    return res.status(400).send("Invalid user ID.");
-  }
-
-  try {
-    const images = await db.helpers.getImagesByUserId(userid);
-    if (images.length === 0) {
-      return res.status(404).send("No images found for this user.");
-    }
-    res.json(images);
-  } catch (err) {
-    console.error("Failed to fetch images for user:", err);
-    res.status(500).send("Failed to fetch images.");
   }
 });
 
