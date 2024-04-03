@@ -14,10 +14,12 @@ import { UserProfileData } from '../user-profile/user-profile.component';
 })
 export class UserEditComponent implements OnInit {
   form: FormGroup
+  username: string | null
   constructor(private route: ActivatedRoute, private router: Router, private userService: UserService) {
     //Will more than likely need a cleaner way of loading default values into form
     const routeParams = this.route.snapshot.paramMap;
     const username = routeParams.get('username');
+    this.username = username
 
     let formControls = {
       username: new FormControl(username,[ Validators.required, Validators.nullValidator, Validators.minLength(5)]),
@@ -42,6 +44,7 @@ export class UserEditComponent implements OnInit {
     })
   }
 
+
   onSubmit() {
     const routeParams = this.route.snapshot.paramMap;
     const username = routeParams.get('username');
@@ -49,15 +52,19 @@ export class UserEditComponent implements OnInit {
     if (this.form.invalid) {
       return;
     }
-
     //TODO: If currentPassword doesn't match the user's password, edit fails
 
     console.log(this.form.value)
-    //Update user's info
-    this.userService.editUser(username, this.form.value).subscribe()
+    //Update user's info, make api calls for each attribute
+    //this.userService.editUser(username, this.form.value).subscribe()
+    
     this.router.navigate([`/user/${this.form.value.username}`]).then(() => {
       alert("User details successfully edited!");
       window.location.reload();
     });
+  }
+
+  cancelEdit() {
+    this.router.navigate([`/user/${this.username}`])
   }
 }

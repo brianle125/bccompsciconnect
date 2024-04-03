@@ -36,11 +36,16 @@ const helpers = {
       id SERIAL, 
       username varchar(255), 
       email varchar(255), 
-      password varchar(1000), 
       description varchar(500),
       role varchar(255), 
       created_at timestamp, 
       PRIMARY KEY(id)
+    )`
+    const accounts = `CREATE TABLE IF NOT EXISTS accounts (
+      email varchar(255),
+      password varchar(1000),
+      role varchar(255),
+      google_id varchar(1000)
     )`
     const posts = `CREATE TABLE IF NOT EXISTS posts (
       id SERIAL, 
@@ -69,6 +74,7 @@ const helpers = {
 
     //call queries
     await pool.query(users);
+    await pool.query(accounts);
     await pool.query(login);
     await pool.query(board);
     await pool.query(topics);
@@ -92,9 +98,12 @@ const helpers = {
     return res.rows;
   },
 
-  addUser: async function (username, email, password, role) {
-    const q = `INSERT INTO users VALUES(DEFAULT, $1, $2, $3, 'User has not changed bio', $4, CURRENT_TIMESTAMP)`;
-    const query = await pool.query(q, [username, email, password, role]);
+  addUser: async function (username, email, password, role, google_id) {
+    const q = `INSERT INTO users VALUES(DEFAULT, $1, $2, 'User has not changed bio', $3, CURRENT_TIMESTAMP)`;
+    const query = await pool.query(q, [username, email, role]);
+
+    const a = 'INSERT INTO accounts VALUES($1, $2, $3, $4)'
+    const accountQuery = await pool.query(a, [email, password, role, google_id])
   },
 
   editUser: async function(username, email, password, description, oldUsername) {

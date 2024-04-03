@@ -7,6 +7,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser')
 var logger = require('morgan');
 const joi = require('joi') // schema validation
+const { v4: uuidv4 } = require('uuid');
 
 
 
@@ -62,80 +63,20 @@ const helpers = require('./helpers')
 
 ////////////////////////////
 /*  Google AUTH  */
- 
-var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-var passport = require('passport');
-var userProfile;
- 
-app.use(passport.initialize());
-app.use(passport.session());
-
-passport.serializeUser(function(user, cb) {
-  cb(null, user);
-});
- 
-passport.deserializeUser(function(obj, cb) {
-  cb(null, obj);
-});
-
-const auth = (req, res, next) => {
-  const token = req.cookies.jwt;
-  if (!token) {
-    return res.status(401).send('Unauthorized Authentication');
-  }
-
-  try {
-    const decoded = jwt.verify(token, "secret_string");
-    req.user = decoded;
-    console.log("User making request: ")
-    console.log(req.user)
-    next();
-  } catch (error) {
-    res.status(400).send('Invalid token');
-  }
-};
-
-passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://localhost:8080/api/google/callback"
-  },
-  function(accessToken, refreshToken, profile, done) {
-      userProfile=profile;
-      return done(null, userProfile);
-  }
-));
-app.get('/api/google', 
-  passport.authenticate('google', { scope : ['profile', 'email'] }));
-
-app.get('/api/google/error', (req, res) => {
-  res.send({"status": "failure"})
-})
-
-app.get('/api/google/callback', passport.authenticate('google', { failureRedirect: '/auth/google/error' }),
-  async (req, res) => {
-  // Successful authentication
-  console.log(userProfile)
-  //load session parameters from payload
-  req.session.user = {username: userProfile.displayName};
-  req.session.username = userProfile.displayName
-
-  //TODO: handle how it interacts with user database
-  
-  req.session.loggedIn = true;
-  req.session.save();
-  res.send({"status": "success"})
-});
-
 
 //USING THE GENERATED BUTTON
 app.post('/api/google/', async (req, res) => {
   const payload = req.body
+  console.log(payload)
   req.session.user = {username: payload.email}
   req.session.loggedIn = true
   req.session.save();
 
-  //add user to database somehow
+  //add user to database if email doesn't exist
+  const possibleUser = await db.helpers.getUser(payload.email)
+  if(possibleUser.length === 0) {
+    await db.helpers.addUser(payload.email, payload.email, null, 'user', payload.sub);
+  }
 })
 
 ////////////////////////////
@@ -154,7 +95,8 @@ app.post('/api/register', async (req, res) => {
   let email = req.body.email;
   let password = req.body.password
 
-  await db.helpers.addUser(name, email, password, 'user');
+  //user is creating account using site
+  await db.helpers.addUser(name, email, password, 'user', null);
 })
 
 app.get('/api/login', async (req, res) => {
@@ -246,12 +188,30 @@ app.put('/api/user/:username', async (req, res) => {
   req.session.save()
 })
 
+//Changing user details //
+
+//Username
+app.put('/api/user/:username/username', async (req, res) => {
+  
+})
+//Email
+app.put('/api/user/:username/email', async (req, res) => {
+  
+})
+//Password
+app.put('/api/user/:username/password', async (req, res) => {
+  
+})
+//Description
+app.put('/api/user/:username/description', async (req, res) => {
+  
+})
+
 
 // BOARDS //
 
 app.get('/api/boards', isLoggedIn, async (req, res) => {
   const boards = await db.helpers.getBoards();
-  console.log(req.session.user)
   res.json(boards)
 })
 
