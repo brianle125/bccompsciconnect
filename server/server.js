@@ -62,7 +62,7 @@ const helpers = require('./helpers')
 
 ////////////////////////////
 /*  Google AUTH  */
- 
+/* 
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 var passport = require('passport');
 var userProfile;
@@ -139,7 +139,7 @@ app.post('/api/google/', async (req, res) => {
 })
 
 ////////////////////////////
-
+*/
 //Sockets
 io.on('connection', (socket) => {
   console.log("a user connected")
@@ -158,7 +158,7 @@ app.post('/api/register', async (req, res) => {
 })
 
 app.get('/api/login', async (req, res) => {
-  req.session.user ? res.status(200).send({loggedIn: true, user: req.session.user.username}) : res.status(200).send({loggedIn: false});
+  req.session.user ? res.status(200).send({loggedIn: true, user: req.session.user.username, role: req.session.user.role}) : res.status(200).send({loggedIn: false});
 })
 
 app.post('/api/login', async (req, res) => {
@@ -173,13 +173,13 @@ app.post('/api/login', async (req, res) => {
   }
   else if(email === targetUser[0].email && password === targetUser[0].password)
   {
-    req.session.user = {username: targetUser[0].username, email: email, password: password}
+    req.session.user = {username: targetUser[0].username, email: email, password: password, role: targetUser[0].role}
     console.log(req.session.id)
     req.session.loggedIn = true;
     req.session.save();
     const token = jwt.sign({email: email, password: password}, "secret_string", {expiresIn:"1h"});
     res.cookie('jwt', token, {httpOnly:true, secure:false})
-    res.json({ status: "success", token: token });
+    res.json({ status: "success", token: token, role: targetUser[0].role });
   }
   else
   {
@@ -245,7 +245,6 @@ app.put('/api/user/:username', async (req, res) => {
   req.session.user = {username: newUsername}
   req.session.save()
 })
-
 
 // BOARDS //
 
