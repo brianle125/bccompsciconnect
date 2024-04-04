@@ -11,6 +11,7 @@ import { UserEditComponent } from './user-edit/user-edit.component';
 import { PostListComponent } from './post-list/post-list.component';
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
 import { authGuard } from './auth.guard';
+import { sessionGuard } from './session.guard';
 
 export const routes: Routes = [
   { path: '', component: HomePageComponent },
@@ -24,5 +25,5 @@ export const routes: Routes = [
   { path: 'user/:username', component: UserProfileComponent},
   {path: 'admin/dashboard', component: AdminDashboardComponent, canActivate: [authGuard]},
   // tentative
-  { path: 'user/:username/edit', component: UserEditComponent}
+  { path: 'user/:username/edit', component: UserEditComponent, canActivate: [sessionGuard]}
 ];

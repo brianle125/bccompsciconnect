@@ -1,12 +1,15 @@
-require("dotenv").config({ path: __dirname + ".env" });
-var session = require("express-session");
-var createError = require("http-errors");
-var express = require("express");
-var path = require("path");
-var cookieParser = require("cookie-parser");
-var bodyParser = require("body-parser");
-var logger = require("morgan");
-const joi = require("joi"); // schema validation
+require('dotenv').config({path:__dirname+'.env'})
+var session = require('express-session')
+var createError = require('http-errors');
+var express = require('express');
+var path = require('path');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser')
+var logger = require('morgan');
+const joi = require('joi') // schema validation
+const { v4: uuidv4 } = require('uuid');
+
+
 
 // var indexRouter = require('./routes/index');
 // var usersRouter = require('./routes/users');
@@ -68,91 +71,27 @@ const helpers = require("./helpers");
 
 ////////////////////////////
 /*  Google AUTH  */
-/* 
-var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-var passport = require('passport');
-var userProfile;
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-passport.serializeUser(function (user, cb) {
-  cb(null, user);
-});
-
-passport.deserializeUser(function (obj, cb) {
-  cb(null, obj);
-});
-
-const auth = (req, res, next) => {
-  const token = req.cookies.jwt;
-  if (!token) {
-    return res.status(401).send("Unauthorized Authentication");
-  }
-
-  try {
-    const decoded = jwt.verify(token, "secret_string");
-    req.user = decoded;
-    console.log("User making request: ");
-    console.log(req.user);
-    next();
-  } catch (error) {
-    res.status(400).send("Invalid token");
-  }
-};
-
-// passport.use(
-//   new GoogleStrategy(
-//     {
-//       clientID: process.env.GOOGLE_CLIENT_ID,
-//       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-//       callbackURL: "http://localhost:8080/api/google/callback",
-//     },
-//     function (accessToken, refreshToken, profile, done) {
-//       userProfile = profile;
-//       return done(null, userProfile);
-//     }
-//   )
-// );
-app.get(
-  "/api/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
-
-app.get("/api/google/error", (req, res) => {
-  res.send({ status: "failure" });
-});
-
-app.get(
-  "/api/google/callback",
-  passport.authenticate("google", { failureRedirect: "/auth/google/error" }),
-  async (req, res) => {
-    // Successful authentication
-    console.log(userProfile);
-    //load session parameters from payload
-    req.session.user = { username: userProfile.displayName };
-    req.session.username = userProfile.displayName;
-
-    //TODO: handle how it interacts with user database
-
-    req.session.loggedIn = true;
-    req.session.save();
-    res.send({ status: "success" });
-  }
-);
 
 //USING THE GENERATED BUTTON
-app.post("/api/google/", async (req, res) => {
-  const payload = req.body;
-  req.session.user = { username: payload.email };
-  req.session.loggedIn = true;
-  req.session.save();
-
-  //add user to database somehow
-});
+app.post('/api/google/', async (req, res) => {
+  const payload = req.body
+  const possibleUser = await db.helpers.getUser(payload.email)
+  
+  //add user to database if email doesn't exist, otherwise login with existing credentials
+  if(possibleUser.length === 0) {
+    req.session.user = {username: payload.email}
+    req.session.loggedIn = true
+    req.session.save();
+    await db.helpers.addUser(payload.email, payload.email, null, 'user', payload.sub);
+  } else {
+    req.session.user = {username: possibleUser[0].username, email: possibleUser[0].email, role: possibleUser[0].role}
+    req.session.loggedIn = true
+    req.session.save();
+  }
+})
 
 ////////////////////////////
-*/
+
 //Sockets
 io.on("connection", (socket) => {
   console.log("a user connected");
@@ -167,8 +106,9 @@ app.post("/api/register", async (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
 
-  await db.helpers.addUser(name, email, password, "user");
-});
+  //user is creating account using site
+  await db.helpers.addUser(name, email, password, 'user', null);
+})
 
 app.get('/api/login', async (req, res) => {
   req.session.user ? res.status(200).send({loggedIn: true, user: req.session.user.username, role: req.session.user.role}) : res.status(200).send({loggedIn: false});
@@ -179,12 +119,14 @@ app.post("/api/login", async (req, res) => {
   let password = req.body.password;
 
   const targetUser = await db.helpers.getUser(email);
+  const accountDetails = await db.helpers.getAccount(email);
+
   if(targetUser.length === 0)
   {
     console.log('Account not found')
     res.send({"status": "failed"})
   }
-  else if(email === targetUser[0].email && password === targetUser[0].password)
+  else if(email === targetUser[0].email && password === accountDetails[0].password)
   {
     req.session.user = {username: targetUser[0].username, email: email, password: password, role: targetUser[0].role}
     console.log(req.session.id)
@@ -242,12 +184,47 @@ app.get("/api/user/:username", async (req, res) => {
   res.json(user);
 });
 
-app.put("/api/user/:username", async (req, res) => {
-  let oldUsername = req.params.username;
-  let newUsername = req.body.username;
-  let email = req.body.email;
-  let password = req.body.password;
-  let description = req.body.description;
+app.put('/api/user/:username/editprofile', async (req, res) => {
+  let oldUsername = req.params.username  
+  let newUsername = req.body.username
+  let email = req.body.email
+  let password = req.body.password
+  let description = req.body.description
+
+  await db.helpers.editUserProfile(newUsername, email, password, description, oldUsername);
+  req.session.user.username = newUsername
+  req.session.save();
+})
+
+app.put('/api/user/:username/editusername', async (req, res) => {
+  let oldUsername = req.params.username  
+  let newUsername = req.body.username
+  await db.helpers.editUserUsername(newUsername, oldUsername);
+
+  //change the username
+  req.session.user.username = newUsername
+  console.log(req.session.user)
+  req.session.save()
+})
+
+app.put('/api/user/:username/editemail', async (req, res) => {
+  let oldUsername = req.params.username  
+  let newEmail = req.body.email
+  await db.helpers.editUserEmail(newEmail, oldUsername);
+  req.session.user.email = newEmail
+  req.session.save()
+})
+
+app.put('/api/user/:username/editpassword', async (req, res) => {
+  let email = req.body.email  
+  let newPassword = req.body.password
+  await db.helpers.editUserPassword(newPassword, email);
+})
+
+app.put('/api/user/:username/editdescription', async (req, res) => {
+  let oldUsername = req.params.username  
+  let newDesc = req.body.description
+  await db.helpers.editUserDescription(newDesc, oldUsername);
 })
 
 app.put('/api/edituser/', async (req, res) => {
@@ -275,11 +252,14 @@ app.post('/api/delete', async (req, res) => {
 
 // BOARDS //
 
-app.get("/api/boards", isLoggedIn, async (req, res) => {
+app.get('/api/boards', isLoggedIn, async (req, res) => {
+  if(req.session.user) {
+    console.log(req.session.user.username)
+  }
+
   const boards = await db.helpers.getBoards();
-  console.log(req.session.user);
-  res.json(boards);
-});
+  res.json(boards)
+})
 
 app.get("/api/board", async (req, res) => {
   const boards = await db.helpers.getBoards();

@@ -22,8 +22,8 @@ export class UserService {
     return this.http.get(`${api}/user/${username}`, {withCredentials: true})
   }
 
-  editUser(username: any, user: any) {
-    return this.http.put(`${api}/user/${username}`, user, {withCredentials: true})
+  editUserProfile(username: any, user: any) {
+    return this.http.put(`${api}/user/${username}/editprofile`, user, {withCredentials: true})
   }
 
   addUser(user: any) {

@@ -11,11 +11,6 @@
         <div *ngIf="form.get('email')?.errors?.['required']">Email is required.</div>
         <div *ngIf="form.get('email')?.errors?.['email']">Email must be valid.</div>
     </div>
-    <label>Current password</label>
-    <input type="password" name="currentPassword" formControlName="currentPassword" required>
-    <div *ngIf="form.get('currentPassword')?.invalid && (form.get('password')?.dirty || form.get('password')?.touched)" id="errorDiv">
-        <div *ngIf="form.get('currentPassword')?.errors?.['required']">Password is required.</div>
-    </div>
     <label>Change password</label>
     <input type="password" name="password" formControlName="password" required>
     <div *ngIf="form.get('password')?.invalid && (form.get('password')?.dirty || form.get('password')?.touched)" id="errorDiv">
@@ -25,5 +20,7 @@
     <label>Edit bio</label>
     <textarea name="description" formControlName="description"></textarea>
     <button type="submit">Save</button>
+
+    <button (click)="cancelEdit()">Cancel</button>
 </form>
   
