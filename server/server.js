@@ -186,7 +186,7 @@ app.post("/api/login", async (req, res) => {
   }
   else if(email === targetUser[0].email && password === targetUser[0].password)
   {
-    req.session.user = {username: targetUser[0].username, email: email, password: password, role: targetUser[0].role}
+    req.session.user = {id: targetUser[0].id, username: targetUser[0].username, email: email, password: password, role: targetUser[0].role}
     console.log(req.session.id)
     req.session.loggedIn = true;
     req.session.save();
