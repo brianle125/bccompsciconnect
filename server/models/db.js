@@ -92,6 +92,18 @@ const helpers = {
     return res.rows;
   },
 
+  getAccount: async function (email) {
+    const q = "SELECT * FROM accounts WHERE email=$1";
+    const res = await pool.query(q, [email]);
+    return res.rows;
+  },
+
+  getUsers: async function () {
+    const q = "SELECT * FROM users";
+    const res = await pool.query(q);
+    return res.rows;
+  },
+
   getUserByUsername: async function (username) {
     const q = "SELECT * FROM users WHERE username=$1";
     const res = await pool.query(q, [username]);
@@ -106,9 +118,40 @@ const helpers = {
     const accountQuery = await pool.query(a, [email, password, role, google_id])
   },
 
-  editUser: async function(username, email, password, description, oldUsername) {
+  editUserProfile: async function(username, email, password, description, oldUsername) {
     const q = `UPDATE users SET username=$1, email=$2, password=$3, description=$4 WHERE username = '${oldUsername}'`;
     const query = await pool.query(q, [username, email, password, description])
+  },
+
+  editUserUsername: async function(username, oldUsername) {
+    const q = `UPDATE users SET username=$1 WHERE username='${oldUsername}'`
+    const query = await pool.query(q, [username])
+  },
+
+  editUserEmail: async function(email, oldUsername) {
+    const q = `UPDATE users SET email=$1 WHERE username='${oldUsername}'`
+    const query = await pool.query(q, [email])
+  },
+
+  editUserPassword: async function(password, email) {
+    const q = `UPDATE accounts SET password=$1 WHERE email='${email}'`
+    const query = await pool.query(q, [password])
+  },
+
+  editUserDescription: async function(description, oldUsername) {
+    const q = `UPDATE users SET description=$1 WHERE username='${oldUsername}'`
+    const query = await pool.query(q, [description])
+  },
+
+  editUserById: async function(id, username, role) {
+    const q = `UPDATE users SET username=$2, role=$3 WHERE id = $1 RETURNING *`;
+    const queryResult = await pool.query(q, [id, username, role]);
+    return queryResult.rows[0];
+  },
+
+  deleteUser: async function(id) {
+    const q = 'DELETE FROM users WHERE id = $1';
+    const queryResult = await pool.query(q, [id]);
   },
 
   /**

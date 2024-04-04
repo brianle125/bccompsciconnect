@@ -63,7 +63,7 @@ export class LoginComponent implements OnInit {
       } else if(response.body.status === "failed") {
         alert("User/pass not found.");
         this.router.navigate(['/register']);
-      }
+      } 
     })
   }
 
