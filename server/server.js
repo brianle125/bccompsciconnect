@@ -397,21 +397,23 @@ app.delete("/api/board/:boardId/topic/:topicId", async (req, res) => {
 });
 
 const postPostSchema = joi.object({
-  created_by: joi.number().integer().required(),
   text: joi.string().required(),
 });
 
 app.post("/api/board/:boardId/topic/:topicId/add-post", async (req, res) => {
+  if(req.session.user == null || req.session.user.id == null) {
+    res.status(401).json({ error: { code: 401, message: "must be logged in to add topic" } });
+  }
+
   let boardId = req.params.boardId;
   let topicId = req.params.topicId;
   let body = req.body;
   let valid = postPostSchema.validate(body);
-  if (valid.error == null) {
-    await db.helpers.addPost(topicId, text, body.created_by);
-    res.redirect(302, `/api/board/${boardId}/topic/${topicId}`);
-  } else {
+  if(valid.error != null) {
     res.status(400).json({ error: { code: 400, message: "invalid schema" } });
   }
+  await db.helpers.addPost(topicId, body.text, req.session.user.id);
+  res.redirect(302, `/api/board/${boardId}/topic/${topicId}`);
 });
 
 //CHANGING THESE ENDPOINTS LATER IF NEEDED
