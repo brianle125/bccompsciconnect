@@ -248,6 +248,7 @@ app.put("/api/user/:username", async (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
   let description = req.body.description;
+})
 
 app.put('/api/edituser/', async (req, res) => {
   let username = req.body.username
