@@ -139,6 +139,17 @@ const helpers = {
     const queryResult = await pool.query(q, [id]);
   },
 
+  editUserById: async function(id, username, role) {
+    const q = `UPDATE users SET username=$2, role=$3 WHERE id = $1 RETURNING *`;
+    const queryResult = await pool.query(q, [id, username, role]);
+    return queryResult.rows[0];
+  },
+
+  deleteUser: async function(id) {
+    const q = 'DELETE FROM users WHERE id = $1';
+    const queryResult = await pool.query(q, [id]);
+  },
+
   /**
    * BOARDS
    */

@@ -170,42 +170,29 @@ app.post("/api/register", async (req, res) => {
   await db.helpers.addUser(name, email, password, "user");
 });
 
-app.get("/api/login", async (req, res) => {
-  req.session.user
-    ? res.status(200).send({ loggedIn: true, user: req.session.user.username })
-    : res.status(200).send({ loggedIn: false });
-});
+app.get('/api/login', async (req, res) => {
+  req.session.user ? res.status(200).send({loggedIn: true, user: req.session.user.username, role: req.session.user.role}) : res.status(200).send({loggedIn: false});
+})
 
 app.post("/api/login", async (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
 
   const targetUser = await db.helpers.getUser(email);
-  if (targetUser.length === 0) {
-    console.log("Account not found");
-    res.send({ status: "failed" });
-  } else if (
-    email === targetUser[0].email &&
-    password === targetUser[0].password
-  ) {
-    req.session.user = {
-      username: targetUser[0].username,
-      email: email,
-      password: password,
-    };
-    console.log(req.session.id);
+  if(targetUser.length === 0)
+  {
+    console.log('Account not found')
+    res.send({"status": "failed"})
+  }
+  else if(email === targetUser[0].email && password === targetUser[0].password)
+  {
+    req.session.user = {username: targetUser[0].username, email: email, password: password, role: targetUser[0].role}
+    console.log(req.session.id)
     req.session.loggedIn = true;
     req.session.save();
-    const token = jwt.sign(
-      { email: email, password: password },
-      "secret_string",
-      { expiresIn: "1h" }
-    );
-    res.cookie("jwt", token, { httpOnly: true, secure: false });
-    res.json({ status: "success", token: token });
-  } else {
-    console.log("Invalid password");
-    res.send({ status: "failed" });
+    const token = jwt.sign({email: email, password: password}, "secret_string", {expiresIn:"1h"});
+    res.cookie('jwt', token, {httpOnly:true, secure:false})
+    res.json({ status: "success", token: token, role: targetUser[0].role });
   }
 });
 
@@ -262,15 +249,27 @@ app.put("/api/user/:username", async (req, res) => {
   let password = req.body.password;
   let description = req.body.description;
 
-  const user = await db.helpers.editUser(
-    newUsername,
-    email,
-    password,
-    description,
-    oldUsername
-  );
-  req.session.user = { username: newUsername };
-  req.session.save();
+app.put('/api/edituser/', async (req, res) => {
+  let username = req.body.username
+  let role = req.body.role
+  let id = req.body.id
+  const user = await db.helpers.editUserById(id, username, role);
+})
+
+app.get('/api/users', isLoggedIn, async (req, res) => {
+  const users = await db.helpers.getUsers();
+  res.json(users)
+})
+
+app.post('/api/delete', async (req, res) => {
+  try {
+    let id = req.body.id;
+    await db.helpers.deleteUser(id);
+    res.status(200).send("User deleted successfully");
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).send("Internal Server Error"); 
+  }
 });
 
 // BOARDS //
