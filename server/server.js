@@ -67,15 +67,18 @@ const helpers = require('./helpers')
 //USING THE GENERATED BUTTON
 app.post('/api/google/', async (req, res) => {
   const payload = req.body
-  console.log(payload)
-  req.session.user = {username: payload.email}
-  req.session.loggedIn = true
-  req.session.save();
-
-  //add user to database if email doesn't exist
   const possibleUser = await db.helpers.getUser(payload.email)
+  
+  //add user to database if email doesn't exist, otherwise login with existing credentials
   if(possibleUser.length === 0) {
+    req.session.user = {username: payload.email}
+    req.session.loggedIn = true
+    req.session.save();
     await db.helpers.addUser(payload.email, payload.email, null, 'user', payload.sub);
+  } else {
+    req.session.user = {username: possibleUser[0].username, email: possibleUser[0].email, role: possibleUser[0].role}
+    req.session.loggedIn = true
+    req.session.save();
   }
 })
 
@@ -178,11 +181,26 @@ app.get('/api/user/:username', async (req, res) => {
   res.json(user);
 })
 
+app.put('/api/user/:username/editprofile', async (req, res) => {
+  let oldUsername = req.params.username  
+  let newUsername = req.body.username
+  let email = req.body.email
+  let password = req.body.password
+  let description = req.body.description
+
+  await db.helpers.editUserProfile(newUsername, email, password, description, oldUsername);
+  req.session.user.username = newUsername
+  req.session.save();
+})
+
 app.put('/api/user/:username/editusername', async (req, res) => {
   let oldUsername = req.params.username  
   let newUsername = req.body.username
   await db.helpers.editUserUsername(newUsername, oldUsername);
+
+  //change the username
   req.session.user.username = newUsername
+  console.log(req.session.user)
   req.session.save()
 })
 
@@ -232,6 +250,10 @@ app.post('/api/delete', async (req, res) => {
 // BOARDS //
 
 app.get('/api/boards', isLoggedIn, async (req, res) => {
+  if(req.session.user) {
+    console.log(req.session.user.username)
+  }
+
   const boards = await db.helpers.getBoards();
   res.json(boards)
 })

@@ -64,10 +64,12 @@ export class UserEditComponent implements OnInit {
       return;
     }
     console.log(this.form.value)
-    this.userService.editUserProfileDescription(username, this.form.value).subscribe()
-    this.userService.editUserProfileUsername(username, this.form.value).subscribe()
-    this.userService.editUserProfileEmail(username, this.form.value).subscribe()
-    this.userService.editUserProfilePassword(username, this.form.value).subscribe()
+
+    this.userService.editUserProfile(username, this.form.value).subscribe()
+    // this.userService.editUserProfileUsername(username, this.form.value).subscribe()
+    // this.userService.editUserProfileDescription(username, this.form.value).subscribe()
+    // this.userService.editUserProfileEmail(username, this.form.value).subscribe()
+    // this.userService.editUserProfilePassword(username, this.form.value).subscribe()
     
 
     this.router.navigate([`/user/${this.form.value.username}`]).then(() => {

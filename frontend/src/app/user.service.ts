@@ -22,22 +22,9 @@ export class UserService {
     return this.http.get(`${api}/user/${username}`, {withCredentials: true})
   }
 
-  editUserProfileUsername(username: any, user: any) {
-    return this.http.put(`${api}/user/${username}/editusername`, user, {withCredentials: true})
+  editUserProfile(username: any, user: any) {
+    return this.http.put(`${api}/user/${username}/editprofile`, user, {withCredentials: true})
   }
-
-  editUserProfileEmail(username: any, user: any) {
-    return this.http.put(`${api}/user/${username}/editemail`, user, {withCredentials: true})
-  }
-
-  editUserProfilePassword(username: any, user: any) {
-    return this.http.put(`${api}/user/${username}/editpassword`, user, {withCredentials: true})
-  }
-
-  editUserProfileDescription(username: any, user: any) {
-    return this.http.put(`${api}/user/${username}/editdescription`, user, {withCredentials: true})
-  }
-
 
   addUser(user: any) {
     return this.http.post<any>(`${api}/register`, user, {withCredentials: true});

@@ -119,8 +119,11 @@ const helpers = {
   },
 
   editUserProfile: async function(username, email, password, description, oldUsername) {
-    const q = `UPDATE users SET username=$1, email=$2, password=$3, description=$4 WHERE username = '${oldUsername}'`;
-    const query = await pool.query(q, [username, email, password, description])
+    const q = `UPDATE users SET username=$1, email=$2, description=$3 WHERE username = '${oldUsername}'`;
+    const query = await pool.query(q, [username, email, description])
+
+    const a = `UPDATE accounts SET email = $1, password=$2 WHERE email = '${email}'`
+    const accountQuery = await pool.query(a, [email, password])
   },
 
   editUserUsername: async function(username, oldUsername) {
