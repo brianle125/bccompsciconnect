@@ -68,9 +68,9 @@ const helpers = require("./helpers");
 
 ////////////////////////////
 /*  Google AUTH  */
-
-var GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
-var passport = require("passport");
+/* 
+var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+var passport = require('passport');
 var userProfile;
 
 app.use(passport.initialize());
@@ -152,7 +152,7 @@ app.post("/api/google/", async (req, res) => {
 });
 
 ////////////////////////////
-
+*/
 //Sockets
 io.on("connection", (socket) => {
   console.log("a user connected");

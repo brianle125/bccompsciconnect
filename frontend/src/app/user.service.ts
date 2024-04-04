@@ -39,6 +39,18 @@ export class UserService {
     return this.http.get(`${api}/logout`, {withCredentials: true});
   }
 
+  getUsers() {
+    return this.http.get(`${api}/users`, {observe: 'response', withCredentials: true})
+  }
+
+  editUser1( user: any) {
+    return this.http.put(`${api}/edituser/`, user, {withCredentials: true})
+  }
+
+  deleteUser(id: any) {
+    return this.http.post(`${api}/delete`, id, {withCredentials: true});
+  }
+
   //google auth
   googleAuthUser(user: any) {
     return this.http.post(`${api}/google/`, user, {observe: 'response', withCredentials: true})
