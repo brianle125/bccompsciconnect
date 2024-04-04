@@ -13,7 +13,7 @@ export class sessionGuard implements CanActivate {
     return this.userService.isLoggedIn().pipe(
       map((data: any) => {
         const username = route.paramMap.get('username');
-        if (data.user === username) {
+        if (data.user === username || data.role === 'admin') {
           console.log('The session user can edit')
           return true; 
         } else {
