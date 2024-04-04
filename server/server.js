@@ -401,7 +401,7 @@ const postPostSchema = joi.object({
   text: joi.string().required(),
 });
 
-app.post("/api/board/:boardId/topic/:topicId", async (req, res) => {
+app.post("/api/board/:boardId/topic/:topicId/add-post", async (req, res) => {
   let boardId = req.params.boardId;
   let topicId = req.params.topicId;
   let body = req.body;
@@ -448,8 +448,8 @@ const postTopicAndFirstPostSchema = joi.object({
   body: joi.string().required(), // of the first post of the topic
 });
 
-app.post("/api/board/addtopic", async (req, res) => {
-  if(req.session.user == null) {
+app.post("/api/board/add-topic", async (req, res) => {
+  if(req.session.user == null || req.session.user.id == null) {
     res.status(401).json({ error: { code: 401, message: "must be logged in to add topic" } });
   }
 
