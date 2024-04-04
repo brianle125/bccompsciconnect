@@ -445,24 +445,26 @@ app.get("/api/board/:boardId", async (req, res) => {
 const postTopicAndFirstPostSchema = joi.object({
   boardid: joi.number().integer().required(),
   question: joi.string().required(), // ie the title
-  created_by: joi.number().integer().required(),
   body: joi.string().required(), // of the first post of the topic
 });
 
 app.post("/api/board/addtopic", async (req, res) => {
+  if(req.session.user == null) {
+    res.status(401).json({ error: { code: 401, message: "must be logged in to add topic" } });
+  }
+
   let valid = postTopicAndFirstPostSchema.validate(req.body);
-  if (valid.error == null) {
-    let body = req.body;
-    await db.helpers.addTopic(
-      body.boardid,
-      body.question,
-      body.created_by,
-      body.body
-    );
-    res.json({ message: "success" });
-  } else {
+  if (valid.error != null) {
     res.status(400).json({ error: { code: 400, message: "invalid schema" } });
   }
+  let body = req.body;
+  await db.helpers.addTopic(
+    body.boardid,
+    body.question,
+    req.session.user.id,
+    body.body
+  );
+  res.json({ message: "success" });
 });
 
 // Getting images
