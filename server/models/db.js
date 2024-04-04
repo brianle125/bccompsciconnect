@@ -3,14 +3,14 @@ require("dotenv").config();
 
 const pool = new Pool({
   user: "postgres",
-  host: 'localhost' || process.env.DB_HOST,
+  host: "localhost" || process.env.DB_HOST,
   database: "testing",
   password: process.env.LOCAL_PASS,
 });
 
 const helpers = {
   //database queries
-  init: async function() {
+  init: async function () {
     //create tables
     const board = `CREATE TABLE IF NOT EXISTS boards (
       id SERIAL, 
@@ -18,7 +18,7 @@ const helpers = {
       description varchar(255), 
       ordering integer, 
       PRIMARY KEY(id)
-    )`
+    )`;
     const topics = `CREATE TABLE IF NOT EXISTS topics (
       id SERIAL, 
       boardid integer, 
@@ -31,7 +31,7 @@ const helpers = {
       CONSTRAINT fk_user FOREIGN KEY (created_by) REFERENCES users(id), 
       CONSTRAINT fk_board FOREIGN KEY (boardid) REFERENCES boards(id) 
       ON DELETE CASCADE
-    )`
+    )`;
     const users = `CREATE TABLE IF NOT EXISTS users (
       id SERIAL, 
       username varchar(255), 
@@ -59,18 +59,31 @@ const helpers = {
       CONSTRAINT fk_user FOREIGN KEY (created_by) REFERENCES users(id),
       CONSTRAINT fk_topic FOREIGN KEY(topicid) REFERENCES topics(id) 
       ON DELETE CASCADE
-    )`
+    )`;
     const login = `CREATE TABLE IF NOT EXISTS login (
       id SERIAL, 
       username varchar(255), 
       password varchar(1000), 
       PRIMARY KEY(id)
-    )`
+    )`;
     const userProfiles = `CREATE TABLE IF NOT EXISTS userprofiles (
       id integer, 
       filename varchar(400), 
       image bytea
-    )`
+    )`;
+
+    const images = `CREATE TABLE IF NOT EXISTS images (
+      id SERIAL, 
+      filename varchar(400), 
+      image bytea,
+      url varchar(400),
+      postid integer,
+      userid integer,
+      PRIMARY KEY(id), 
+      CONSTRAINT fk_user_id FOREIGN KEY (userid) REFERENCES users(id),
+      CONSTRAINT fk_post_id FOREIGN KEY(postid) REFERENCES posts(id) 
+      ON DELETE CASCADE
+    )`;
 
     //call queries
     await pool.query(users);
@@ -79,7 +92,8 @@ const helpers = {
     await pool.query(board);
     await pool.query(topics);
     await pool.query(posts);
-    await pool.query(userProfiles)
+    await pool.query(userProfiles);
+    await pool.query(images);
   },
 
   /**
@@ -175,15 +189,24 @@ const helpers = {
   },
 
   //Add a board
-  addBoard: async function(boardTitle, boardDescription, ordering) {
-      // const res = await pool.query('INSERT INTO boards VALUES (DEFAULT, $1)', [boardTitle]);
-      const res = await pool.query('INSERT INTO boards(id, title, description, ordering) VALUES (DEFAULT, $1, $2, $3)', [boardTitle, boardDescription, ordering]);
+  addBoard: async function (boardTitle, boardDescription, ordering) {
+    // const res = await pool.query('INSERT INTO boards VALUES (DEFAULT, $1)', [boardTitle]);
+    const res = await pool.query(
+      "INSERT INTO boards(id, title, description, ordering) VALUES (DEFAULT, $1, $2, $3)",
+      [boardTitle, boardDescription, ordering]
+    );
   },
 
   //Edit a board
-  editBoard: async function(boardId, boardTitle, boardDescription, ordering) {
-      const q = 'UPDATE boards SET title = $1 description = $2 ordering = $3 WHERE id = $2';
-      const res = await pool.query(q, [boardTitle, boardDescription, ordering,boardId]);
+  editBoard: async function (boardId, boardTitle, boardDescription, ordering) {
+    const q =
+      "UPDATE boards SET title = $1 description = $2 ordering = $3 WHERE id = $2";
+    const res = await pool.query(q, [
+      boardTitle,
+      boardDescription,
+      ordering,
+      boardId,
+    ]);
   },
 
   //Delete a board
@@ -224,15 +247,23 @@ const helpers = {
     return res.rows;
   },
 
-  addTopic: async function(boardID, question, createdBy, body) {
+  addTopic: async function (boardID, question, createdBy, body) {
     try {
-      const createTopicQuery = `INSERT INTO topics VALUES (DEFAULT, $1, $2, $3, CURRENT_TIMESTAMP, NUll, CURRENT_TIMESTAMP) RETURNING id`
-      const createTopicRes = await pool.query(createTopicQuery, [boardID, question, createdBy]);
-      const topicID = createTopicRes.rows[0].id
-      const createPostQuery = `INSERT INTO posts VALUES (DEFAULT, $1, $2, $3, 'status', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`
-      const createPostRes = await pool.query(createPostQuery, [createdBy, topicID, body])
-    } catch(e) {
-      console.log(e)
+      const createTopicQuery = `INSERT INTO topics VALUES (DEFAULT, $1, $2, $3, CURRENT_TIMESTAMP, NUll, CURRENT_TIMESTAMP) RETURNING id`;
+      const createTopicRes = await pool.query(createTopicQuery, [
+        boardID,
+        question,
+        createdBy,
+      ]);
+      const topicID = createTopicRes.rows[0].id;
+      const createPostQuery = `INSERT INTO posts VALUES (DEFAULT, $1, $2, $3, 'status', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`;
+      const createPostRes = await pool.query(createPostQuery, [
+        createdBy,
+        topicID,
+        body,
+      ]);
+    } catch (e) {
+      console.log(e);
     }
   },
 
@@ -254,18 +285,22 @@ const helpers = {
     return res.rows;
   },
 
-  getPostCount: async function(topicId) {
-      const res = await pool.query('SELECT COUNT(*) FROM posts WHERE topicid = $1', [topicId])
-      return res;
+  getPostCount: async function (topicId) {
+    const res = await pool.query(
+      "SELECT COUNT(*) FROM posts WHERE topicid = $1",
+      [topicId]
+    );
+    return res;
   },
-  
-  addPost: async function(topicId, text, userId) {
-      //update latest post in topic
-      const updated = 'UPDATE topics SET latest_post = CURRENT_TIMESTAMP WHERE id = $1';
-      const updateQuery = await pool.query(updated, [topicId]);
-      //add the post
-      const q = `INSERT INTO posts VALUES(DEFAULT, $1, $2, $3, 'status', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`;
-      const res = await pool.query(q, [userId, topicId, text])
+
+  addPost: async function (topicId, text, userId) {
+    //update latest post in topic
+    const updated =
+      "UPDATE topics SET latest_post = CURRENT_TIMESTAMP WHERE id = $1";
+    const updateQuery = await pool.query(updated, [topicId]);
+    //add the post
+    const q = `INSERT INTO posts VALUES(DEFAULT, $1, $2, $3, 'status', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`;
+    const res = await pool.query(q, [userId, topicId, text]);
   },
 
   editPost: async function (postId, text) {
@@ -277,6 +312,45 @@ const helpers = {
   deletePost: async function (postId) {
     //Need to account for latest post field
     const res = await pool.query("DELETE from posts WHERE id = $1", [postId]);
+  },
+
+  // get images
+
+  getImages: async function () {
+    const query = `SELECT * FROM images`;
+    try {
+      const res = await pool.query(query);
+      return res.rows; // Returns an array of image records
+    } catch (err) {
+      console.error("Error executing getImages query:", err.stack);
+      throw err; // Allows further error handling or logging outside this function
+    }
+  },
+
+  // save images
+
+  saveImage: async function (filename, imageBuffer, url, postid, userid) {
+    const query = `INSERT INTO images (filename, image, url, postid, userid) VALUES ($1, $2, $3, $4, $5) RETURNING *;`;
+    const values = [filename, imageBuffer, url, postid, userid];
+
+    try {
+      const res = await pool.query(query, values);
+      return res.rows[0]; // Return the inserted image record
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  // get images by userid
+  getImagesByUserId: async function (userId) {
+    const query = `SELECT * FROM images WHERE userid = $1`;
+    try {
+      const res = await pool.query(query, [userId]);
+      return res.rows;
+    } catch (err) {
+      console.error("Error executing getImagesByUserId query:", err.stack);
+      throw err;
+    }
   },
 };
 
