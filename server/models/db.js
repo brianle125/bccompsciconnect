@@ -322,7 +322,7 @@ const helpers = {
   getProfile: async function(id) {
     const q = 'SELECT * FROM userProfiles WHERE id = $1'
     const res = await pool.query(q, [id]);
-    return res.rows[0]
+    return res.rows
   },
   // get images
 

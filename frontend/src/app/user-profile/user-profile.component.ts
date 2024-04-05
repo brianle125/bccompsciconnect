@@ -31,7 +31,11 @@ export class UserProfileComponent implements OnInit {
 
       this.userService.getUserProfile(this.user[0].id).subscribe((data) => {
         let response = data as any;
-        response ? this.userData.icon = 'data:image/jpg;base64,' + arrayBufferToBase64(response.image.data) : this.userData.icon = 'assets/user.png'
+        if(response.length !== 0) {
+          this.userData.icon = 'data:image/jpg;base64,' + arrayBufferToBase64(response[0].image.data)
+        } else {
+          this.userData.icon = 'assets/user.png'
+        }
       })
     })
 

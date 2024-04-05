@@ -258,8 +258,10 @@ app.post("/api/uploadprofile", upload.single("image"), async (req, res) => {
 
   //TODO: if profile picture exists, simply update
   const exists = await db.helpers.getProfile(req.body.userid)
-  if(exists == undefined) {
+  console.log(exists.length)
+  if(exists.length === 0) {
      //else add new profile
+     console.log("adding profile")
     await db.helpers.addProfile(req.body.userid, req.file.originalname, req.file.buffer)
   }
   else

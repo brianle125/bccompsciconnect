@@ -30,7 +30,11 @@ export class TopBarComponent implements OnInit {
       if(this.loggedIn) {
         this.userService.getUserProfile(response.id).subscribe((data) => {
           let response = data as any;
-          response ? this.profilePic = 'data:image/jpg;base64,' + arrayBufferToBase64(response.image.data) : this.profilePic = 'assets/user.png'
+          if(response.length !== 0) {
+            this.profilePic = 'data:image/jpg;base64,' + arrayBufferToBase64(response[0].image.data)
+          } else {
+            this.profilePic = 'assets/user.png'
+          }
         })
       }
       this.profileLink = `/user/${this.username}`
