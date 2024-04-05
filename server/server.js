@@ -257,22 +257,22 @@ app.post("/api/uploadprofile", upload.single("image"), async (req, res) => {
   } 
 
   //TODO: if profile picture exists, simply update
-  const exists = await db.helpers.getProfile(req.body.userid)
+  const exists = await db.helpers.getProfilePicture(req.body.userid)
   console.log(exists.length)
   if(exists.length === 0) {
      //else add new profile
      console.log("adding profile")
-    await db.helpers.addProfile(req.body.userid, req.file.originalname, req.file.buffer)
+    await db.helpers.addProfilePicture(req.body.userid, req.file.originalname, req.file.buffer)
   }
   else
   {
-    await db.helpers.changeProfile(req.body.userid, req.file.originalname, req.file.buffer)
+    await db.helpers.changeProfilePicture(req.body.userid, req.file.originalname, req.file.buffer)
   }
  
 });
 
 app.get("/api/getprofile/:userid", async (req, res) => {
-  const image = await db.helpers.getProfile(req.params.userid)
+  const image = await db.helpers.getProfilePicture(req.params.userid)
   res.json(image)
 })
 
