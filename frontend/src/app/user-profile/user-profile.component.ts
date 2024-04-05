@@ -6,6 +6,7 @@ import { TopBarComponent } from '../top-bar/top-bar.component';
 import { UserEditComponent } from '../user-edit/user-edit.component';
 import { PostListComponent } from '../post-list/post-list.component';
 import { UserProfileUploadComponent } from '../user-profile-upload/user-profile-upload.component';
+import { arrayBufferToBase64 } from '../image-helper';
 
 @Component({
   selector: 'app-user-profile',
@@ -17,8 +18,8 @@ import { UserProfileUploadComponent } from '../user-profile-upload/user-profile-
 export class UserProfileComponent implements OnInit {
   userData: UserProfileData = new UserProfileData('Invalid user', 'assets/user.png', '', 'Desc', '')
   user: any
-  pfp: any;
   //Session user
+  isCurrentUser: boolean = false
   constructor(private userService: UserService, private route: ActivatedRoute, private router: Router ) {}
   ngOnInit(): void {
     const routeParams = this.route.snapshot.paramMap;
@@ -30,7 +31,7 @@ export class UserProfileComponent implements OnInit {
 
       this.userService.getUserProfile(this.user[0].id).subscribe((data) => {
         let response = data as any;
-        this.userData.icon = 'data:image/jpg;base64,' + this.arrayBufferToBase64(response.image.data)
+        response ? this.userData.icon = 'data:image/jpg;base64,' + arrayBufferToBase64(response.image.data) : this.userData.icon = 'assets/user.png'
       })
     })
 
@@ -39,17 +40,6 @@ export class UserProfileComponent implements OnInit {
   editUser() {
     this.router.navigate([`/user/${this.userData.username}/edit`])
   }
-
-   arrayBufferToBase64(buffer : any) {
-    var binary = '';
-    var bytes = new Uint8Array( buffer );
-    var len = bytes.byteLength;
-    for (var i = 0; i < len; i++) {
-       binary += String.fromCharCode( bytes[ i ] );
-    }
-    return window.btoa( binary );
-  }
-
 }
 
 export class UserProfileData {

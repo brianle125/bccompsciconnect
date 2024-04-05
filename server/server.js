@@ -82,7 +82,7 @@ app.post('/api/google/', async (req, res) => {
     req.session.save();
     await db.helpers.addUser(payload.email, payload.email, null, 'user', payload.sub);
   } else {
-    req.session.user = {username: possibleUser[0].username, email: possibleUser[0].email, role: possibleUser[0].role}
+    req.session.user = {id: possibleUser[0].id, username: possibleUser[0].username, email: possibleUser[0].email, role: possibleUser[0].role}
     req.session.loggedIn = true
     req.session.save();
   }
@@ -109,7 +109,7 @@ app.post("/api/register", async (req, res) => {
 })
 
 app.get('/api/login', async (req, res) => {
-  req.session.user ? res.status(200).send({loggedIn: true, user: req.session.user.username, role: req.session.user.role}) : res.status(200).send({loggedIn: false});
+  req.session.user ? res.status(200).send({loggedIn: true, id: req.session.user.id, user: req.session.user.username, role: req.session.user.role}) : res.status(200).send({loggedIn: false});
 })
 
 app.post("/api/login", async (req, res) => {
@@ -126,7 +126,7 @@ app.post("/api/login", async (req, res) => {
   }
   else if(email === targetUser[0].email && password === accountDetails[0].password)
   {
-    req.session.user = {username: targetUser[0].username, email: email, password: password, role: targetUser[0].role}
+    req.session.user = {id: targetUser[0].id, username: targetUser[0].username, email: email, password: password, role: targetUser[0].role}
     console.log(req.session.id)
     req.session.loggedIn = true;
     req.session.save();
@@ -191,38 +191,8 @@ app.put('/api/user/:username/editprofile', async (req, res) => {
 
   await db.helpers.editUserProfile(newUsername, email, password, description, oldUsername);
   req.session.user.username = newUsername
+  console.log(req.session.user);
   req.session.save();
-})
-
-app.put('/api/user/:username/editusername', async (req, res) => {
-  let oldUsername = req.params.username  
-  let newUsername = req.body.username
-  await db.helpers.editUserUsername(newUsername, oldUsername);
-
-  //change the username
-  req.session.user.username = newUsername
-  console.log(req.session.user)
-  req.session.save()
-})
-
-app.put('/api/user/:username/editemail', async (req, res) => {
-  let oldUsername = req.params.username  
-  let newEmail = req.body.email
-  await db.helpers.editUserEmail(newEmail, oldUsername);
-  req.session.user.email = newEmail
-  req.session.save()
-})
-
-app.put('/api/user/:username/editpassword', async (req, res) => {
-  let email = req.body.email  
-  let newPassword = req.body.password
-  await db.helpers.editUserPassword(newPassword, email);
-})
-
-app.put('/api/user/:username/editdescription', async (req, res) => {
-  let oldUsername = req.params.username  
-  let newDesc = req.body.description
-  await db.helpers.editUserDescription(newDesc, oldUsername);
 })
 
 app.put('/api/edituser/', async (req, res) => {
@@ -255,8 +225,16 @@ app.post("/api/uploadprofile", upload.single("image"), async (req, res) => {
   } 
 
   //TODO: if profile picture exists, simply update
-  //else add new profile
-  await db.helpers.addProfile(req.body.userid, req.file.originalname, req.file.buffer)
+  const exists = await db.helpers.getProfile(req.body.userid)
+  if(exists == undefined) {
+     //else add new profile
+    await db.helpers.addProfile(req.body.userid, req.file.originalname, req.file.buffer)
+  }
+  else
+  {
+    await db.helpers.changeProfile(req.body.userid, req.file.originalname, req.file.buffer)
+  }
+ 
 });
 
 app.get("/api/getprofile/:userid", async (req, res) => {

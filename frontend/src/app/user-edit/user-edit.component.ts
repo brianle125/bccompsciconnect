@@ -65,17 +65,29 @@ export class UserEditComponent implements OnInit {
     }
     console.log(this.form.value)
 
-    this.userService.editUserProfile(username, this.form.value).subscribe()
-    // this.userService.editUserProfileUsername(username, this.form.value).subscribe()
-    // this.userService.editUserProfileDescription(username, this.form.value).subscribe()
-    // this.userService.editUserProfileEmail(username, this.form.value).subscribe()
-    // this.userService.editUserProfilePassword(username, this.form.value).subscribe()
-    
+    //If username belongs to someone else stop edit, otherwise continue
+    this.userService.isLoggedIn().subscribe((data) => {
+      let response = data as any
 
-    this.router.navigate([`/user/${this.form.value.username}`]).then(() => {
-      alert("User details successfully edited!");
-      window.location.reload();
-    });
+      this.userService.checkUserExists(this.form.value.username).subscribe((data) => {
+        let exists = data as any
+        if(exists.exists && response.user !== this.form.value.username) {
+          alert('Username is taken')
+          this.form.reset();
+        } else {
+          this.userService.editUserProfile(username, this.form.value).subscribe()
+            this.router.navigate([`/user/${this.form.value.username}`]).then(() => {
+              alert("User details successfully edited!");
+              window.location.reload();
+          });
+        }
+      })
+
+      
+    })
+
+    //Otherwise edit is granted
+    
   }
 
   cancelEdit() {

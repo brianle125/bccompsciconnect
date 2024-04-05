@@ -69,7 +69,8 @@ const helpers = {
     const userProfiles = `CREATE TABLE IF NOT EXISTS userprofiles (
       id integer, 
       filename varchar(400), 
-      image bytea
+      image bytea,
+      CONSTRAINT fk_user FOREIGN KEY (id) REFERENCES users(id)
     )`;
 
     const images = `CREATE TABLE IF NOT EXISTS images (
@@ -138,26 +139,6 @@ const helpers = {
 
     const a = `UPDATE accounts SET email = $1, password=$2 WHERE email = '${email}'`
     const accountQuery = await pool.query(a, [email, password])
-  },
-
-  editUserUsername: async function(username, oldUsername) {
-    const q = `UPDATE users SET username=$1 WHERE username='${oldUsername}'`
-    const query = await pool.query(q, [username])
-  },
-
-  editUserEmail: async function(email, oldUsername) {
-    const q = `UPDATE users SET email=$1 WHERE username='${oldUsername}'`
-    const query = await pool.query(q, [email])
-  },
-
-  editUserPassword: async function(password, email) {
-    const q = `UPDATE accounts SET password=$1 WHERE email='${email}'`
-    const query = await pool.query(q, [password])
-  },
-
-  editUserDescription: async function(description, oldUsername) {
-    const q = `UPDATE users SET description=$1 WHERE username='${oldUsername}'`
-    const query = await pool.query(q, [description])
   },
 
   editUserById: async function(id, username, role) {
@@ -321,9 +302,9 @@ const helpers = {
     const query = await pool.query(q, [id, filename, image])
   },
 
-  changeProfile: async function(id, image) {
-    const q = 'UPDATE userProfiles SET image = $1 WHERE id = $2'
-    const query = await pool.query(q, [image, id])
+  changeProfile: async function(id, filename, image) {
+    const q = 'UPDATE userProfiles SET image = $1, filename = $2 WHERE id = $3'
+    const query = await pool.query(q, [image, filename, id])
   },
 
   getProfile: async function(id) {
