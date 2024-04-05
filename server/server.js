@@ -9,8 +9,6 @@ var logger = require('morgan');
 const joi = require('joi') // schema validation
 const { v4: uuidv4 } = require('uuid');
 
-
-
 // var indexRouter = require('./routes/index');
 // var usersRouter = require('./routes/users');
 
@@ -250,6 +248,22 @@ app.post('/api/delete', async (req, res) => {
   }
 });
 
+//profile pictures; experimental
+app.post("/api/uploadprofile", upload.single("image"), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).send("No files were uploaded.");
+  } 
+
+  //TODO: if profile picture exists, simply update
+  //else add new profile
+  await db.helpers.addProfile(req.body.userid, req.file.originalname, req.file.buffer)
+});
+
+app.get("/api/getprofile/:userid", async (req, res) => {
+  const image = await db.helpers.getProfile(req.params.userid)
+  res.json(image)
+})
+
 // BOARDS //
 
 app.get('/api/boards', isLoggedIn, async (req, res) => {
@@ -456,6 +470,8 @@ app.get("/api/images", async (req, res) => {
     res.status(500).send("Failed to fetch images");
   }
 });
+
+
 // for uploadding images
 
 app.post("/api/upload", upload.single("image"), async (req, res) => {
@@ -506,6 +522,8 @@ app.get("/api/images/user/:userid", async (req, res) => {
     res.status(500).send("Failed to fetch images.");
   }
 });
+
+
 
 // app.get("*", (req, res) =>{
 //   res.sendFile(path.join(__dirname, "static/index.html"));

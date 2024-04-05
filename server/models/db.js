@@ -314,6 +314,23 @@ const helpers = {
     const res = await pool.query("DELETE from posts WHERE id = $1", [postId]);
   },
 
+  //profiles
+
+  addProfile: async function (id, filename, image) {
+    const q = 'INSERT INTO userProfiles VALUES($1, $2, $3)'
+    const query = await pool.query(q, [id, filename, image])
+  },
+
+  changeProfile: async function(id, image) {
+    const q = 'UPDATE userProfiles SET image = $1 WHERE id = $2'
+    const query = await pool.query(q, [image, id])
+  },
+
+  getProfile: async function(id) {
+    const q = 'SELECT * FROM userProfiles WHERE id = $1'
+    const res = await pool.query(q, [id]);
+    return res.rows[0]
+  },
   // get images
 
   getImages: async function () {

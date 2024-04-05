@@ -9,6 +9,7 @@
         <div *ngIf="userData.postsLink; then hasPosts else noPosts"></div>
         <ng-template #hasPosts><p><a href="{{ userData.postsLink }}">View posts</a></p></ng-template>
         <ng-template #noPosts>User has not posted</ng-template>
+        <app-user-profile-upload></app-user-profile-upload>
     </div>
     <div class="col-sm-10 description">
         <div class="description-text">
@@ -18,7 +19,4 @@
         <button class="btn btn-outline-primary" (click)="editUser()">Edit</button>
     </div>
 </div>
-<!-- <div *ngIf="user">
-    <app-user-edit></app-user-edit>
-</div> -->
 

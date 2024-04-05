@@ -22,10 +22,6 @@ export class UserService {
     return this.http.get(`${api}/user/${username}`, {withCredentials: true})
   }
 
-  editUserProfile(username: any, user: any) {
-    return this.http.put(`${api}/user/${username}/editprofile`, user, {withCredentials: true})
-  }
-
   addUser(user: any) {
     return this.http.post<any>(`${api}/register`, user, {withCredentials: true});
   }
@@ -35,8 +31,7 @@ export class UserService {
   }
 
   logoutUser() {
-    console.log("Calling logout");
-    return this.http.get(`${api}/logout`, {withCredentials: true});
+    return this.http.post(`${api}/logout`, null, {withCredentials: true});
   }
 
   getUsers() {
@@ -49,6 +44,19 @@ export class UserService {
 
   deleteUser(id: any) {
     return this.http.post(`${api}/delete`, id, {withCredentials: true});
+  }
+
+  //profiles
+  editUserProfile(username: any, user: any) {
+    return this.http.put(`${api}/user/${username}/editprofile`, user, {withCredentials: true})
+  }
+
+  uploadUserProfile(image: any) {
+    return this.http.post(`${api}/uploadprofile`, image, {withCredentials: true})
+  }
+
+  getUserProfile(userid: any) {
+    return this.http.get(`${api}/getprofile/${userid}`, {withCredentials: true})
   }
 
   //google auth

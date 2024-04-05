@@ -30,7 +30,11 @@ export class TopBarComponent implements OnInit {
   }
   
   logOut() {
-    this.userService.logoutUser().subscribe((data) => {
+    this.userService.isLoggedIn().subscribe((data) => {
+      let response = data as any
+      console.log(response)
     })
+    console.log("Logging out")
+    this.userService.logoutUser().subscribe()
   }
 }
