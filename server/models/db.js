@@ -40,13 +40,13 @@ const helpers = {
       role varchar(255), 
       created_at timestamp, 
       PRIMARY KEY(id)
-    )`
+    )`;
     const accounts = `CREATE TABLE IF NOT EXISTS accounts (
       email varchar(255),
       password varchar(1000),
       role varchar(255),
       google_id varchar(1000)
-    )`
+    )`;
     const posts = `CREATE TABLE IF NOT EXISTS posts (
       id SERIAL, 
       created_by integer,
@@ -79,6 +79,7 @@ const helpers = {
       url varchar(400),
       postid integer,
       userid integer,
+      content_type varchar(400),
       PRIMARY KEY(id), 
       CONSTRAINT fk_user_id FOREIGN KEY (userid) REFERENCES users(id),
       CONSTRAINT fk_post_id FOREIGN KEY(postid) REFERENCES posts(id) 
@@ -128,46 +129,57 @@ const helpers = {
     const q = `INSERT INTO users VALUES(DEFAULT, $1, $2, 'User has not changed bio', $3, CURRENT_TIMESTAMP)`;
     const query = await pool.query(q, [username, email, role]);
 
-    const a = 'INSERT INTO accounts VALUES($1, $2, $3, $4)'
-    const accountQuery = await pool.query(a, [email, password, role, google_id])
+    const a = "INSERT INTO accounts VALUES($1, $2, $3, $4)";
+    const accountQuery = await pool.query(a, [
+      email,
+      password,
+      role,
+      google_id,
+    ]);
   },
 
-  editUserProfile: async function(username, email, password, description, oldUsername) {
+  editUserProfile: async function (
+    username,
+    email,
+    password,
+    description,
+    oldUsername
+  ) {
     const q = `UPDATE users SET username=$1, email=$2, description=$3 WHERE username = '${oldUsername}'`;
-    const query = await pool.query(q, [username, email, description])
+    const query = await pool.query(q, [username, email, description]);
 
-    const a = `UPDATE accounts SET email = $1, password=$2 WHERE email = '${email}'`
-    const accountQuery = await pool.query(a, [email, password])
+    const a = `UPDATE accounts SET email = $1, password=$2 WHERE email = '${email}'`;
+    const accountQuery = await pool.query(a, [email, password]);
   },
 
-  editUserUsername: async function(username, oldUsername) {
-    const q = `UPDATE users SET username=$1 WHERE username='${oldUsername}'`
-    const query = await pool.query(q, [username])
+  editUserUsername: async function (username, oldUsername) {
+    const q = `UPDATE users SET username=$1 WHERE username='${oldUsername}'`;
+    const query = await pool.query(q, [username]);
   },
 
-  editUserEmail: async function(email, oldUsername) {
-    const q = `UPDATE users SET email=$1 WHERE username='${oldUsername}'`
-    const query = await pool.query(q, [email])
+  editUserEmail: async function (email, oldUsername) {
+    const q = `UPDATE users SET email=$1 WHERE username='${oldUsername}'`;
+    const query = await pool.query(q, [email]);
   },
 
-  editUserPassword: async function(password, email) {
-    const q = `UPDATE accounts SET password=$1 WHERE email='${email}'`
-    const query = await pool.query(q, [password])
+  editUserPassword: async function (password, email) {
+    const q = `UPDATE accounts SET password=$1 WHERE email='${email}'`;
+    const query = await pool.query(q, [password]);
   },
 
-  editUserDescription: async function(description, oldUsername) {
-    const q = `UPDATE users SET description=$1 WHERE username='${oldUsername}'`
-    const query = await pool.query(q, [description])
+  editUserDescription: async function (description, oldUsername) {
+    const q = `UPDATE users SET description=$1 WHERE username='${oldUsername}'`;
+    const query = await pool.query(q, [description]);
   },
 
-  editUserById: async function(id, username, role) {
+  editUserById: async function (id, username, role) {
     const q = `UPDATE users SET username=$2, role=$3 WHERE id = $1 RETURNING *`;
     const queryResult = await pool.query(q, [id, username, role]);
     return queryResult.rows[0];
   },
 
-  deleteUser: async function(id) {
-    const q = 'DELETE FROM users WHERE id = $1';
+  deleteUser: async function (id) {
+    const q = "DELETE FROM users WHERE id = $1";
     const queryResult = await pool.query(q, [id]);
   },
 
@@ -328,15 +340,22 @@ const helpers = {
   },
 
   // save images
-
-  saveImage: async function (filename, imageBuffer, url, postid, userid) {
-    const query = `INSERT INTO images (filename, image, url, postid, userid) VALUES ($1, $2, $3, $4, $5) RETURNING *;`;
-    const values = [filename, imageBuffer, url, postid, userid];
+  saveImage: async function (
+    filename,
+    imageBuffer,
+    url,
+    postid,
+    userid,
+    contentType
+  ) {
+    const query = `INSERT INTO images (filename, image, url, postid, userid, content_type) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;`;
+    const values = [filename, imageBuffer, url, postid, userid, contentType];
 
     try {
       const res = await pool.query(query, values);
       return res.rows[0]; // Return the inserted image record
     } catch (err) {
+      console.error("Error executing saveImage query:", err.stack);
       throw err;
     }
   },
@@ -350,6 +369,22 @@ const helpers = {
     } catch (err) {
       console.error("Error executing getImagesByUserId query:", err.stack);
       throw err;
+    }
+  },
+
+  // get image by id
+  getImageById: async function (imageId) {
+    const query = "SELECT * FROM images WHERE id = $1;";
+    try {
+      const result = await pool.query(query, [imageId]);
+      if (result.rows.length > 0) {
+        return result.rows[0];
+      } else {
+        return null; // Or however you prefer to handle no results found
+      }
+    } catch (err) {
+      console.error("Error executing getImageById query:", err.stack);
+      throw err; // Rethrow or handle as preferred
     }
   },
 };
