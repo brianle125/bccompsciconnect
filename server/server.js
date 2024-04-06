@@ -153,6 +153,15 @@ app.post("/api/google/", async (req, res) => {
 
 ////////////////////////////
 */
+
+// middleware to send a 401 error if the user is not logged in
+const requireLogin = (req, res, next) => {
+  if (req.session.user == null || req.session.user.id == null) {
+    return res.status(401).json({ code:401, error: "Must be logged in" });
+  }
+  next();
+};
+
 //Sockets
 io.on("connection", (socket) => {
   console.log("a user connected");
@@ -191,7 +200,7 @@ app.post("/api/login", async (req, res) => {
     req.session.loggedIn = true;
     req.session.save();
     const token = jwt.sign({email: email, password: password}, "secret_string", {expiresIn:"1h"});
-    res.cookie('jwt', token, {httpOnly:true, secure:false})
+    res.cookie('jwt', token, {httpOnly:false, secure:false})
     res.json({ status: "success", token: token, role: targetUser[0].role });
   }
 });
@@ -202,7 +211,7 @@ app.post("/api/logout", async (req, res) => {
   if (req.session.user) {
     req.session.destroy();
     res.clearCookie("jwt", {
-      httpOnly: true,
+      httpOnly: false,
       secure: false,
     });
     res.send({ status: "loggedout" });
@@ -214,7 +223,7 @@ app.get("/api/logout", async (req, res) => {
   if (req.session.user) {
     req.session.destroy();
     res.clearCookie("jwt", {
-      httpOnly: true,
+      httpOnly: false,
       secure: false,
     });
     res.send({ status: "loggedout" });
@@ -277,7 +286,6 @@ app.post('/api/delete', async (req, res) => {
 
 app.get("/api/boards", isLoggedIn, async (req, res) => {
   const boards = await db.helpers.getBoards();
-  console.log(req.session.user);
   res.json(boards);
 });
 
@@ -402,7 +410,7 @@ const postPostSchema = joi.object({
 
 app.post("/api/board/:boardId/topic/:topicId/add-post", async (req, res) => {
   if(req.session.user == null || req.session.user.id == null) {
-    res.status(401).json({ error: { code: 401, message: "must be logged in to add topic" } });
+    res.status(401).json({ error: { code: 401, message: "must be logged in to add post" } });
   }
 
   let boardId = req.params.boardId;
@@ -445,23 +453,19 @@ app.get("/api/board/:boardId", async (req, res) => {
 });
 
 const postTopicAndFirstPostSchema = joi.object({
-  boardid: joi.number().integer().required(),
   question: joi.string().required(), // ie the title
   body: joi.string().required(), // of the first post of the topic
 });
 
-app.post("/api/board/add-topic", async (req, res) => {
-  if(req.session.user == null || req.session.user.id == null) {
-    res.status(401).json({ error: { code: 401, message: "must be logged in to add topic" } });
-  }
-
+app.post("/api/board/:boardId/add-topic", requireLogin, async (req, res) => {
   let valid = postTopicAndFirstPostSchema.validate(req.body);
   if (valid.error != null) {
     res.status(400).json({ error: { code: 400, message: "invalid schema" } });
   }
   let body = req.body;
+  let boardId = req.params.boardId;
   await db.helpers.addTopic(
-    body.boardid,
+    boardId,
     body.question,
     req.session.user.id,
     body.body

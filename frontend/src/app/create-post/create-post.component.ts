@@ -4,6 +4,7 @@ import { FormattedTextComponent } from '../formatted-text/formatted-text.compone
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
 import { TopBarComponent } from '../top-bar/top-bar.component';
+import { PostService } from '../post.service';
 
 @Component({
   selector: 'app-create-post',
@@ -14,18 +15,19 @@ import { TopBarComponent } from '../top-bar/top-bar.component';
 })
 export class CreatePostComponent implements OnInit{
   public previewText: string = ''
-  public boardID: string = ''
-  public topicID: string = ''
+  public boardID: number | null = null
+  public topicID: number | null = null
 
-  constructor(private activatedRoute: ActivatedRoute, private router: Router) {}
+  constructor(private activatedRoute: ActivatedRoute, private router: Router, private postService: PostService) {}
   ngOnInit(): void {
     let tempBoardID: string | null = this.activatedRoute.snapshot.params['board-id']
     let tempTopicID: string | null = this.activatedRoute.snapshot.params['topic-id']
     if(tempBoardID == null || tempTopicID == null) {
       this.router.navigate(['/'])
     } else {
-      this.boardID = tempBoardID
-      this.topicID = tempTopicID
+      // if(!Number.isNaN(id))
+      this.boardID = parseInt(tempBoardID)
+      this.topicID = parseInt(tempTopicID)
     }
     console.log(this)
   }
@@ -35,6 +37,8 @@ export class CreatePostComponent implements OnInit{
   }
 
   public onSubmit(text: string): void {
-    
+    if(this.topicID != null && this.boardID != null) {
+      this.postService.addPost(this.boardID, this.topicID, text);
+    }
   }
 }

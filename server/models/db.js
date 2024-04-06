@@ -157,7 +157,6 @@ const helpers = {
   //Get all boards
   getBoards: async function () {
     const res = await pool.query("SELECT * from boards ORDER by id");
-    console.log(res);
     return res.rows;
   },
 

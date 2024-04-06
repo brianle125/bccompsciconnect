@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Message } from './post-create/post-create.model';
 import { api } from './common-strings';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -18,10 +18,7 @@ export class PostService {
     return this.http.get(`http://localhost:8080/posts/${topicid}`);
   }
 
-  addMessage(message: Message) {
-    this.http.post<Message>(this.apiUrl, message).subscribe((response) => {
-      console.log(response);
-      // Handle response here
-    });
+  addPost(boardID: number, topicID:number, message: string): Observable<any> {
+    return this.http.post(`${api}/board/${boardID}/topic/${topicID}/add-post`, {text: message})
   }
 }
