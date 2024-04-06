@@ -12,6 +12,7 @@ import { arrayBufferToBase64 } from '../image-helper';
 })
 export class TopBarComponent implements OnInit {
   loggedIn: boolean = false;
+  isAdmin: boolean = false;
   username: string = 'user'
   profilePic: string = 'assets/user.png'
   profileLink: string = ''
@@ -26,6 +27,8 @@ export class TopBarComponent implements OnInit {
       let response = data as any
       this.loggedIn = response.loggedIn;
       this.username = response.user;
+      this.isAdmin = response.role === 'admin'
+
       //load profile picture
       if(this.loggedIn) {
         this.userService.getUserProfile(response.id).subscribe((data) => {
