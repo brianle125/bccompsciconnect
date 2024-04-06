@@ -374,22 +374,6 @@ app.delete("/api/board/:boardId", async (req, res) => {
 
 // TOPICS AND POSTS //
 
-// TODO: are these still needed
-app.post("/api/board/:boardId", async (req, res) => {
-  let boardId = req.params.boardId;
-  let question = req.body.question;
-  await db.helpers.addTopic(boardId, question, null);
-  res.redirect(`/api/board/${boardId}`);
-});
-
-// TODO: are these still needed
-app.post("/api/board/:boardId/latest", async (req, res) => {
-  let boardId = req.params.boardId;
-  let question = req.body.question;
-  await db.helpers.addTopic(boardId, question, null);
-  res.redirect(`/api/board/${boardId}`);
-});
-
 app.get("/api/board/:boardId/topic/:topicId", async (req, res) => {
   let boardId = req.params.boardId;
   let topicId = req.params.topicId;
@@ -416,11 +400,7 @@ const postPostSchema = joi.object({
   text: joi.string().required(),
 });
 
-app.post("/api/board/:boardId/topic/:topicId/add-post", async (req, res) => {
-  if(req.session.user == null || req.session.user.id == null) {
-    res.status(401).json({ error: { code: 401, message: "must be logged in to add post" } });
-  }
-
+app.post("/api/board/:boardId/topic/:topicId/add-post", requireLogin, async (req, res) => {
   let boardId = req.params.boardId;
   let topicId = req.params.topicId;
   let body = req.body;
