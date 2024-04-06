@@ -164,7 +164,6 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-//For some reason it isnt working / Not calling but the clear cookie works.
 app.post("/api/logout", async (req, res) => {
   console.log(req.session.user);
   if (req.session.user) {
@@ -256,7 +255,7 @@ app.post("/api/uploadprofile", upload.single("image"), async (req, res) => {
     return res.status(400).send("No files were uploaded.");
   } 
 
-  //TODO: if profile picture exists, simply update
+  //If profile picture exists, simply update
   const exists = await db.helpers.getProfilePicture(req.body.userid)
   console.log(exists.length)
   if(exists.length === 0) {

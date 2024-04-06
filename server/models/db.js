@@ -71,6 +71,7 @@ const helpers = {
       filename varchar(400), 
       image bytea,
       CONSTRAINT fk_user FOREIGN KEY (id) REFERENCES users(id)
+      ON DELETE CASCADE
     )`;
 
     const images = `CREATE TABLE IF NOT EXISTS images (
@@ -86,6 +87,7 @@ const helpers = {
       CONSTRAINT fk_post_id FOREIGN KEY(postid) REFERENCES posts(id) 
       ON DELETE CASCADE
     )`;
+
 
     //call queries
     await pool.query(users);
