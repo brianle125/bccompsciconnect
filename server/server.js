@@ -7,6 +7,7 @@ var cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
 var logger = require("morgan");
 const joi = require("joi"); // schema validation
+const { v4: uuidv4 } = require("uuid");
 
 // var indexRouter = require('./routes/index');
 // var usersRouter = require('./routes/users');
@@ -68,91 +69,34 @@ const helpers = require("./helpers");
 
 ////////////////////////////
 /*  Google AUTH  */
-/* 
-var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-var passport = require('passport');
-var userProfile;
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-passport.serializeUser(function (user, cb) {
-  cb(null, user);
-});
-
-passport.deserializeUser(function (obj, cb) {
-  cb(null, obj);
-});
-
-const auth = (req, res, next) => {
-  const token = req.cookies.jwt;
-  if (!token) {
-    return res.status(401).send("Unauthorized Authentication");
-  }
-
-  try {
-    const decoded = jwt.verify(token, "secret_string");
-    req.user = decoded;
-    console.log("User making request: ");
-    console.log(req.user);
-    next();
-  } catch (error) {
-    res.status(400).send("Invalid token");
-  }
-};
-
-// passport.use(
-//   new GoogleStrategy(
-//     {
-//       clientID: process.env.GOOGLE_CLIENT_ID,
-//       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-//       callbackURL: "http://localhost:8080/api/google/callback",
-//     },
-//     function (accessToken, refreshToken, profile, done) {
-//       userProfile = profile;
-//       return done(null, userProfile);
-//     }
-//   )
-// );
-app.get(
-  "/api/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
-
-app.get("/api/google/error", (req, res) => {
-  res.send({ status: "failure" });
-});
-
-app.get(
-  "/api/google/callback",
-  passport.authenticate("google", { failureRedirect: "/auth/google/error" }),
-  async (req, res) => {
-    // Successful authentication
-    console.log(userProfile);
-    //load session parameters from payload
-    req.session.user = { username: userProfile.displayName };
-    req.session.username = userProfile.displayName;
-
-    //TODO: handle how it interacts with user database
-
-    req.session.loggedIn = true;
-    req.session.save();
-    res.send({ status: "success" });
-  }
-);
 
 //USING THE GENERATED BUTTON
 app.post("/api/google/", async (req, res) => {
   const payload = req.body;
-  req.session.user = { username: payload.email };
-  req.session.loggedIn = true;
-  req.session.save();
+  const possibleUser = await db.helpers.getUser(payload.email);
 
-  //add user to database somehow
+  //add user to database if email doesn't exist, otherwise login with existing credentials
+  if (possibleUser.length === 0) {
+    req.session.user = { username: payload.email };
+    req.session.loggedIn = true;
+    req.session.save();
+    await db.helpers.addUser(
+      payload.email,
+      payload.email,
+      null,
+      "user",
+      payload.sub
+    );
+  } else {
+    req.session.user = {
+      username: possibleUser[0].username,
+      email: possibleUser[0].email,
+      role: possibleUser[0].role,
+    };
+    req.session.loggedIn = true;
+    req.session.save();
+  }
 });
-
-////////////////////////////
-*/
 
 // middleware to send a 401 error if the user is not logged in
 const requireLogin = (req, res, next) => {
@@ -176,31 +120,50 @@ app.post("/api/register", async (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
 
-  await db.helpers.addUser(name, email, password, "user");
+  //user is creating account using site
+  await db.helpers.addUser(name, email, password, "user", null);
 });
 
-app.get('/api/login', async (req, res) => {
-  req.session.user ? res.status(200).send({loggedIn: true, user: req.session.user.username, role: req.session.user.role}) : res.status(200).send({loggedIn: false});
-})
+app.get("/api/login", async (req, res) => {
+  req.session.user
+    ? res.status(200).send({
+        loggedIn: true,
+        user: req.session.user.username,
+        role: req.session.user.role,
+      })
+    : res.status(200).send({ loggedIn: false });
+});
 
 app.post("/api/login", async (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
 
   const targetUser = await db.helpers.getUser(email);
-  if(targetUser.length === 0)
-  {
-    console.log('Account not found')
-    res.send({"status": "failed"})
-  }
-  else if(email === targetUser[0].email && password === targetUser[0].password)
-  {
-    req.session.user = {id: targetUser[0].id, username: targetUser[0].username, email: email, password: password, role: targetUser[0].role}
-    console.log(req.session.id)
+  const accountDetails = await db.helpers.getAccount(email);
+
+  if (targetUser.length === 0) {
+    console.log("Account not found");
+    res.send({ status: "failed" });
+  } else if (
+    email === targetUser[0].email &&
+    password === accountDetails[0].password
+  ) {
+    req.session.user = {
+      id: targetUser[0].id,
+      username: targetUser[0].username,
+      email: email,
+      password: password,
+      role: targetUser[0].role,
+    };
+    console.log(req.session.id);
     req.session.loggedIn = true;
     req.session.save();
-    const token = jwt.sign({email: email, password: password}, "secret_string", {expiresIn:"1h"});
-    res.cookie('jwt', token, {httpOnly:false, secure:false})
+    const token = jwt.sign(
+      { email: email, password: password },
+      "secret_string",
+      { expiresIn: "1h" }
+    );
+    res.cookie("jwt", token, { httpOnly: true, secure: false });
     res.json({ status: "success", token: token, role: targetUser[0].role });
   }
 });
@@ -251,40 +214,85 @@ app.get("/api/user/:username", async (req, res) => {
   res.json(user);
 });
 
-app.put("/api/user/:username", async (req, res) => {
+app.put("/api/user/:username/editprofile", async (req, res) => {
   let oldUsername = req.params.username;
   let newUsername = req.body.username;
   let email = req.body.email;
   let password = req.body.password;
   let description = req.body.description;
-})
 
-app.put('/api/edituser/', async (req, res) => {
-  let username = req.body.username
-  let role = req.body.role
-  let id = req.body.id
+  await db.helpers.editUserProfile(
+    newUsername,
+    email,
+    password,
+    description,
+    oldUsername
+  );
+  req.session.user.username = newUsername;
+  req.session.save();
+});
+
+app.put("/api/user/:username/editusername", async (req, res) => {
+  let oldUsername = req.params.username;
+  let newUsername = req.body.username;
+  await db.helpers.editUserUsername(newUsername, oldUsername);
+
+  //change the username
+  req.session.user.username = newUsername;
+  console.log(req.session.user);
+  req.session.save();
+});
+
+app.put("/api/user/:username/editemail", async (req, res) => {
+  let oldUsername = req.params.username;
+  let newEmail = req.body.email;
+  await db.helpers.editUserEmail(newEmail, oldUsername);
+  req.session.user.email = newEmail;
+  req.session.save();
+});
+
+app.put("/api/user/:username/editpassword", async (req, res) => {
+  let email = req.body.email;
+  let newPassword = req.body.password;
+  await db.helpers.editUserPassword(newPassword, email);
+});
+
+app.put("/api/user/:username/editdescription", async (req, res) => {
+  let oldUsername = req.params.username;
+  let newDesc = req.body.description;
+  await db.helpers.editUserDescription(newDesc, oldUsername);
+});
+
+app.put("/api/edituser/", async (req, res) => {
+  let username = req.body.username;
+  let role = req.body.role;
+  let id = req.body.id;
   const user = await db.helpers.editUserById(id, username, role);
-})
+});
 
-app.get('/api/users', isLoggedIn, async (req, res) => {
+app.get("/api/users", isLoggedIn, async (req, res) => {
   const users = await db.helpers.getUsers();
-  res.json(users)
-})
+  res.json(users);
+});
 
-app.post('/api/delete', async (req, res) => {
+app.post("/api/delete", async (req, res) => {
   try {
     let id = req.body.id;
     await db.helpers.deleteUser(id);
     res.status(200).send("User deleted successfully");
   } catch (error) {
     console.error("Error deleting user:", error);
-    res.status(500).send("Internal Server Error"); 
+    res.status(500).send("Internal Server Error");
   }
 });
 
 // BOARDS //
 
 app.get("/api/boards", isLoggedIn, async (req, res) => {
+  if (req.session.user) {
+    console.log(req.session.user.username);
+  }
+
   const boards = await db.helpers.getBoards();
   res.json(boards);
 });
@@ -491,20 +499,21 @@ app.post("/api/upload", upload.single("image"), async (req, res) => {
     return res.status(400).send("No files were uploaded.");
   }
 
-  // Example: Extract additional information from the request
-  // NOTE: Ensure these values are validated and sanitized properly in a real app
+  // Extracting additional information from the request
   const { postid, userid, url } = req.body;
-  const filename = req.file.originalname; // Use the original file name or generate a new one
+  const filename = req.file.originalname; // The original file name
   const imageBuffer = req.file.buffer; // Image data as a buffer
+  const contentType = req.file.mimetype; // Extracting the content type of the uploaded file
 
   try {
-    // Call saveImage with the required parameters
+    // Assuming saveImage function is modified to accept contentType parameter
     const savedImage = await db.helpers.saveImage(
       filename,
       imageBuffer,
       url,
       postid,
-      userid
+      userid,
+      contentType // Pass the content type to your database/helper function
     );
     res.json({ message: "Image uploaded successfully", image: savedImage });
   } catch (err) {
@@ -532,6 +541,30 @@ app.get("/api/images/user/:userid", async (req, res) => {
   } catch (err) {
     console.error("Failed to fetch images for user:", err);
     res.status(500).send("Failed to fetch images.");
+  }
+});
+
+//  get image by id
+
+app.get("/api/images/:imageId", async (req, res) => {
+  const { imageId } = req.params;
+
+  try {
+    // Assuming you have a function to get the image by ID
+    const image = await db.helpers.getImageById(imageId);
+
+    if (!image) {
+      return res.status(404).send("Image not found");
+    }
+
+    const contentType = image.content_type || "image/jpeg"; // Adjust based on your schema
+    res.type(contentType);
+
+    // Send the image data
+    res.send(image.image); // Assuming 'image.image' is the binary data
+  } catch (err) {
+    console.error("Error fetching image:", err);
+    res.status(500).send("Failed to fetch image");
   }
 });
 

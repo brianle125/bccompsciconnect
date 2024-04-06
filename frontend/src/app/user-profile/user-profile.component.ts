@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../user.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TopBarComponent } from '../top-bar/top-bar.component';
 import { UserEditComponent } from '../user-edit/user-edit.component';
@@ -17,7 +17,7 @@ export class UserProfileComponent implements OnInit {
   userData: UserProfileData = new UserProfileData('Invalid user', 'assets/user.png', '', 'Desc', '')
   user: any
   //Session user
-  constructor(private userService: UserService, private route: ActivatedRoute) {}
+  constructor(private userService: UserService, private route: ActivatedRoute, private router: Router ) {}
   ngOnInit(): void {
     const routeParams = this.route.snapshot.paramMap;
     const username = routeParams.get('username');
@@ -33,9 +33,16 @@ export class UserProfileComponent implements OnInit {
     })
   }
 
+  editUser() {
+    this.router.navigate([`/user/${this.userData.username}/edit`])
+  }
+
 
   //CHECK IF LOGGED IN, AND IF CURRENT SESSION MATCHES THE USER
   addProfilePicture(file: FileList) {
+    this.userService.isLoggedIn().subscribe((data) => {
+
+    })
     //get image
   }
 
