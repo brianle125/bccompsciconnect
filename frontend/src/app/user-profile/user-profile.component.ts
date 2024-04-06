@@ -29,10 +29,11 @@ export class UserProfileComponent implements OnInit {
       this.user = data as any;
       this.userData = new UserProfileData(this.user[0].username, 'assets/user.png', this.user[0].email, this.user[0].description, `/user/${username}/posts`)
 
-      this.userService.getUserProfile(this.user[0].id).subscribe((data) => {
+      this.userService.getUserProfile(this.user[0].username).subscribe((data) => {
         let response = data as any;
-        if(response.length !== 0) {
-          this.userData.icon = 'data:image/jpg;base64,' + arrayBufferToBase64(response[0].image.data)
+        console.log(response)
+        if(response[0].profile_image !== null) {
+          this.userData.icon = 'data:image/jpg;base64,' + arrayBufferToBase64(response[0].profile_image.data)
         } else {
           this.userData.icon = 'assets/user.png'
         }

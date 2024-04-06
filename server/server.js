@@ -135,14 +135,13 @@ app.post("/api/login", async (req, res) => {
   let password = req.body.password;
 
   const targetUser = await db.helpers.getUser(email);
-  const accountDetails = await db.helpers.getAccount(email);
 
   if (targetUser.length === 0) {
     console.log("Account not found");
     res.send({ status: "failed" });
   } else if (
     email === targetUser[0].email &&
-    password === accountDetails[0].password
+    password === targetUser[0].password
   ) {
     req.session.user = {
       id: targetUser[0].id,
@@ -255,18 +254,18 @@ app.post("/api/uploadprofile", upload.single("image"), async (req, res) => {
     return res.status(400).send("No files were uploaded.");
   } 
 
-  //If profile picture exists, simply update
-  const exists = await db.helpers.getProfilePicture(req.body.userid)
-  console.log(exists.length)
-  if(exists.length === 0) {
-     //else add new profile
-     console.log("adding profile")
-    await db.helpers.addProfilePicture(req.body.userid, req.file.originalname, req.file.buffer)
-  }
-  else
-  {
-    await db.helpers.changeProfilePicture(req.body.userid, req.file.originalname, req.file.buffer)
-  }
+  await db.helpers.saveProfilePicture(req.file.buffer, req.body.username)
+  // const exists = await db.helpers.getProfilePicture(req.body.username)
+  // console.log(exists.length)
+  // if(exists.length === 0) {
+  //    //else add new profile
+  //    console.log("adding profile")
+  //   await db.helpers.addProfilePicture(req.body.username, req.file.originalname, req.file.buffer)
+  // }
+  // else
+  // {
+  //   await db.helpers.changeProfilePicture(req.body.username, req.file.originalname, req.file.buffer)
+  // }
  
 });
 

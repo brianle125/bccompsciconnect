@@ -45,11 +45,12 @@ export class UserProfileUploadComponent implements OnInit{
       this.fileName = file.name;
       const formData = new FormData();
       formData.append("userid", this.user[0].id)
+      formData.append("username", this.user[0].username)
       formData.append("filename", this.fileName)
       formData.append("url", "")
       formData.append("image", file);
-      console.log(file.name)
       this.userService.uploadUserProfile(formData).subscribe()
+      console.log(formData)
       window.location.reload();
     }
 

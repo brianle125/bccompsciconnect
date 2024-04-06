@@ -29,12 +29,14 @@ export class TopBarComponent implements OnInit {
       this.username = response.user;
       this.isAdmin = response.role === 'admin'
 
+      console.log(response)
+
       //load profile picture
       if(this.loggedIn) {
-        this.userService.getUserProfile(response.id).subscribe((data) => {
-          let response = data as any;
-          if(response.length !== 0) {
-            this.profilePic = 'data:image/jpg;base64,' + arrayBufferToBase64(response[0].image.data)
+        this.userService.getUserProfile(response.user).subscribe((data) => {
+          let retrievedImage = data as any;
+          if(retrievedImage[0].profile_image !== null) {
+            this.profilePic = 'data:image/jpg;base64,' + arrayBufferToBase64(retrievedImage[0].profile_image.data)
           } else {
             this.profilePic = 'assets/user.png'
           }
