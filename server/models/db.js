@@ -249,9 +249,14 @@ const helpers = {
     const res = await pool.query(q, [topicId]);
   },
 
+  getPost: async function (postId) {
+    const q = `SELECT * FROM posts JOIN public_user_info ON posts.created_by = public_user_info.id WHERE posts.id = $1`
+    const res = await pool.query(q, [postId]);
+    return res.rows
+  },
+
   getPosts: async function (topicId) {
     const q = `SELECT * FROM posts JOIN public_user_info ON posts.created_by = public_user_info.id WHERE posts.topicid = $1 ORDER BY posts.created_at`
-    // const q = "SELECT * FROM posts WHERE topicid = $1 ORDER BY created_at";
     const res = await pool.query(q, [topicId]);
     return res.rows;
   },

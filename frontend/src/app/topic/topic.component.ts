@@ -58,9 +58,9 @@ export class TopicComponent {
         }
         let allPosts: PostData[] = []
           res.posts.posts.forEach((post) => {
-            let postData: PostData = new PostData(post.body, post.username, '', 'assets/user.png', post.created_at, null, null)
+            let postData: PostData = new PostData( post.body,  post.username,  '',  'assets/user.png',  post.created_at,  null,  null)
             if(userID != null && post.id == userID) {
-              postData.editLink = '' // TODO implement
+              postData.editLink = `board/${this.board}/topic/${this.topic}/post/${post.id}/edit-post`
             }
             allPosts.push(postData)
           })

@@ -455,6 +455,30 @@ app.post("/api/board/:boardId/add-topic", requireLogin, async (req, res) => {
   res.json({ message: "success" });
 });
 
+app.get("/api/board/:boardId/topic/:topicId/post/:postId", async (req, res) => {
+  let params = req.params
+  let post = await db.helpers.getPost(params.postId)
+  if(post.length < 1) {
+    res.error(404).json({ error: { code: 404, message: "no post with given id found" }})
+    return
+  }
+  res.json(post[0])
+})
+
+const editPostSchema = joi.object({
+  text: joi.string().required(),
+});
+
+app.put("/api/board/:boardId/topic/:topicId/post/:postId", async (req, res) => {
+  let valid = editPostSchema.validate(req.body)
+  if(valid.error != null) {
+    res.status(400).json({ error: { code: 400, message: "invalid schema" } });
+  }
+
+  let post = await db.helpers.editPost(req.params.postId, req.body.text)
+  res.json({ message: "success"})
+})
+
 // Getting images
 
 app.get("/api/images", async (req, res) => {
