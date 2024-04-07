@@ -38,7 +38,7 @@ export class CreatePostComponent implements OnInit{
 
   public onSubmit(text: string): void {
     if(this.topicID != null && this.boardID != null) {
-      this.postService.addPost(this.boardID, this.topicID, text);
+      this.postService.addPost(this.boardID, this.topicID, text).subscribe({next:()=>{}, error:(e)=>{console.log(e)}})
     }
   }
 }

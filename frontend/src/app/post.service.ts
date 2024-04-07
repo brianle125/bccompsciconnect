@@ -19,6 +19,6 @@ export class PostService {
   }
 
   addPost(boardID: number, topicID:number, message: string): Observable<any> {
-    return this.http.post(`${api}/board/${boardID}/topic/${topicID}/add-post`, {text: message})
+    return this.http.post(`${api}/board/${boardID}/topic/${topicID}/add-post`, {text: message}, {withCredentials: true})
   }
 }
