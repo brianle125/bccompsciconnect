@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-import { PostListComponent } from '../post-list/post-list.component';
+import { PostData, PostListComponent } from '../post-list/post-list.component';
 import { TopBarComponent } from '../top-bar/top-bar.component';
 import { FormattedTextComponent } from '../formatted-text/formatted-text.component';
 import { CreatePostComponent } from '../create-post/create-post.component';
 import { ActivatedRoute, Router } from '@angular/router';
+import { PostService } from '../post.service';
 
 @Component({
   selector: 'app-topic',
@@ -23,8 +24,9 @@ export class TopicComponent {
   private board: number | null = null
   private topic: number | null = null
   public createPostLink: string | null = null
+  public posts: PostData[] = []
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute) {}
+  constructor(private router: Router, private activatedRoute: ActivatedRoute, private postService: PostService) {}
   ngOnInit(): void {
     let tempBoardID: string | null = this.activatedRoute.snapshot.params['board-id']
     let tempTopicID: string | null = this.activatedRoute.snapshot.params['topic-id']
@@ -39,6 +41,24 @@ export class TopicComponent {
       }
     } else {
       this.router.navigate(['/'])
+      return
     }
+
+    if(this.board != null && this.topic != null) {
+      this.postService.getPostByTopicID(this.board, this.topic).subscribe({
+        next:(res)=>{
+          let allPosts: PostData[] = []
+          res.posts.forEach((post) => {
+            let postData: PostData = new PostData(post.body, post.username, '', '', post.created_at, null, '')
+
+            allPosts.push(new PostData(post.body, post.username, 'assets/user.png', '', post.created_at, null, ''))
+          })
+          this.posts = allPosts
+          console.log(allPosts)
+        },
+        error:(e)=>{console.log(e)}
+      })
+    }
+    
   }
 }
