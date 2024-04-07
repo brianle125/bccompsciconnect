@@ -99,7 +99,13 @@ app.post("/api/google/", async (req, res) => {
   }
 });
 
-////////////////////////////
+// middleware to send a 401 error if the user is not logged in
+const requireLogin = (req, res, next) => {
+  if (req.session.user == null || req.session.user.id == null) {
+    return res.status(401).json({ code:401, error: "Must be logged in" });
+  }
+  next();
+};
 
 //Sockets
 io.on("connection", (socket) => {
@@ -168,7 +174,7 @@ app.post("/api/logout", async (req, res) => {
   if (req.session.user) {
     req.session.destroy();
     res.clearCookie("jwt", {
-      httpOnly: true,
+      httpOnly: false,
       secure: false,
     });
     res.send({ status: "loggedout" });
@@ -180,7 +186,7 @@ app.get("/api/logout", async (req, res) => {
   if (req.session.user) {
     req.session.destroy();
     res.clearCookie("jwt", {
-      httpOnly: true,
+      httpOnly: false,
       secure: false,
     });
     res.send({ status: "loggedout" });
@@ -362,22 +368,6 @@ app.delete("/api/board/:boardId", async (req, res) => {
 
 // TOPICS AND POSTS //
 
-// TODO: are these still needed
-app.post("/api/board/:boardId", async (req, res) => {
-  let boardId = req.params.boardId;
-  let question = req.body.question;
-  await db.helpers.addTopic(boardId, question, null);
-  res.redirect(`/api/board/${boardId}`);
-});
-
-// TODO: are these still needed
-app.post("/api/board/:boardId/latest", async (req, res) => {
-  let boardId = req.params.boardId;
-  let question = req.body.question;
-  await db.helpers.addTopic(boardId, question, null);
-  res.redirect(`/api/board/${boardId}`);
-});
-
 app.get("/api/board/:boardId/topic/:topicId", async (req, res) => {
   let boardId = req.params.boardId;
   let topicId = req.params.topicId;
@@ -401,21 +391,19 @@ app.delete("/api/board/:boardId/topic/:topicId", async (req, res) => {
 });
 
 const postPostSchema = joi.object({
-  created_by: joi.number().integer().required(),
   text: joi.string().required(),
 });
 
-app.post("/api/board/:boardId/topic/:topicId", async (req, res) => {
+app.post("/api/board/:boardId/topic/:topicId/add-post", requireLogin, async (req, res) => {
   let boardId = req.params.boardId;
   let topicId = req.params.topicId;
   let body = req.body;
   let valid = postPostSchema.validate(body);
-  if (valid.error == null) {
-    await db.helpers.addPost(topicId, text, body.created_by);
-    res.redirect(302, `/api/board/${boardId}/topic/${topicId}`);
-  } else {
+  if(valid.error != null) {
     res.status(400).json({ error: { code: 400, message: "invalid schema" } });
   }
+  await db.helpers.addPost(topicId, body.text, req.session.user.id);
+  res.redirect(302, `/api/board/${boardId}/topic/${topicId}`);
 });
 
 //CHANGING THESE ENDPOINTS LATER IF NEEDED
@@ -447,26 +435,24 @@ app.get("/api/board/:boardId", async (req, res) => {
 });
 
 const postTopicAndFirstPostSchema = joi.object({
-  boardid: joi.number().integer().required(),
   question: joi.string().required(), // ie the title
-  created_by: joi.number().integer().required(),
   body: joi.string().required(), // of the first post of the topic
 });
 
-app.post("/api/board/addtopic", async (req, res) => {
+app.post("/api/board/:boardId/add-topic", requireLogin, async (req, res) => {
   let valid = postTopicAndFirstPostSchema.validate(req.body);
-  if (valid.error == null) {
-    let body = req.body;
-    await db.helpers.addTopic(
-      body.boardid,
-      body.question,
-      body.created_by,
-      body.body
-    );
-    res.json({ message: "success" });
-  } else {
+  if (valid.error != null) {
     res.status(400).json({ error: { code: 400, message: "invalid schema" } });
   }
+  let body = req.body;
+  let boardId = req.params.boardId;
+  await db.helpers.addTopic(
+    boardId,
+    body.question,
+    req.session.user.id,
+    body.body
+  );
+  res.json({ message: "success" });
 });
 
 // Getting images

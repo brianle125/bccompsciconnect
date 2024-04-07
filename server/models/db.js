@@ -84,6 +84,12 @@ const helpers = {
       ON DELETE CASCADE
     )`;
 
+    // stuff that's ok to send to everyone
+    const publicUserInfo = `CREATE OR REPLACE VIEW public_user_info 
+      AS SELECT id, username, description, role, created_at, profile_image 
+      FROM users;
+    `
+
     //call queries
     await pool.query(users);
     await pool.query(login);
@@ -92,6 +98,7 @@ const helpers = {
     await pool.query(posts);
     await pool.query(userProfiles);
     await pool.query(images);
+    await pool.query(publicUserInfo);
   },
 
   /**
@@ -150,7 +157,6 @@ const helpers = {
   //Get all boards
   getBoards: async function () {
     const res = await pool.query("SELECT * from boards ORDER by id");
-    console.log(res);
     return res.rows;
   },
 
@@ -245,7 +251,8 @@ const helpers = {
   },
 
   getPosts: async function (topicId) {
-    const q = "SELECT * FROM posts WHERE topicid = $1 ORDER BY created_at";
+    const q = `SELECT * FROM posts JOIN public_user_info ON posts.created_by = public_user_info.id WHERE posts.topicid = $1 ORDER BY posts.created_at`
+    // const q = "SELECT * FROM posts WHERE topicid = $1 ORDER BY created_at";
     const res = await pool.query(q, [topicId]);
     return res.rows;
   },

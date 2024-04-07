@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { api } from './common-strings';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -10,57 +11,57 @@ export class UserService {
   // api = 'http://localhost:8080/api';
   constructor(private http: HttpClient) { }
 
-  checkUserExists(username: any) {
+  checkUserExists(username: any): Observable<any> {
     return this.http.get(`${api}/usercheck?name=${username}`, {withCredentials:true})
   }
 
-  isLoggedIn() {
+  isLoggedIn(): Observable<any> {
     return this.http.get(`${api}/login`, {withCredentials: true})
   }
 
-  getUser(username: any) {
+  getUser(username: any): Observable<any> {
     return this.http.get(`${api}/user/${username}`, {withCredentials: true})
   }
 
-  addUser(user: any) {
+  addUser(user: any): Observable<any> {
     return this.http.post<any>(`${api}/register`, user, {withCredentials: true});
   }
 
-  loginUser(user: any) {
+  loginUser(user: any): Observable<any> {
     return this.http.post<any>(`${api}/login`, user, {observe: 'response', withCredentials: true});
   }
 
-  logoutUser() {
+  logoutUser(): Observable<any> {
     return this.http.post(`${api}/logout`, null, {withCredentials: true});
   }
 
-  getUsers() {
+  getUsers(): Observable<any> {
     return this.http.get(`${api}/users`, {observe: 'response', withCredentials: true})
   }
 
-  editUser1( user: any) {
+  editUser1( user: any): Observable<any> {
     return this.http.put(`${api}/edituser/`, user, {withCredentials: true})
   }
 
-  deleteUser(id: any) {
+  deleteUser(id: any): Observable<any> {
     return this.http.post(`${api}/delete`, id, {withCredentials: true});
   }
 
   //profiles
-  editUserProfile(username: any, user: any) {
+  editUserProfile(username: any, user: any): Observable<any> {
     return this.http.put(`${api}/user/${username}/editprofile`, user, {withCredentials: true})
   }
 
-  uploadUserProfile(image: any) {
+  uploadUserProfile(image: any): Observable<any> {
     return this.http.post(`${api}/uploadprofile`, image, {withCredentials: true})
   }
 
-  getUserProfile(userid: any) {
+  getUserProfile(userid: any): Observable<any> {
     return this.http.get(`${api}/getprofile/${userid}`, {withCredentials: true})
   }
 
   //google auth
-  googleAuthUser(user: any) {
+  googleAuthUser(user: any): Observable<any> {
     return this.http.post(`${api}/google/`, user, {observe: 'response', withCredentials: true})
   }
 }

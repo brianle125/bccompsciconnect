@@ -39,7 +39,11 @@ export class CreateTopicComponent implements OnInit{
     console.log(titleAndPost)
     // TODO: actually read the user
     if(this.board != null) {
-      // this.topicService.addTopic(this.board, titleAndPost.title, 1, titleAndPost.post)      
+      this.topicService.addTopic(this.board, titleAndPost.title, titleAndPost.post).subscribe({
+        error:(e) => {
+          console.log(e)
+        }
+      })   
     }
   }
 }
