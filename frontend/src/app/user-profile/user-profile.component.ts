@@ -7,6 +7,7 @@ import { UserEditComponent } from '../user-edit/user-edit.component';
 import { PostListComponent } from '../post-list/post-list.component';
 import { UserProfileUploadComponent } from '../user-profile-upload/user-profile-upload.component';
 import { arrayBufferToBase64 } from '../image-helper';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-user-profile',
@@ -33,28 +34,25 @@ export class UserProfileComponent implements OnInit {
   user: any;
   //Session user
 
+  imageurl: any;
+
   isCurrentUser: boolean = false;
   constructor(
     private userService: UserService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private http: HttpClient
   ) {}
   ngOnInit(): void {
     const routeParams = this.route.snapshot.paramMap;
     const username = routeParams.get('username');
-    this.userService.getUser(username).subscribe((data) => {
-      // Assuming you have the user data
-      this.user = data as any;
-      console.log(this.user[0].profile_image);
-      // Check if the icon needs conversion (i.e., it's a Blob)
-      if (this.user[0].profile_image instanceof Blob) {
-        // Convert ArrayBuffer to base64
-        const base64String = btoa(
-          String.fromCharCode(...new Uint8Array(this.user[0].profile_image))
-        );
-        this.userData.icon = `data:image/jpeg;base64,${base64String}`;
-        console.log(this.userData.icon);
-      } else {
+    if (username) {
+      this.userService.getUser(username).subscribe((data) => {
+        // Assuming you have the user data
+        this.user = data as any;
+        console.log(this.user[0].profile_image);
+        // Check if the icon needs conversion (i.e., it's a Blob)
+
         // If it's not a Blob, directly use the icon as it is (likely a URL)
         this.userData = new UserProfileData(
           this.user[0].username,
@@ -63,13 +61,13 @@ export class UserProfileComponent implements OnInit {
           this.user[0].description,
           `/user/${username}/posts`
         );
-      }
-    });
+      });
 
-    this.userService.isLoggedIn().subscribe((data) => {
-      let amilogged = data as any;
-      console.log(amilogged.loggedIn);
-    });
+      this.userService.isLoggedIn().subscribe((data) => {
+        let amilogged = data as any;
+        console.log(amilogged.loggedIn);
+      });
+    }
   }
 
   editUser() {
