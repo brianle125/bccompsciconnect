@@ -63,6 +63,7 @@ const helpers = {
       password varchar(1000), 
       PRIMARY KEY(id)
     )`;
+    
     const userProfiles = `CREATE TABLE IF NOT EXISTS userprofiles (
       username varchar(255),
       filename varchar(400), 
