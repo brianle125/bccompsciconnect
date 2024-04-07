@@ -526,11 +526,17 @@ app.get("/api/images/user/:userid", async (req, res) => {
   }
 
   try {
-    const images = await db.helpers.getImagesByUserId(userid);
-    if (images.length === 0) {
-      return res.status(404).send("No images found for this user.");
+    const image = await db.helpers.getImagesByUserId(userid);
+    console.log(image);
+    if (!image) {
+      return res.status(404).send("Image not found");
     }
-    res.json(images);
+
+    const contentType = image.content_type || "image/jpeg"; // Adjust based on your schema
+    res.type(contentType);
+
+    // Send the image data
+    res.send(image.image); //
   } catch (err) {
     console.error("Failed to fetch images for user:", err);
     res.status(500).send("Failed to fetch images.");

@@ -364,8 +364,12 @@ const helpers = {
   getImagesByUserId: async function (userId) {
     const query = `SELECT * FROM images WHERE userid = $1`;
     try {
-      const res = await pool.query(query, [userId]);
-      return res.rows;
+      const result = await pool.query(query, [userId]);
+      if (result.rows.length > 0) {
+        return result.rows[0];
+      } else {
+        return null; // Or however you prefer to handle no results found
+      }
     } catch (err) {
       console.error("Error executing getImagesByUserId query:", err.stack);
       throw err;
