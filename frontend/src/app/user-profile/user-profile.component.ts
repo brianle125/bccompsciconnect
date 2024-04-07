@@ -43,15 +43,27 @@ export class UserProfileComponent implements OnInit {
     const routeParams = this.route.snapshot.paramMap;
     const username = routeParams.get('username');
     this.userService.getUser(username).subscribe((data) => {
-      //Get username, profile and related information for display
+      // Assuming you have the user data
       this.user = data as any;
-      this.userData = new UserProfileData(
-        this.user[0].username,
-        'assets/user.png',
-        this.user[0].email,
-        this.user[0].description,
-        `/user/${username}/posts`
-      );
+      console.log(this.user[0].profile_image);
+      // Check if the icon needs conversion (i.e., it's a Blob)
+      if (this.user[0].profile_image instanceof Blob) {
+        // Convert ArrayBuffer to base64
+        const base64String = btoa(
+          String.fromCharCode(...new Uint8Array(this.user[0].profile_image))
+        );
+        this.userData.icon = `data:image/jpeg;base64,${base64String}`;
+        console.log(this.userData.icon);
+      } else {
+        // If it's not a Blob, directly use the icon as it is (likely a URL)
+        this.userData = new UserProfileData(
+          this.user[0].username,
+          this.user[0].icon,
+          this.user[0].email,
+          this.user[0].description,
+          `/user/${username}/posts`
+        );
+      }
     });
 
     this.userService.isLoggedIn().subscribe((data) => {

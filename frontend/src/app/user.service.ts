@@ -64,6 +64,7 @@ export class UserService {
   }
 
   uploadUserProfile(image: any) {
+    console.log(image.image_type);
     return this.http.post(`${api}/uploadprofile`, image, {
       withCredentials: true,
     });
