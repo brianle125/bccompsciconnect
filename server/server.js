@@ -77,9 +77,6 @@ app.post("/api/google/", async (req, res) => {
 
   //add user to database if email doesn't exist, otherwise login with existing credentials
   if (possibleUser.length === 0) {
-    req.session.user = { username: payload.email };
-    req.session.loggedIn = true;
-    req.session.save();
     await db.helpers.addUser(
       payload.email,
       payload.email,
@@ -87,6 +84,17 @@ app.post("/api/google/", async (req, res) => {
       "user",
       payload.sub
     );
+    possibleUser = await db.helpers.getUser(payload.email);
+    req.session.user = {
+      id: possibleUser[0].id,
+      username: possibleUser[0].username,
+      email: possibleUser[0].email,
+      role: possibleUser[0].role,
+    };
+    req.session.loggedIn = true;
+    req.session.save();
+
+
   } else {
     req.session.user = {
       id: possibleUser[0].id,
