@@ -1,4 +1,4 @@
-<div *ngFor="let post of posts" class="col-sm-12">
+<div *ngFor="let post of posts" class="post col-sm-12">
     <div class="col-sm-2 info">
         <a class="username" [href]="post.profileLink">{{post.username}}</a>
         <div class="profile-pic-frame">
@@ -19,6 +19,6 @@
         </div>
     </div>
     <div class="col-sm-10 message">
-        {{post.message}}
+        <app-formatted-text [text]="post.message"></app-formatted-text>
     </div>
 </div>
