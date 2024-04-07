@@ -5,15 +5,19 @@ import { CommonModule } from '@angular/common';
 import { TopBarComponent } from '../top-bar/top-bar.component';
 import { UserEditComponent } from '../user-edit/user-edit.component';
 import { PostListComponent } from '../post-list/post-list.component';
+import { UserProfileUploadComponent } from '../user-profile-upload/user-profile-upload.component';
+import { arrayBufferToBase64 } from '../image-helper';
 
 @Component({
   selector: 'app-user-profile',
   standalone: true,
+
   imports: [
     CommonModule,
     TopBarComponent,
     UserEditComponent,
     PostListComponent,
+    UserProfileUploadComponent,
   ],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.css',
@@ -28,6 +32,8 @@ export class UserProfileComponent implements OnInit {
   );
   user: any;
   //Session user
+
+  isCurrentUser: boolean = false;
   constructor(
     private userService: UserService,
     private route: ActivatedRoute,
@@ -39,11 +45,9 @@ export class UserProfileComponent implements OnInit {
     this.userService.getUser(username).subscribe((data) => {
       //Get username, profile and related information for display
       this.user = data as any;
-      const iconUrl = `http://localhost:8080/api/images/user/${this.user[0].id}`;
-      console.log(iconUrl);
       this.userData = new UserProfileData(
         this.user[0].username,
-        iconUrl,
+        'assets/user.png',
         this.user[0].email,
         this.user[0].description,
         `/user/${username}/posts`

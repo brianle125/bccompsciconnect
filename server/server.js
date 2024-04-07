@@ -89,6 +89,7 @@ app.post("/api/google/", async (req, res) => {
     );
   } else {
     req.session.user = {
+      id: possibleUser[0].id,
       username: possibleUser[0].username,
       email: possibleUser[0].email,
       role: possibleUser[0].role,
@@ -122,6 +123,7 @@ app.get("/api/login", async (req, res) => {
   req.session.user
     ? res.status(200).send({
         loggedIn: true,
+        id: req.session.user.id,
         user: req.session.user.username,
         role: req.session.user.role,
       })
@@ -133,16 +135,16 @@ app.post("/api/login", async (req, res) => {
   let password = req.body.password;
 
   const targetUser = await db.helpers.getUser(email);
-  const accountDetails = await db.helpers.getAccount(email);
 
   if (targetUser.length === 0) {
     console.log("Account not found");
     res.send({ status: "failed" });
   } else if (
     email === targetUser[0].email &&
-    password === accountDetails[0].password
+    password === targetUser[0].password
   ) {
     req.session.user = {
+      id: targetUser[0].id,
       username: targetUser[0].username,
       email: email,
       password: password,
@@ -161,7 +163,6 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-//For some reason it isnt working / Not calling but the clear cookie works.
 app.post("/api/logout", async (req, res) => {
   console.log(req.session.user);
   if (req.session.user) {
@@ -213,7 +214,6 @@ app.put("/api/user/:username/editprofile", async (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
   let description = req.body.description;
-
   await db.helpers.editUserProfile(
     newUsername,
     email,
@@ -225,41 +225,10 @@ app.put("/api/user/:username/editprofile", async (req, res) => {
   req.session.save();
 });
 
-app.put("/api/user/:username/editusername", async (req, res) => {
-  let oldUsername = req.params.username;
-  let newUsername = req.body.username;
-  await db.helpers.editUserUsername(newUsername, oldUsername);
-
-  //change the username
-  req.session.user.username = newUsername;
-  console.log(req.session.user);
-  req.session.save();
-});
-
-app.put("/api/user/:username/editemail", async (req, res) => {
-  let oldUsername = req.params.username;
-  let newEmail = req.body.email;
-  await db.helpers.editUserEmail(newEmail, oldUsername);
-  req.session.user.email = newEmail;
-  req.session.save();
-});
-
-app.put("/api/user/:username/editpassword", async (req, res) => {
-  let email = req.body.email;
-  let newPassword = req.body.password;
-  await db.helpers.editUserPassword(newPassword, email);
-});
-
-app.put("/api/user/:username/editdescription", async (req, res) => {
-  let oldUsername = req.params.username;
-  let newDesc = req.body.description;
-  await db.helpers.editUserDescription(newDesc, oldUsername);
-});
-
-app.put("/api/edituser/", async (req, res) => {
-  let username = req.body.username;
-  let role = req.body.role;
-  let id = req.body.id;
+app.put('/api/edituser/', async (req, res) => {
+  let username = req.body.username
+  let role = req.body.role
+  let id = req.body.id
   const user = await db.helpers.editUserById(id, username, role);
 });
 
@@ -278,6 +247,32 @@ app.post("/api/delete", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
+
+//profile pictures; experimental
+app.post("/api/uploadprofile", upload.single("image"), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).send("No files were uploaded.");
+  } 
+
+  await db.helpers.saveProfilePicture(req.file.buffer, req.body.username)
+  // const exists = await db.helpers.getProfilePicture(req.body.username)
+  // console.log(exists.length)
+  // if(exists.length === 0) {
+  //    //else add new profile
+  //    console.log("adding profile")
+  //   await db.helpers.addProfilePicture(req.body.username, req.file.originalname, req.file.buffer)
+  // }
+  // else
+  // {
+  //   await db.helpers.changeProfilePicture(req.body.username, req.file.originalname, req.file.buffer)
+  // }
+ 
+});
+
+app.get("/api/getprofile/:userid", async (req, res) => {
+  const image = await db.helpers.getProfilePicture(req.params.userid)
+  res.json(image)
+})
 
 // BOARDS //
 
@@ -485,6 +480,8 @@ app.get("/api/images", async (req, res) => {
     res.status(500).send("Failed to fetch images");
   }
 });
+
+
 // for uploadding images
 
 app.post("/api/upload", upload.single("image"), async (req, res) => {

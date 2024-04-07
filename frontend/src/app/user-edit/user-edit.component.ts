@@ -117,6 +117,32 @@ export class UserEditComponent implements OnInit {
       alert('User details successfully edited!');
       window.location.reload();
     });
+    //If username belongs to someone else stop edit, otherwise continue
+    this.userService.isLoggedIn().subscribe((data) => {
+      let response = data as any;
+
+      this.userService
+        .checkUserExists(this.form.value.username)
+        .subscribe((data) => {
+          let exists = data as any;
+          if (exists.exists && response.user !== this.form.value.username) {
+            alert('Username is taken');
+            this.form.reset();
+          } else {
+            this.userService
+              .editUserProfile(username, this.form.value)
+              .subscribe();
+            this.router
+              .navigate([`/user/${this.form.value.username}`])
+              .then(() => {
+                alert('User details successfully edited!');
+                window.location.reload();
+              });
+          }
+        });
+    });
+
+    //Otherwise edit is granted
   }
 
   cancelEdit() {
