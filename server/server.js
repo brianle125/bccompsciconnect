@@ -102,7 +102,7 @@ app.post("/api/google/", async (req, res) => {
 // middleware to send a 401 error if the user is not logged in
 const requireLogin = (req, res, next) => {
   if (req.session.user == null || req.session.user.id == null) {
-    return res.status(401).json({ code:401, error: "Must be logged in" });
+    return res.status(401).json({ code: 401, error: "Must be logged in" });
   }
   next();
 };
@@ -256,13 +256,16 @@ app.post("/api/delete", async (req, res) => {
 
 //profile pictures; experimental
 app.post("/api/uploadprofile", upload.single("image"), async (req, res) => {
-  console.log("ahaaaaa"); // Check the file object
-  console.log("MIME type:", req.file.mimetype); // Log the MIME type
+  //alert(req.file.mimetype); // Log the MIME type
   if (!req.file) {
     return res.status(400).send("No files were uploaded.");
   }
 
-  await db.helpers.saveProfilePicture(req.file.buffer, req.body.username);
+  await db.helpers.saveProfilePicture(
+    req.file.buffer,
+    req.body.username,
+    req.file.mimetype
+  );
 });
 
 ////////////////////////
@@ -397,17 +400,21 @@ const postPostSchema = joi.object({
   text: joi.string().required(),
 });
 
-app.post("/api/board/:boardId/topic/:topicId/add-post", requireLogin, async (req, res) => {
-  let boardId = req.params.boardId;
-  let topicId = req.params.topicId;
-  let body = req.body;
-  let valid = postPostSchema.validate(body);
-  if(valid.error != null) {
-    res.status(400).json({ error: { code: 400, message: "invalid schema" } });
+app.post(
+  "/api/board/:boardId/topic/:topicId/add-post",
+  requireLogin,
+  async (req, res) => {
+    let boardId = req.params.boardId;
+    let topicId = req.params.topicId;
+    let body = req.body;
+    let valid = postPostSchema.validate(body);
+    if (valid.error != null) {
+      res.status(400).json({ error: { code: 400, message: "invalid schema" } });
+    }
+    await db.helpers.addPost(topicId, body.text, req.session.user.id);
+    res.redirect(302, `/api/board/${boardId}/topic/${topicId}`);
   }
-  await db.helpers.addPost(topicId, body.text, req.session.user.id);
-  res.redirect(302, `/api/board/${boardId}/topic/${topicId}`);
-});
+);
 
 //CHANGING THESE ENDPOINTS LATER IF NEEDED
 app.delete("/api/board/:boardId/topic/:topicId/delete", async (req, res) => {
@@ -531,21 +538,21 @@ app.get("/api/images/user/:userid", async (req, res) => {
 
 // get userimage
 app.get("/api/userimages/:username", async (req, res) => {
-  const { imageId } = req.params;
+  const { username } = req.params;
 
   try {
     // Assuming you have a function to get the image by ID
     const user = await db.helpers.getuserImage(username);
 
-    if (!user) {
+    if (!user || !user.profile_image) {
       return res.status(404).send("Image not found");
     }
 
-    const contentType = user.image_type || "image/jpeg"; // Adjust based on your schema
+    const image_type = user.image_type || "image/jpeg"; // Adjust based on your schema
     res.type(image_type);
-
+    console.log(`Serving image for ${username}: type ${image_type}`);
     // Send the image data
-    res.send(user.image); // Assuming 'image.image' is the binary data
+    res.send(user.profile_image); // Assuming 'image.image' is the binary data
   } catch (err) {
     console.error("Error fetching image:", err);
     res.status(500).send("Failed to fetch image");

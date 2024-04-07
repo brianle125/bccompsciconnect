@@ -42,7 +42,7 @@ const helpers = {
       created_at timestamp,
       profile_image bytea, 
       google_id varchar(1000),
-      image_type varchar(400),
+      image_type varchar(1000),
       PRIMARY KEY(id)
     )`;
     const posts = `CREATE TABLE IF NOT EXISTS posts (
@@ -89,7 +89,7 @@ const helpers = {
     const publicUserInfo = `CREATE OR REPLACE VIEW public_user_info 
       AS SELECT id, username, description, role, created_at, profile_image 
       FROM users;
-    `
+    `;
 
     //call queries
     await pool.query(users);
@@ -258,7 +258,7 @@ const helpers = {
   },
 
   getPosts: async function (topicId) {
-    const q = `SELECT * FROM posts JOIN public_user_info ON posts.created_by = public_user_info.id WHERE posts.topicid = $1 ORDER BY posts.created_at`
+    const q = `SELECT * FROM posts JOIN public_user_info ON posts.created_by = public_user_info.id WHERE posts.topicid = $1 ORDER BY posts.created_at`;
     // const q = "SELECT * FROM posts WHERE topicid = $1 ORDER BY created_at";
     const res = await pool.query(q, [topicId]);
     return res.rows;
@@ -302,11 +302,14 @@ const helpers = {
 
   //profiles
 
-  saveProfilePicture: async function (image, username) {
+  saveProfilePicture: async function (image, username, imagetype) {
+    type = imagetype;
     // Include the imageType field in the UPDATE statement and add a placeholder for it ($3)
-    const sqlQuery = `UPDATE users SET profile_image = $1 WHERE username = $3`;
+    const sqlQuery = `UPDATE users SET profile_image = $1, image_type = $3 WHERE username = $2`;
     // Execute the query with the provided parameters in the correct order
-    const res = await pool.query(sqlQuery, [image, username]);
+    const res = await pool.query(sqlQuery, [image, username, type]);
+
+    console.log(imagetype);
   },
 
   // addProfilePicture: async function (username, filename, image) {
@@ -331,7 +334,7 @@ const helpers = {
     return res.rows;
   },
 
-  // get images
+  // get user images
 
   getImages: async function () {
     const query = `SELECT * FROM images`;
@@ -408,9 +411,18 @@ const helpers = {
 
   // get image by id
   getuserImage: async function (username) {
-    const q = "SELECT * FROM users WHERE username=$1";
-    const res = await pool.query(q, [username]);
-    return res.rows;
+    const query = "SELECT * FROM users WHERE username=$1";
+    try {
+      const result = await pool.query(query, [username]);
+      if (result.rows.length > 0) {
+        return result.rows[0];
+      } else {
+        return null; // Or however you prefer to handle no results found
+      }
+    } catch (err) {
+      console.error("Error executing getImageById query:", err.stack);
+      throw err; // Rethrow or handle as preferred
+    }
   },
 };
 
