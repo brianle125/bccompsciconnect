@@ -1,0 +1,6 @@
+<div *ngIf="loggedAsUser">
+    <form method="post" enctype="multipart/form-data" >
+        <input type="file" name="image"class="file-input" [accept]="requiredFileType" (change)="onFileSelected($event)" #fileUpload />
+    </form>
+</div>
+

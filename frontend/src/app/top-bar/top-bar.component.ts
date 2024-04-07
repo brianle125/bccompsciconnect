@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { UserService } from '../user.service';
+import { arrayBufferToBase64 } from '../image-helper';
 
 @Component({
   selector: 'app-top-bar',
@@ -11,6 +12,7 @@ import { UserService } from '../user.service';
 })
 export class TopBarComponent implements OnInit {
   loggedIn: boolean = false;
+  isAdmin: boolean = false;
   username: string = 'user'
   profilePic: string = 'assets/user.png'
   profileLink: string = ''
@@ -25,12 +27,33 @@ export class TopBarComponent implements OnInit {
       let response = data as any
       this.loggedIn = response.loggedIn;
       this.username = response.user;
+      this.isAdmin = response.role === 'admin'
+
+      console.log(response)
+
+      //load profile picture
+      if(this.loggedIn) {
+        this.userService.getUserProfile(response.user).subscribe((data) => {
+          let retrievedImage = data as any;
+          if(retrievedImage[0].profile_image !== null) {
+            this.profilePic = 'data:image/jpg;base64,' + arrayBufferToBase64(retrievedImage[0].profile_image.data)
+          } else {
+            this.profilePic = 'assets/user.png'
+          }
+        })
+      }
       this.profileLink = `/user/${this.username}`
     })
+
   }
   
   logOut() {
-    this.userService.logoutUser().subscribe((data) => {
+    this.userService.isLoggedIn().subscribe((data) => {
+      let response = data as any
+      console.log(response)
     })
+    console.log("Logging out")
+    this.userService.logoutUser().subscribe()
   }
 }
+
