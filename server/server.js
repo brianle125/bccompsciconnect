@@ -225,10 +225,10 @@ app.put("/api/user/:username/editprofile", async (req, res) => {
   req.session.save();
 });
 
-app.put('/api/edituser/', async (req, res) => {
-  let username = req.body.username
-  let role = req.body.role
-  let id = req.body.id
+app.put("/api/edituser/", async (req, res) => {
+  let username = req.body.username;
+  let role = req.body.role;
+  let id = req.body.id;
   const user = await db.helpers.editUserById(id, username, role);
 });
 
@@ -250,29 +250,32 @@ app.post("/api/delete", async (req, res) => {
 
 //profile pictures; experimental
 app.post("/api/uploadprofile", upload.single("image"), async (req, res) => {
+  console.log("ahaaaaa"); // Check the file object
+  console.log("MIME type:", req.file.mimetype); // Log the MIME type
   if (!req.file) {
     return res.status(400).send("No files were uploaded.");
-  } 
+  }
 
-  await db.helpers.saveProfilePicture(req.file.buffer, req.body.username)
-  // const exists = await db.helpers.getProfilePicture(req.body.username)
-  // console.log(exists.length)
-  // if(exists.length === 0) {
-  //    //else add new profile
-  //    console.log("adding profile")
-  //   await db.helpers.addProfilePicture(req.body.username, req.file.originalname, req.file.buffer)
-  // }
-  // else
-  // {
-  //   await db.helpers.changeProfilePicture(req.body.username, req.file.originalname, req.file.buffer)
-  // }
- 
+  await db.helpers.saveProfilePicture(req.file.buffer, req.body.username);
 });
 
+////////////////////////
+// const exists = await db.helpers.getProfilePicture(req.body.username)
+// console.log(exists.length)
+// if(exists.length === 0) {
+//    //else add new profile
+//    console.log("adding profile")
+//   await db.helpers.addProfilePicture(req.body.username, req.file.originalname, req.file.buffer)
+// }
+// else
+// {
+//   await db.helpers.changeProfilePicture(req.body.username, req.file.originalname, req.file.buffer)
+// }
+
 app.get("/api/getprofile/:userid", async (req, res) => {
-  const image = await db.helpers.getProfilePicture(req.params.userid)
-  res.json(image)
-})
+  const image = await db.helpers.getProfilePicture(req.params.userid);
+  res.json(image);
+});
 
 // BOARDS //
 
@@ -481,7 +484,6 @@ app.get("/api/images", async (req, res) => {
   }
 });
 
-
 // for uploadding images
 
 app.post("/api/upload", upload.single("image"), async (req, res) => {
@@ -490,7 +492,7 @@ app.post("/api/upload", upload.single("image"), async (req, res) => {
   }
 
   // Extracting additional information from the request
-  const { postid, userid, url } = req.body;
+  const { username, postid, userid, url } = req.body;
   const filename = req.file.originalname; // The original file name
   const imageBuffer = req.file.buffer; // Image data as a buffer
   const contentType = req.file.mimetype; // Extracting the content type of the uploaded file
@@ -498,6 +500,7 @@ app.post("/api/upload", upload.single("image"), async (req, res) => {
   try {
     // Assuming saveImage function is modified to accept contentType parameter
     const savedImage = await db.helpers.saveImage(
+      username,
       filename,
       imageBuffer,
       url,
@@ -537,6 +540,29 @@ app.get("/api/images/user/:userid", async (req, res) => {
   } catch (err) {
     console.error("Failed to fetch images for user:", err);
     res.status(500).send("Failed to fetch images.");
+  }
+});
+
+// get userimage
+app.get("/api/userimages/:username", async (req, res) => {
+  const { imageId } = req.params;
+
+  try {
+    // Assuming you have a function to get the image by ID
+    const user = await db.helpers.getuserImage(username);
+
+    if (!user) {
+      return res.status(404).send("Image not found");
+    }
+
+    const contentType = user.image_type || "image/jpeg"; // Adjust based on your schema
+    res.type(image_type);
+
+    // Send the image data
+    res.send(user.image); // Assuming 'image.image' is the binary data
+  } catch (err) {
+    console.error("Error fetching image:", err);
+    res.status(500).send("Failed to fetch image");
   }
 });
 
