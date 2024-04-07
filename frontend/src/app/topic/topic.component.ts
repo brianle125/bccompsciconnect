@@ -51,7 +51,7 @@ export class TopicComponent {
           res.posts.forEach((post) => {
             let postData: PostData = new PostData(post.body, post.username, '', '', post.created_at, null, '')
 
-            allPosts.push(new PostData(post.body, post.username, 'assets/user.png', '', post.created_at, null, ''))
+            allPosts.push(new PostData(post.body, post.username, '', 'assets/user.png', post.created_at, null, ''))
           })
           this.posts = allPosts
           console.log(allPosts)
