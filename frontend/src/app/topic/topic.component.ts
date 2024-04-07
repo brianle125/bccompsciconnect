@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
-import { PostListComponent } from '../post-list/post-list.component';
-import { PostCreateComponent } from '../post-create/post-create.component';
+import { PostData, PostListComponent } from '../post-list/post-list.component';
 import { TopBarComponent } from '../top-bar/top-bar.component';
 import { FormattedTextComponent } from '../formatted-text/formatted-text.component';
 import { CreatePostComponent } from '../create-post/create-post.component';
 import { ActivatedRoute, Router } from '@angular/router';
+import { PostService } from '../post.service';
+import { forkJoin } from 'rxjs';
+import { UserService } from '../user.service';
 
 @Component({
   selector: 'app-topic',
@@ -24,8 +26,9 @@ export class TopicComponent {
   private board: number | null = null
   private topic: number | null = null
   public createPostLink: string | null = null
+  public posts: PostData[] = []
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute) {}
+  constructor(private router: Router, private activatedRoute: ActivatedRoute, private postService: PostService, private userService: UserService) {}
   ngOnInit(): void {
     let tempBoardID: string | null = this.activatedRoute.snapshot.params['board-id']
     let tempTopicID: string | null = this.activatedRoute.snapshot.params['topic-id']
@@ -40,6 +43,30 @@ export class TopicComponent {
       }
     } else {
       this.router.navigate(['/'])
+      return
     }
+
+    // get posts to display
+    if(this.board != null && this.topic != null) {
+      forkJoin({
+        posts: this.postService.getPostByTopicID(this.board, this.topic),
+        user: this.userService.isLoggedIn()
+      }).subscribe((res) => {
+        let userID: number | null = null
+        if(res.user.loggedIn) {
+          userID = res.user.id
+        }
+        let allPosts: PostData[] = []
+          res.posts.posts.forEach((post) => {
+            let postData: PostData = new PostData(post.body, post.username, '', 'assets/user.png', post.created_at, null, null)
+            if(userID != null && post.id == userID) {
+              postData.editLink = '' // TODO implement
+            }
+            allPosts.push(postData)
+          })
+          this.posts = allPosts
+      })
+    }
+    
   }
 }
