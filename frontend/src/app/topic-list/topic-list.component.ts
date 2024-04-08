@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { BoardService } from '../board.service';
 import { ActivatedRoute } from '@angular/router';
+import { unixTimeStampStringToDate } from '../helpers';
 
 @Component({
   selector: 'app-topic-list',
@@ -31,14 +32,18 @@ export class TopicListComponent implements OnInit {
       let tempTopics: TopicListEntry[] = []
       for(let i = 0; i < data.topics.length; i++) {
         let target = data.topics[i]
-        tempTopics.push(new TopicListEntry(target.question, target.username, 0, 0, this.unixTimeStampToDate(target.created_at_unix), this.unixTimeStampToDate(target.latest_post_unix), `/board/${boardId}/topic/${target.id}`))
+        tempTopics.push(new TopicListEntry(
+          target.question, 
+          target.username, 
+          0, 
+          0, 
+          unixTimeStampStringToDate(target.created_at_unix), 
+          unixTimeStampStringToDate(target.latest_post_unix), 
+          `/board/${boardId}/topic/${target.id}`
+        ))
         this.topics = tempTopics
       }
     })
-  }
-
-  private unixTimeStampToDate(unixTime: string): Date {
-    return new Date(Math.round(parseFloat(unixTime) * 1000))
   }
 }
 
