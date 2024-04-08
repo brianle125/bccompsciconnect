@@ -31,10 +31,14 @@ export class TopicListComponent implements OnInit {
       let tempTopics: TopicListEntry[] = []
       for(let i = 0; i < data.topics.length; i++) {
         let target = data.topics[i]
-        tempTopics.push(new TopicListEntry(target.question, 'user', 1, 0, target.created_at_unix, '', `/board/${boardId}/topic/${target.id}`))
+        tempTopics.push(new TopicListEntry(target.question, target.username, 0, 0, this.unixTimeStampToDate(target.created_at_unix), this.unixTimeStampToDate(target.latest_post_unix), `/board/${boardId}/topic/${target.id}`))
         this.topics = tempTopics
       }
     })
+  }
+
+  private unixTimeStampToDate(unixTime: string): Date {
+    return new Date(Math.round(parseFloat(unixTime) * 1000))
   }
 }
 
@@ -44,8 +48,8 @@ class TopicListEntry {
     public originalPoster: string,
     public views: number,
     public numberOfReplies: number,
-    public created: string,
-    public lastUpdated: string,
+    public created: Date,
+    public lastUpdated: Date,
     public link: string
   ) {}
 }
