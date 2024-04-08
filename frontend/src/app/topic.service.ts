@@ -39,6 +39,7 @@ export interface GetTopicType {
   boardid: number,
   question: string,
   created_by: number,
+  username: string,
   created_at: string,
   created_at_unix: string,
   last_modified: string| null,
