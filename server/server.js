@@ -446,13 +446,13 @@ app.post("/api/board/:boardId/add-topic", requireLogin, async (req, res) => {
   }
   let body = req.body;
   let boardId = req.params.boardId;
-  await db.helpers.addTopic(
+  let topicId = await db.helpers.addTopic(
     boardId,
     body.question,
     req.session.user.id,
     body.body
   );
-  res.json({ message: "success" });
+  res.json({ 'topicId': topicId });
 });
 
 app.get("/api/board/:boardId/topic/:topicId/post/:postId", async (req, res) => {

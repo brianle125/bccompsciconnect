@@ -38,7 +38,10 @@ export class CreatePostComponent implements OnInit{
 
   public onSubmit(text: string): void {
     if(this.topicID != null && this.boardID != null) {
-      this.postService.addPost(this.boardID, this.topicID, text).subscribe({next:()=>{}, error:(e)=>{console.log(e)}})
+      this.postService.addPost(this.boardID, this.topicID, text).subscribe({
+        next:()=>{this.router.navigate([`board/${this.boardID}/topic/${this.topicID}`])}, 
+        error:(e)=>{console.log(e)}
+      })
     }
   }
 }

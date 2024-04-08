@@ -239,6 +239,7 @@ const helpers = {
         topicID,
         body,
       ]);
+      return topicID
     } catch (e) {
       console.log(e);
     }
