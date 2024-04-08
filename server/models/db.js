@@ -197,7 +197,14 @@ const helpers = {
    */
   getTopics: async function (id) {
     const res = await pool.query(
-      "SELECT * from topics WHERE boardid = $1 ORDER BY last_modified",
+      `SELECT *, 
+        EXTRACT(EPOCH FROM created_at) AS created_at_unix, 
+        EXTRACT(EPOCH FROM last_modified) AS last_modified_unix, 
+        EXTRACT(EPOCH FROM latest_post) AS latest_post_unix 
+        FROM topics 
+        WHERE boardid = $1 
+        ORDER BY last_modified
+      `,
       [id]
     );
     return res.rows;
@@ -212,14 +219,27 @@ const helpers = {
   },
 
   getTopic: async function (id) {
-    const q = "SELECT * FROM topics WHERE id = $1";
+    const q = `SELECT *, 
+      EXTRACT(EPOCH FROM created_at) AS created_at_unix, 
+      EXTRACT(EPOCH FROM last_modified) AS last_modified_unix, 
+      EXTRACT(EPOCH FROM latest_post) AS latest_post_unix  
+      FROM topics 
+      WHERE id = $1
+    `;
     const res = await pool.query(q, [id]);
     return res.rows[0];
   },
 
   getTopicsByRange: async function (id, start, end) {
-    const q =
-      "SELECT * FROM topics WHERE boardid = $1  ORDER BY created_at LIMIT $2 OFFSET $3";
+    const q =`SELECT *, 
+      EXTRACT(EPOCH FROM created_at) AS created_at_unix, 
+      EXTRACT(EPOCH FROM last_modified) AS last_modified_unix, 
+      EXTRACT(EPOCH FROM latest_post) AS latest_post_unix  
+      FROM topics 
+      WHERE boardid = $1  
+      ORDER BY created_at 
+      LIMIT $2 OFFSET $3
+    `;
     const res = await pool.query(q, [id, end, start]);
     return res.rows;
   },
@@ -251,13 +271,22 @@ const helpers = {
   },
 
   getPost: async function (postId) {
-    const q = `SELECT * FROM posts JOIN public_user_info ON posts.created_by = public_user_info.id WHERE posts.id = $1`
+    const q = `SELECT *, 
+      EXTRACT(EPOCH FROM posts.created_at) AS created_at_unix, 
+      EXTRACT(EPOCH FROM posts.last_modified) AS last_modified_unix
+      FROM posts JOIN public_user_info ON posts.created_by = public_user_info.id 
+      WHERE posts.id = $1
+    `
     const res = await pool.query(q, [postId]);
     return res.rows
   },
 
   getPosts: async function (topicId) {
-    const q = `SELECT * FROM posts JOIN public_user_info ON posts.created_by = public_user_info.id WHERE posts.topicid = $1 ORDER BY posts.created_at`
+    const q = `SELECT *,
+      EXTRACT(EPOCH FROM posts.created_at) AS created_at_unix, 
+      EXTRACT(EPOCH FROM posts.last_modified) AS last_modified_unix
+      FROM posts JOIN public_user_info ON posts.created_by = public_user_info.id 
+      WHERE posts.topicid = $1 ORDER BY posts.created_at`
     const res = await pool.query(q, [topicId]);
     return res.rows;
   },

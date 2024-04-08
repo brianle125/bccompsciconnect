@@ -14,8 +14,9 @@ import { ActivatedRoute } from '@angular/router';
  * Component to list topics
  */
 export class TopicListComponent implements OnInit {
-  @Input() topics: TopicListEntry[] = [
-  ]
+  public boardTitle: string = ''
+  public description: string = ''
+  @Input() topics: TopicListEntry[] = []
   constructor(private boardService: BoardService, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
@@ -23,15 +24,14 @@ export class TopicListComponent implements OnInit {
     const boardId = Number(routeParams.get('board-id'));
 
     this.boardService.getBoard(boardId).subscribe((data) => {
-      let board = data as any
+      console.log(data)
+      let board = data.board
+      this.boardTitle = board.title
+      this.description = board.description
       let tempTopics: TopicListEntry[] = []
-      for(let i = 0; i < board.topics.length; i++) {
-        let target = board.topics[i]
-        this.boardService.getTopic(boardId, target.id).subscribe((data) => {
-          let topic = data as any
-          //console.log(topic)
-          tempTopics.push(new TopicListEntry(target.question, 'user', 1, topic.postCount, target.created_at, target.last_modified, `/board/${boardId}/topic/${target.id}`))
-        })
+      for(let i = 0; i < data.topics.length; i++) {
+        let target = data.topics[i]
+        tempTopics.push(new TopicListEntry(target.question, 'user', 1, 0, target.created_at_unix, '', `/board/${boardId}/topic/${target.id}`))
         this.topics = tempTopics
       }
     })
