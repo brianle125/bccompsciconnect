@@ -21,6 +21,7 @@ export class AdminDashboardComponent implements OnInit {
    editRole: string;
    editId: string;
    currentUser:any;
+   clicked:boolean;
   constructor(private userService: UserService, private router: Router){
     let formControls = {
       username: new FormControl('',[ Validators.required, Validators.nullValidator, Validators.email]),
@@ -30,6 +31,7 @@ export class AdminDashboardComponent implements OnInit {
     this.editUsername = "";
     this.editRole = "";
     this.editId = "";
+    this.clicked = false;
   }
   ngOnInit(): void {
     this.userService.isLoggedIn().subscribe((data) => {
@@ -60,6 +62,8 @@ export class AdminDashboardComponent implements OnInit {
   editUser(userId: string) {
     const foundUser = this.users.find(user => user.id === userId);
     if (foundUser) {
+      console.log("Found user:", foundUser);
+      this.clicked = true;
       this.editUsername = foundUser.username;
       this.editRole = foundUser.role;
       this.currentUser = foundUser;
@@ -79,7 +83,7 @@ export class AdminDashboardComponent implements OnInit {
     this.userService.editUser1(this.form.value).subscribe((data) => {
       let response = data as any;
     })
-
+    
     window.location.reload()
     
   }

@@ -67,9 +67,10 @@ app.use(bodyParser.json());
 const db = require("./models/db");
 const helpers = require("./helpers");
 
+
 ////////////////////////////
 /*  Google AUTH  */
-
+/*
 //USING THE GENERATED BUTTON
 app.post("/api/google/", async (req, res) => {
   const payload = req.body;
@@ -106,7 +107,7 @@ app.post("/api/google/", async (req, res) => {
     req.session.save();
   }
 });
-
+*/
 // middleware to send a 401 error if the user is not logged in
 const requireLogin = (req, res, next) => {
   if (req.session.user == null || req.session.user.id == null) {

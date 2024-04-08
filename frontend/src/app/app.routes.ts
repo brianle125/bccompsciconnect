@@ -12,9 +12,11 @@ import { PostListComponent } from './post-list/post-list.component';
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
 import { authGuard } from './auth.guard';
 import { sessionGuard } from './session.guard';
+import { LandingPageComponent } from './landing-page/landing-page.component';
 
 export const routes: Routes = [
-  { path: '', component: HomePageComponent },
+  { path: 'home', component: HomePageComponent },
+  { path: '', component: LandingPageComponent },
   { path: 'board/:board-id', component: BoardComponent },
   { path: 'board/:board-id/topic/:topic-id', component: TopicComponent },
   { path: 'board/:board-id/topic/:topic-id/create-post', component: CreatePostComponent },
