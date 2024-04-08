@@ -20,6 +20,10 @@ export class PostService {
     // return this.http.get(`http://localhost:8080/posts/${topicid}`);
   }
 
+  getPostsByUserID(userID: number) {
+    return this.http.get<any[]>(`${api}/posts/${userID}`)
+  }
+
   addPost(boardID: number, topicID:number, message: string): Observable<any> {
     return this.http.post(`${api}/board/${boardID}/topic/${topicID}/add-post`, {text: message}, {withCredentials: true})
   }

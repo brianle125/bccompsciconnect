@@ -1,6 +1,6 @@
 <app-top-bar></app-top-bar>
 <div class="profile">
-    <div class="col-sm-2 profile-content">
+    <div class="col-sm-3 profile-content">
         <h2>{{ userData.username }}</h2>
         <div class="image-profile">
             <img src="{{ userData.icon }}" class="icon">   
@@ -11,7 +11,7 @@
         <ng-template #noPosts>User has not posted</ng-template>
         <app-user-profile-upload></app-user-profile-upload>
     </div>
-    <div class="col-sm-10 description">
+    <div class="col-sm-9 description">
         <div class="description-text">
             <p>{{userData.description}}</p>
         </div>
