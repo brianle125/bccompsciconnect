@@ -53,7 +53,7 @@ export class EditPostComponent implements OnInit{
   public onSubmit(text: string): void {
     if(this.topicID != null && this.boardID != null && this.postID != null) {
       this.postService.editPost(this.boardID, this.topicID, this.postID, text).subscribe({
-        next:()=>{},
+        next:()=>{this.router.navigate([`board/${this.boardID}/topic/${this.topicID}`])},
         error:(e)=>{console.log(e)}
       })
     }
