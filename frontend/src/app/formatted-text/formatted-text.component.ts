@@ -17,13 +17,13 @@ export class FormattedTextComponent {
   public compiled: string = '' 
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log(changes)
+    // console.log(changes)
     if(changes['text'] != undefined) {
-      console.log('before', this.text)
+      // console.log('before', this.text)
       let div: HTMLDivElement = document.createElement('div')
       div.innerHTML = this.text
       this.editDOM(div).finally(()=> {
-        console.log('result', div.innerHTML)
+        // console.log('result', div.innerHTML)
         this.compiled = div.innerHTML
       })
     }
@@ -45,15 +45,15 @@ export class FormattedTextComponent {
     while (!exploreNext.isEmpty()) {
       let currentNode: DOMTraverseNode = exploreNext.pop()
       // this.removeBannedTags(currentNode.node)
-      console.log(currentNode)
+      // console.log(currentNode)
       // node's children haven't been accessed yet so editing node's children is fine
       let visitChildren: boolean = true
       if(currentNode.node.nodeName == 'MARKDOWN') {
         let asHTML: HTMLElement = currentNode.node as HTMLElement
-        console.log('str', asHTML.innerHTML);
+        // console.log('str', asHTML.innerHTML);
         let compiledMarkdown: string = await marked(this.nodeToString(currentNode.node));
         asHTML.innerHTML = compiledMarkdown
-        console.log('md', compiledMarkdown)
+        // console.log('md', compiledMarkdown)
         visitChildren = false
       }
       
@@ -64,7 +64,7 @@ export class FormattedTextComponent {
             // if(this.isHTMLAllowedTag(currentNode.node.nodeName)) {
             //   allowHTML = true
             // }
-            console.log('child', node)
+            // console.log('child', node)
             exploreNext.push(new DOMTraverseNode(node, currentNode.depth + 1, false))
           }
         })
