@@ -10,8 +10,8 @@
                 <div *ngIf="post.edited != null">edited:</div>
             </div>
             <div class="dates">
-                <div>{{post.created}}</div>
-                <div *ngIf="post.edited != null">{{post.edited}}</div>
+                <div>{{post.created | date:'medium'}}</div>
+                <div *ngIf="post.edited != null">{{post.edited | date:'medium'}}</div>
             </div>
         </div>
         <div class="after-dates-section">

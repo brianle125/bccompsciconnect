@@ -7,6 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { PostService } from '../post.service';
 import { forkJoin } from 'rxjs';
 import { UserService } from '../user.service';
+import { unixTimeStampStringToDate } from '../helpers';
 
 @Component({
   selector: 'app-topic',
@@ -58,7 +59,7 @@ export class TopicComponent {
         }
         let allPosts: PostData[] = []
           res.posts.posts.forEach((post) => {
-            let postData: PostData = new PostData( post.body,  post.username,  '',  'assets/user.png',  post.created_at,  null,  null)
+            let postData: PostData = new PostData( post.body,  post.username,  '',  'assets/user.png', unixTimeStampStringToDate(post.created_at_unix),  null,  null)
             if(userID != null && post.id == userID) {
               postData.editLink = `board/${this.board}/topic/${this.topic}/post/${post.id}/edit-post`
             }
