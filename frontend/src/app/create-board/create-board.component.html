@@ -1,0 +1,17 @@
+<app-top-bar></app-top-bar>
+<main>
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div>
+        <label for="exampleFormControlInput1" class="form-label">Board Title</label>
+        <input type="text" name="title" placeholder="Title:" formControlName="title" class="form-control"/>
+    </div>
+    <div>
+        <label for="exampleFormControlInput1" class="form-label">Description</label>
+        <textarea name="description" placeholder="Description: " formControlName="description" class="form-control">
+        </textarea>
+    </div>
+    <button class="btn btn-primary btn-block" [disabled]="!form.valid">
+        Create
+    </button>
+</form>
+</main>
