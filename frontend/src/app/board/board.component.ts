@@ -74,41 +74,5 @@ export class BoardComponent implements OnInit {
         }
       }
     })
-
-    // this.boardService.getBoard(this.boardId).subscribe((data) => {
-    //   console.log(data)
-    //   // set up title and description
-    //   let board = data.board
-    //   this.boardTitle = board.title
-    //   this.description = board.description
-
-    //   // set up nav links
-    //   this.navLinks = [
-    //     new LinkData('BcCompSciConnect', '/'), 
-    //     new LinkData(this.boardTitle, `board/${this.boardId}`)
-    //   ]
-
-    //   // set up topic list
-    //   let tempTopics: TopicListEntry[] = []
-    //   for(let i = 0; i < data.topics.length; i++) {
-    //     let target = data.topics[i]
-    //     tempTopics.push(new TopicListEntry(
-    //       target.question, 
-    //       target.username, 
-    //       target.num_views, 
-    //       target.num_replies, 
-    //       unixTimeStampStringToDate(target.created_at_unix), 
-    //       unixTimeStampStringToDate(target.latest_post_unix), 
-    //       `/board/${this.boardId}/topic/${target.id}`
-    //     ))
-    //     this.topics = tempTopics
-    //   }
-    // })
   }
-
-
-
-  // navigateToTopicCreate() {
-  //   this.router.navigate(['/create-topic']);
-  // }
 }
