@@ -51,5 +51,6 @@ export interface BoardResponse {
   title: string,
   description: string,
   id: string,
-  ordering: string
+  ordering: string,
+  pinned: boolean
 }

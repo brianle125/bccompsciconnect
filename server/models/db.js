@@ -5,7 +5,7 @@ const pool = new Pool({
   user: "postgres",
   host: "localhost" || process.env.DB_HOST,
   database: "testing",
-  password: process.env.LOCAL_PASS,
+  password: "thunder43", //process.env.LOCAL_PASS
 });
 
 const helpers = {
@@ -16,7 +16,8 @@ const helpers = {
       id SERIAL, 
       title character varying(255), 
       description varchar(255), 
-      ordering integer, 
+      ordering integer,
+      pinned boolean DEFAULT false, 
       PRIMARY KEY(id)
     )`;
     const topics = `CREATE TABLE IF NOT EXISTS topics (

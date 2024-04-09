@@ -20,6 +20,9 @@ export class BoardList implements OnInit{
     new PageBarData('Test', 'assets/page.png', 'Desc', 'board/1'),
     new PageBarData('Test', 'assets/page.png', 'Desc', 'board/2'),
   ];
+  pinned_pages: PageBarData[] = [
+
+  ];
 
   constructor(private router: Router, private boardService: BoardService) {}
 
@@ -28,20 +31,27 @@ export class BoardList implements OnInit{
       next:(data) => {
         let boards: PageBarData[] = []
         data.forEach((val) => {
-          boards.push(new PageBarData(val.title, 'assets/page.png', val.description, `board/${val.id}`, Number.parseInt(val.ordering)))
-        })
-        boards.sort((a: PageBarData, b: PageBarData) => {
-          if(a.order < b.order) {
-            return -1
-          } else if(a.order > b.order) {
-            return 1
-          } else {
-            return 0
+          boards.push(new PageBarData(val.title, 'assets/page.png', val.description, `board/${val.id}`, Number.parseInt(val.id)))
+          if(val.pinned) {
+            this.pinned_pages.push(new PageBarData(val.title, 'assets/page.png', val.description, `board/${val.id}`, Number.parseInt(val.id)))
           }
         })
         this.pages = boards
+        console.log(this.pages)
       }
     })
+  }
+
+  newest() {
+    this.pages.sort((a, b) => b.order - a.order);
+  }
+
+  oldest() {
+    this.pages.sort((a, b) => a.order - b.order);
+  }
+
+  active() {
+
   }
 }
 
