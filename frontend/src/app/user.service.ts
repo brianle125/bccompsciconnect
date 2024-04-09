@@ -69,8 +69,8 @@ export class UserService {
     });
   }
 
-  getUserProfile(userid: any): Observable<any> {
-    return this.http.get(`${api}/getprofile/${userid}`, {
+  getUserProfile(username: any): Observable<any> {
+    return this.http.get(`${api}/getprofile/${username}`, {
       withCredentials: true,
     });
   }
