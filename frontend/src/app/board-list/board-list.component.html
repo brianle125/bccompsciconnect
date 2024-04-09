@@ -12,6 +12,7 @@
         </h2>
         <p>{{ page.description }}</p>
       </div>
+      <button id="pin-button"class="btn btn-light" *ngIf="loggedIn" (click)="pin(page.order)">Pin</button>
     </section>
   </section>
   <section id="all-boards">
@@ -20,7 +21,6 @@
       <div id="buttons">
         <button type="button" class="btn btn-light" (click)="newest()">Newest</button>
         <button type="button" class="btn btn-light" (click)="oldest()">Oldest</button>
-        <button type="button" class="btn btn-light" (click)="active()">Active</button>
       </div>
     </span>
     <section *ngFor="let page of pages" class="col-sm-12 page">
@@ -33,6 +33,7 @@
         </h2>
         <p>{{ page.description }}</p>
       </div>
+      <button id="pin-button"class="btn btn-light" *ngIf="loggedIn" (click)="pin(page.order)">Pin</button>
     </section>
   </section>
 </main>

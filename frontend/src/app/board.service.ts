@@ -23,6 +23,12 @@ export class BoardService {
     return this.http.get<any>(`${api}/board/${id}`, { withCredentials: true })
   }
 
+  setPinned(id: any, tf: boolean) {
+    const stringValue = tf ? "true" : "false";
+    console.log("setPinnedWorked " + stringValue + " " +  id)
+    return this.http.post(`${api}/board/pin`, { id: id, tf: stringValue }, { withCredentials: true })
+  }
+
   addBoard(title: string, description: string, ordering: number) {
     console.log(`${api}/board`)
     this.http.post(`${api}/board`, {'boardTitle': title, 'boardDescription': description, 'ordering': ordering}).subscribe({

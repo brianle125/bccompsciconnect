@@ -338,6 +338,17 @@ app.get("/api/board/:id", async (req, res) => {
   }
 });
 
+app.post("/api/board/pin", async (req, res) => {
+  let id = req.body.id;
+  let tf = req.body.tf;
+  console.log("Updating: " + id + " from " + tf);
+  if(tf == "false") {
+    await db.helpers.pinBoard(id, "true");
+  } else {
+    await db.helpers.pinBoard(id, "false");
+  }
+});
+
 app.get("/api/board/:id/latest", async (req, res) => {
   try {
     let id = req.params.id;

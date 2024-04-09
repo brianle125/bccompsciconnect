@@ -196,6 +196,12 @@ const helpers = {
     ]);
   },
 
+  pinBoard: async function (id, tf) {
+    const q =
+      "UPDATE boards SET pinned = $2 WHERE id = $1";
+    const res = await pool.query(q, [id, tf]);
+  },
+
   //Delete a board
   deleteBoard: async function (boardId) {
     const q = "DELETE FROM boards WHERE id=$1";
