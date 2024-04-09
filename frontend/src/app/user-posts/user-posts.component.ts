@@ -32,7 +32,7 @@ export class UserPostsComponent implements OnInit {
       if(response[0].id !== null) {
         this.postService.getPostsByUserID(response[0].id).subscribe((postsJson) => {
           postsJson.forEach((post) => {
-            let postData: PostData = new PostData(post.body, response[0].username, '', profilePic, post.created_at, null, null)
+            let postData: PostData = new PostData(post.body, response[0].username, `/user/${response[0].username}`, profilePic, post.created_at, null, null)
             this.posts.push(postData)
           })
         })

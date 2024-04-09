@@ -48,7 +48,7 @@ export class UserProfileComponent implements OnInit {
     //Users can only edit their own profiles
     this.userService.isLoggedIn().subscribe((data) => {
       let response = data as any;
-      if(response.loggedIn || response.user === username)
+      if(response.loggedIn && response.user === username)
       {
         this.isCurrentUser = true;
       }
