@@ -1,6 +1,7 @@
 <app-top-bar></app-top-bar>
 <div class="content">
-    <a [href]="createTopicLink" class="btn btn-primary">Create Topic</a>
+    <div><app-list-of-links [links]="navLinks"></app-list-of-links></div>
+    <div><a [href]="createTopicLink" class="btn btn-primary">Create Topic</a></div>
     <h1>{{boardTitle}}</h1>
     <p>{{description}}</p>
     <app-topic-list [topics]="topics"></app-topic-list>

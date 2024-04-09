@@ -4,11 +4,12 @@ import { TopicListComponent, TopicListEntry } from '../topic-list/topic-list.com
 import { TopBarComponent } from '../top-bar/top-bar.component';
 import { BoardService } from '../board.service';
 import { unixTimeStampStringToDate } from '../helpers';
+import { LinkData, ListOfLinksComponent } from '../list-of-links/list-of-links.component';
 
 @Component({
   selector: 'app-board',
   standalone: true,
-  imports: [TopicListComponent, TopBarComponent],
+  imports: [TopicListComponent, TopBarComponent, ListOfLinksComponent],
   templateUrl: './board.component.html',
   styleUrl: './board.component.css',
 })
@@ -19,6 +20,7 @@ export class BoardComponent implements OnInit {
   public boardId: number | null = null
   public createTopicLink: string | null = null;
   public topics: TopicListEntry[] = []
+  public navLinks: LinkData[] = []
   public boardTitle: string = ''
   public description: string = ''
 
@@ -36,9 +38,18 @@ export class BoardComponent implements OnInit {
 
     this.boardService.getBoard(this.boardId).subscribe((data) => {
       console.log(data)
+      // set up title and description
       let board = data.board
       this.boardTitle = board.title
       this.description = board.description
+
+      // set up nav links
+      this.navLinks = [
+        new LinkData('BcCompSciConnect', '/'), 
+        new LinkData(this.boardTitle, `board/${this.boardId}`)
+      ]
+
+      // set up topic list
       let tempTopics: TopicListEntry[] = []
       for(let i = 0; i < data.topics.length; i++) {
         let target = data.topics[i]
