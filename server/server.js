@@ -371,6 +371,7 @@ app.delete("/api/board/:boardId", async (req, res) => {
 app.get("/api/board/:boardId/topic/:topicId", async (req, res) => {
   let boardId = req.params.boardId;
   let topicId = req.params.topicId;
+  const board = await db.helpers.getBoard(boardId)
   const topic = await db.helpers.getTopic(topicId);
   const posts = await db.helpers.getPosts(topicId);
   const postCount = await db.helpers.getPostCount(topicId);
@@ -378,6 +379,7 @@ app.get("/api/board/:boardId/topic/:topicId", async (req, res) => {
 
   //Subject to change; this just bundles the topic and associated Posts together
   res.json({
+    board: board,
     topic: topic,
     posts: posts,
     postCount: postCount.rows[0].count,
