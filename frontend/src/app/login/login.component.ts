@@ -59,7 +59,7 @@ export class LoginComponent implements OnInit {
       console.log(response)
       if(response.body.status === "success") {
         // Navigate to the home page if the user is found
-        this.router.navigate(['/']);
+        this.router.navigate(['/home']);
       } else if(response.body.status === "failed") {
         alert("User/pass not found.");
         this.router.navigate(['/register']);
