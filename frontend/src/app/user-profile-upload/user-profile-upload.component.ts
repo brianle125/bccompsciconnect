@@ -52,7 +52,10 @@ export class UserProfileUploadComponent implements OnInit {
       formData.append('url', '');
       formData.append('image', file);
       formData.append('image_type', file.type);
-      this.userService.uploadUserProfile(formData).subscribe();
+      this.userService.uploadUserProfile(formData).subscribe({
+        next:()=>{},
+        error:(e)=>{e}
+      });
 
       window.location.reload();
     }
