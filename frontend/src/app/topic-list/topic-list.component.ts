@@ -35,8 +35,8 @@ export class TopicListComponent implements OnInit {
         tempTopics.push(new TopicListEntry(
           target.question, 
           target.username, 
-          0, 
-          0, 
+          target.num_views, 
+          target.num_replies, 
           unixTimeStampStringToDate(target.created_at_unix), 
           unixTimeStampStringToDate(target.latest_post_unix), 
           `/board/${boardId}/topic/${target.id}`

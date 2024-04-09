@@ -45,5 +45,7 @@ export interface GetTopicType {
   last_modified: string| null,
   last_modified_unix: string| null,
   latest_post: string,
-  latest_post_unix: string
+  latest_post_unix: string,
+  num_replies: number,
+  num_views: number
 }
