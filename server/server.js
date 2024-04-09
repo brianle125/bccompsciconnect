@@ -156,7 +156,7 @@ app.post("/api/login", async (req, res) => {
     res.send({ status: "failed" });
   } else if (
     email === targetUser[0].email &&
-    password === targetUser[0].password
+    db.helpers.checkPassword(targetUser[0].password, password)
   ) {
     req.session.user = {
       id: targetUser[0].id,
