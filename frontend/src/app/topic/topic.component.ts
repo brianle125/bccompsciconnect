@@ -9,6 +9,7 @@ import { forkJoin } from 'rxjs';
 import { UserService } from '../user.service';
 import { unixTimeStampStringToDate } from '../helpers';
 import { LinkData, ListOfLinksComponent } from '../list-of-links/list-of-links.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-topic',
@@ -16,6 +17,7 @@ import { LinkData, ListOfLinksComponent } from '../list-of-links/list-of-links.c
   templateUrl: './topic.component.html',
   styleUrl: './topic.component.css',
   imports: [
+    CommonModule,
     PostListComponent,
     TopBarComponent,
     FormattedTextComponent,
@@ -31,6 +33,7 @@ export class TopicComponent {
   public createPostLink: string | null = null
   public posts: PostData[] = []
   public navLinks: LinkData[] = []
+  public loggedIn: boolean = false
 
   constructor(private router: Router, private activatedRoute: ActivatedRoute, private postService: PostService, private userService: UserService) {}
   ngOnInit(): void {
@@ -56,6 +59,9 @@ export class TopicComponent {
         posts: this.postService.getPostByTopicID(this.board, this.topic),
         user: this.userService.isLoggedIn()
       }).subscribe((res) => {
+        // set loggedIn
+        this.loggedIn = res.user.loggedIn
+
         // create list of links
         console.log(res)
         this.navLinks = [

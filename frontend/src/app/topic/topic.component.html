@@ -1,6 +1,6 @@
 <app-top-bar></app-top-bar>
 <div class="content">
     <div><app-list-of-links [links]="navLinks"></app-list-of-links></div>
-    <div><a [href]="createPostLink" class="btn btn-primary">Create Post</a></div>
+    <div *ngIf="loggedIn"><a [href]="createPostLink" class="btn btn-primary">Create Post</a></div>
     <app-post-list [posts]="posts"></app-post-list>
 </div>
