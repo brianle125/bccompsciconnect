@@ -13,9 +13,11 @@ import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.compo
 import { authGuard } from './auth.guard';
 import { sessionGuard } from './session.guard';
 import { EditPostComponent } from './edit-post/edit-post.component';
+import { LandingPageComponent } from './landing-page/landing-page.component';
 
 export const routes: Routes = [
-  { path: '', component: HomePageComponent },
+  { path: 'home', component: HomePageComponent },
+  { path: '', component: LandingPageComponent },
   { path: 'board/:board-id', component: BoardComponent },
   { path: 'board/:board-id/topic/:topic-id', component: TopicComponent },
   { path: 'board/:board-id/topic/:topic-id/create-post', component: CreatePostComponent },

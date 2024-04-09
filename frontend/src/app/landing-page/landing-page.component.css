@@ -1,0 +1,77 @@
+#logo {
+    background: white;
+    display: flex;
+    justify-content: center;
+    height: 40vh;
+    width: 40vw;
+}
+
+#boards {
+    height: 15vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#login {
+    height: 15vh;
+    width: 100%; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background-color: #f2f2f2;
+}
+
+section {
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-family: Helvetica, Arial, sans-serif;
+    font-weight: bold;
+    border-radius: 10px;
+    user-select: none;
+}
+
+span {
+    display: flex;
+    flex-direction: row;
+    height: 40vh;
+    width: 40vw;
+}
+
+img {
+    width: fit-content;
+    height: 100%;
+}
+
+h1 {
+    font-size: 5rem;
+}
+
+#container {
+    height: 40vh;
+    width: 40vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 10vw;
+}
+
+#boards:hover, #login:hover {
+    height: 17.5vh;
+    transition: width 0.5s ease;
+}
+
+#boards, #login {
+    margin: 5vh;
+}

@@ -1,29 +1,32 @@
 <app-top-bar></app-top-bar>
-<h1>Welcome to the Moderation Dashboard {{username}}</h1>
+<h1 id="topHeader">Welcome to the Moderation Dashboard {{username}},</h1>
 <main>
-<section id="users">
-    <table class="table table-bordered table-striped table-hover shadow">
-        <thead>
-            <th>User ID:</th>
-            <th>Username:</th>
-            <th>Role:</th>
-            <th>Delete</th>
-            <th>Edit</th>
-        </thead>
-        <tbody>
-            <tr *ngFor="let user of users">
-                <td>{{ user.id }}</td>
-                <td>{{ user.username }}</td>
-                <td>{{ user.role }}</td>
-                <td><button class="btn btn-danger" (click)="deleteUser(user.id)">Delete</button></td>
-                <td><button class="btn btn-primary" (click)="editUser(user.id)">Edit</button></td>
-            </tr>
-        </tbody>
-    </table>
+    <section id="users">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover shadow">
+                <thead>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Delete</th>
+                    <th>Edit</th>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let user of users">
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.role }}</td>
+                        <td><button class="btn btn-danger" (click)="deleteUser(user.id)">Delete</button></td>
+                        <td><button class="btn btn-primary" (click)="editUser(user.id)">Edit</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 </section>
 <section id="editUser">
-    <h1>Editing user:</h1>
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <h1>Edit User</h1>
+    <ng-template [ngIf]="!clicked">Edit a user to use!</ng-template>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" [hidden]="!clicked" >
         <div>
             <label for="exampleFormControlInput1" class="form-label">Username</label>
             <input type="text" name="username" placeholder="Username:" [value]="editUsername" formControlName="username" class="form-control"/>
@@ -39,8 +42,10 @@
                 <label class="form-check-label" for="roleAdmin">Admin</label>
             </div>
         </div>
-        <button class="btn btn-primary">
+        <button class="btn btn-primary btn-block">
             Edit
         </button>
     </form>
 </section>
+</main>
+
