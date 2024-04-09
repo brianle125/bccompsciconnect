@@ -42,3 +42,17 @@ p {
     float: center;
     max-height: 150px;
 }
+
+.edit-button {
+    position:absolute;
+    right: 15px;
+    bottom:0;
+}
+
+/* .col-sm-9 {
+    display: table-cell;
+    height: 300px;
+    width: 800px;
+    border: 1px solid black;
+    float: none;
+} */

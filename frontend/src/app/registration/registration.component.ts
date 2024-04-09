@@ -42,7 +42,7 @@ export class RegistrationComponent {
         console.log("ADDING USER")
         this.userService.addUser(this.form.value).subscribe((data) => {
         })
-        this.router.navigate(['/']);
+        this.router.navigate(['/login']);
       }
     })
 

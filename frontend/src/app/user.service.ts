@@ -64,14 +64,13 @@ export class UserService {
   }
 
   uploadUserProfile(image: any): Observable<any> {
-    alert(image);
     return this.http.post(`${api}/uploadprofile`, image, {
       withCredentials: true,
     });
   }
 
-  getUserProfile(userid: any): Observable<any> {
-    return this.http.get(`${api}/getprofile/${userid}`, {
+  getUserProfile(username: any): Observable<any> {
+    return this.http.get(`${api}/getprofile/${username}`, {
       withCredentials: true,
     });
   }

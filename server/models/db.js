@@ -5,7 +5,7 @@ const argon2 = require('argon2')
 
 const pool = new Pool({
   user: "postgres",
-  host: "localhost" || process.env.DB_HOST,
+  host: 'localhost' || process.env.DB_HOST,
   database: "testing",
   password: process.env.LOCAL_PASS,
 });
@@ -327,6 +327,12 @@ const helpers = {
     return res.rows;
   },
 
+  getPostsByUser: async function(userId) {
+    const q = `SELECT * from posts WHERE created_by = $1 ORDER BY created_by`
+    const res = await pool.query(q, [userId])
+    return res.rows;
+  },
+
   getPostsByRange: async function (topicId, start, end) {
     const q =
       "SELECT * from posts WHERE topicId = $1 ORDER BY created_at LIMIT $2 OFFSET $3";
@@ -392,9 +398,15 @@ const helpers = {
     return res.rows;
   },
 
-  getProfilePictures: async function () {
-    const res = `SELECT * from userProfiles`;
-    return res.rows;
+  getProfilePictureById: async function(id) {
+    const q = `SELECT profile_image from users WHERE id = $1`
+    const res = await pool.query(q, [id]);
+    return res.rows
+  },
+
+  getProfilePictures: async function() {
+    const res = `SELECT * from userProfiles`
+    return res.rows
   },
 
   // get user images
