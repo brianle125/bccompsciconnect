@@ -61,7 +61,7 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-// app.use(express.static(path.join(__dirname, 'static')));
+//app.use(express.static(path.join(__dirname, 'static')));
 
 // internal modules
 const db = require("./models/db");
@@ -283,8 +283,8 @@ app.post("/api/uploadprofile", upload.single("image"), async (req, res) => {
  
 });
 
-app.get("/api/getprofile/:userid", async (req, res) => {
-  const image = await db.helpers.getProfilePicture(req.params.userid)
+app.get("/api/getprofile/:username", async (req, res) => {
+  const image = await db.helpers.getProfilePicture(req.params.username)
   res.json(image)
 })
 
@@ -462,6 +462,12 @@ app.post("/api/board/:boardId/add-topic", requireLogin, async (req, res) => {
   );
   res.json({ message: "success" });
 });
+
+app.get("/api/posts/:userID", async (req, res) => {
+  let userID = req.params.userID
+  const posts = await db.helpers.getPostsByUser(userID)
+  res.json(posts);
+})
 
 // Getting images
 

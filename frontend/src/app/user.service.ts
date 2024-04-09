@@ -56,8 +56,8 @@ export class UserService {
     return this.http.post(`${api}/uploadprofile`, image, {withCredentials: true})
   }
 
-  getUserProfile(userid: any): Observable<any> {
-    return this.http.get(`${api}/getprofile/${userid}`, {withCredentials: true})
+  getUserProfile(username: any): Observable<any> {
+    return this.http.get(`${api}/getprofile/${username}`, {withCredentials: true})
   }
 
   //google auth
