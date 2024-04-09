@@ -26,7 +26,9 @@ const helpers = {
       created_by integer, 
       created_at timestamp, 
       last_modified timestamp, 
-      latest_post timestamp, 
+      latest_post timestamp,
+      num_replies integer,
+      num_views integer,
       PRIMARY KEY(id), 
       CONSTRAINT fk_user FOREIGN KEY (created_by) REFERENCES users(id), 
       CONSTRAINT fk_board FOREIGN KEY (boardid) REFERENCES boards(id) 
@@ -249,7 +251,7 @@ const helpers = {
 
   addTopic: async function (boardID, question, createdBy, body) {
     try {
-      const createTopicQuery = `INSERT INTO topics VALUES (DEFAULT, $1, $2, $3, CURRENT_TIMESTAMP, NUll, CURRENT_TIMESTAMP) RETURNING id`;
+      const createTopicQuery = `INSERT INTO topics VALUES (DEFAULT, $1, $2, $3, CURRENT_TIMESTAMP, NUll, CURRENT_TIMESTAMP, 1, 0) RETURNING id`;
       const createTopicRes = await pool.query(createTopicQuery, [
         boardID,
         question,
@@ -271,6 +273,11 @@ const helpers = {
   deleteTopic: async function (topicId) {
     const q = "DELETE FROM topics WHERE id = $1";
     const res = await pool.query(q, [topicId]);
+  },
+
+  addViewToTopic: async function (topicId) {
+    const q = `UPDATE topics SET num_views = num_views + 1 WHERE id = $1`
+    const res = await pool.query(q, [topicId])
   },
 
   getPost: async function (postId) {
@@ -312,7 +319,7 @@ const helpers = {
   addPost: async function (topicId, text, userId) {
     //update latest post in topic
     const updated =
-      "UPDATE topics SET latest_post = CURRENT_TIMESTAMP WHERE id = $1";
+      "UPDATE topics SET latest_post = CURRENT_TIMESTAMP, num_replies = num_replies + 1 WHERE id = $1";
     const updateQuery = await pool.query(updated, [topicId]);
     //add the post
     const q = `INSERT INTO posts VALUES(DEFAULT, $1, $2, $3, 'status', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`;
