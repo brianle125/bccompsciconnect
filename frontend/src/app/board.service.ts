@@ -24,12 +24,23 @@ export class BoardService {
     return this.http.get<GetBoardType>(`${api}/board/${id}`, { withCredentials: true })
   }
 
+  setPinned(id: any, tf: boolean) {
+    const stringValue = tf ? "true" : "false";
+    console.log("setPinnedWorked " + stringValue + " " +  id)
+    return this.http.post(`${api}/board/pin`, { id: id, tf: stringValue }, { withCredentials: true })
+  }
+
   addBoard(title: string, description: string, ordering: number) {
     console.log(`${api}/board`)
     this.http.post(`${api}/board`, {'boardTitle': title, 'boardDescription': description, 'ordering': ordering}).subscribe({
       next:(res) => { console.log(res) },
       error:(e) => { console.log(e) }
     })
+  }
+
+  addBoard1(title: string, description: string) {
+    console.log("TITLE ADDBOARD: " + title + " DESCIRPTION:  " + description)
+    return this.http.post(`${api}/add/board`, {'boardTitle': title, 'boardDescription': description}, { withCredentials: true })
   }
 
   addSampleBoards() {
@@ -52,7 +63,8 @@ export interface BoardResponse {
   title: string,
   description: string,
   id: string,
-  ordering: string
+  ordering: string,
+  pinned: boolean
 }
 
 export interface GetBoardType {
