@@ -64,7 +64,6 @@ export class UserService {
   }
 
   uploadUserProfile(image: any): Observable<any> {
-    alert(image);
     return this.http.post(`${api}/uploadprofile`, image, {
       withCredentials: true,
     });

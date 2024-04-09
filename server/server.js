@@ -74,7 +74,7 @@ const helpers = require("./helpers");
 //USING THE GENERATED BUTTON
 app.post("/api/google/", async (req, res) => {
   const payload = req.body;
-  const possibleUser = await db.helpers.getUser(payload.email);
+  let possibleUser = await db.helpers.getUser(payload.email);
 
   //add user to database if email doesn't exist, otherwise login with existing credentials
   if (possibleUser.length === 0) {

@@ -15,7 +15,7 @@
         <div class="description-text">
             <p>{{userData.description}}</p>
         </div>
-        
-        <button class="btn btn-outline-primary" (click)="editUser()">Edit</button>
+        <section class="edit-button" *ngIf="isCurrentUser"><button class="btn btn-primary" (click)="editUser()">Edit description</button></section>
     </div>
+    
 </div>
