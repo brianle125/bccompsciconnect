@@ -53,7 +53,7 @@ export class BoardComponent implements OnInit {
   
         // set up nav links
         this.navLinks = [
-          new LinkData('BcCompSciConnect', '/'), 
+          new LinkData('BcCompSciConnect', '/home'), 
           new LinkData(this.boardTitle, `board/${this.boardId}`)
         ]
   

@@ -65,7 +65,7 @@ export class TopicComponent {
         // create list of links
         console.log(res)
         this.navLinks = [
-          new LinkData('BcCompSciConnect', '/'), 
+          new LinkData('BcCompSciConnect', '/home'), 
           new LinkData(res.posts.board.title, `board/${this.board}`),
           new LinkData(res.posts.topic.question, `board/${this.board}/topic/${this.topic}`)
         ]
