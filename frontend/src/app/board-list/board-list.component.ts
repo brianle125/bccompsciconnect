@@ -71,6 +71,10 @@ export class BoardList implements OnInit{
     }
   }
 
+  createBoard() {
+    this.router.navigate(['create-board'])
+  }
+
 
 }
 

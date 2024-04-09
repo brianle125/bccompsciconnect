@@ -5,7 +5,7 @@ const pool = new Pool({
   user: "postgres",
   host: "localhost" || process.env.DB_HOST,
   database: "testing",
-  password: "thunder43", //process.env.LOCAL_PASS
+  password: process.env.LOCAL_PASS,
 });
 
 const helpers = {
@@ -181,6 +181,14 @@ const helpers = {
     const res = await pool.query(
       "INSERT INTO boards(id, title, description, ordering) VALUES (DEFAULT, $1, $2, $3)",
       [boardTitle, boardDescription, ordering]
+    );
+  },
+
+  addBoard1: async function (boardTitle, boardDescription) {
+    // const res = await pool.query('INSERT INTO boards VALUES (DEFAULT, $1)', [boardTitle]);
+    const res = await pool.query(
+      "INSERT INTO boards VALUES (DEFAULT, $1, $2)",
+      [boardTitle, boardDescription]
     );
   },
 

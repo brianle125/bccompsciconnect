@@ -37,6 +37,11 @@ export class BoardService {
     })
   }
 
+  addBoard1(title: string, description: string) {
+    console.log("TITLE ADDBOARD: " + title + " DESCIRPTION:  " + description)
+    return this.http.post(`${api}/add/board`, {'boardTitle': title, 'boardDescription': description}, { withCredentials: true })
+  }
+
   addSampleBoards() {
     // for testing
     this.addBoard('Courses', 'Discuss course related problems.', 0)

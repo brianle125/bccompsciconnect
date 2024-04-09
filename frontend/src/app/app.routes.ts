@@ -13,6 +13,7 @@ import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.compo
 import { authGuard } from './auth.guard';
 import { sessionGuard } from './session.guard';
 import { LandingPageComponent } from './landing-page/landing-page.component';
+import { CreateBoardComponent } from './create-board/create-board.component';
 
 export const routes: Routes = [
   { path: 'home', component: HomePageComponent },
@@ -24,6 +25,7 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegistrationComponent },
   { path: 'create-topic', component: CreateTopicComponent },
+  { path: 'create-board', component: CreateBoardComponent },
   { path: 'user/:username', component: UserProfileComponent},
   {path: 'admin/dashboard', component: AdminDashboardComponent, canActivate: [authGuard]},
   // tentative
