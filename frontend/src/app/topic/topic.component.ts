@@ -8,6 +8,7 @@ import { PostService } from '../post.service';
 import { forkJoin } from 'rxjs';
 import { UserService } from '../user.service';
 import { unixTimeStampStringToDate } from '../helpers';
+import { LinkData, ListOfLinksComponent } from '../list-of-links/list-of-links.component';
 
 @Component({
   selector: 'app-topic',
@@ -18,6 +19,7 @@ import { unixTimeStampStringToDate } from '../helpers';
     PostListComponent,
     TopBarComponent,
     FormattedTextComponent,
+    ListOfLinksComponent
   ],
 })
 /**
@@ -28,6 +30,7 @@ export class TopicComponent {
   private topic: number | null = null
   public createPostLink: string | null = null
   public posts: PostData[] = []
+  public navLinks: LinkData[] = []
 
   constructor(private router: Router, private activatedRoute: ActivatedRoute, private postService: PostService, private userService: UserService) {}
   ngOnInit(): void {
@@ -53,6 +56,15 @@ export class TopicComponent {
         posts: this.postService.getPostByTopicID(this.board, this.topic),
         user: this.userService.isLoggedIn()
       }).subscribe((res) => {
+        // create list of links
+        console.log(res)
+        this.navLinks = [
+          new LinkData('BcCompSciConnect', '/'), 
+          new LinkData(res.posts.board.title, `board/${this.board}`),
+          new LinkData(res.posts.topic.question, `board/${this.board}/topic/${this.topic}`)
+        ]
+
+        // read in posts
         let userID: number | null = null
         if(res.user.loggedIn) {
           userID = res.user.id

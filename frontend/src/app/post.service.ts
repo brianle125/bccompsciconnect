@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { api } from './common-strings';
 import { Observable, ObservedValuesFromArray } from 'rxjs';
 import { GetTopicType } from './topic.service';
+import { BoardResponse } from './board.service';
 
 @Injectable({
   providedIn: 'root',
@@ -32,7 +33,8 @@ export class PostService {
 export interface GetAllPostsType {
   postCount: string,
   posts: GetPostType[],
-  topic: GetTopicType
+  topic: GetTopicType,
+  board: BoardResponse
 }
 
 export interface GetPostType {
