@@ -1,13 +1,15 @@
 .page {
     max-height: 100px;
-    border: 1px solid black;
+    border: 1px solid grey;
+    border-radius: 5px;
+    margin-top: 3px;
 }
 
 .image-frame {
     float: left;
     max-width: 100px;
     max-height: 100px;
-    border: 1px solid red;
+    
 }
 
 .text {
@@ -17,4 +19,41 @@
 img {
     max-width: 100%;
     max-height: 100%;
+}
+
+main {
+    height: 80vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    font-family: Helvetica, Arial, sans-serif;
+    font-weight: bold;
+}
+
+span {
+    display: flex;
+    flex-direction:row;
+    height: fit-content;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#buttons {
+    display: flex;
+    flex-direction: row;
+    margin: 3px;
+    border-radius: 3px;
+    padding-right: 8vw;
+}
+
+button {
+    margin: 3px;
+}
+
+h1 {
+    padding-left: 2vw;
+}
+
+#pin-button {
+    float: right;
 }

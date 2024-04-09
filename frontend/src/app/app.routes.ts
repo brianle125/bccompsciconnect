@@ -15,6 +15,7 @@ import { sessionGuard } from './session.guard';
 import { UserPostsComponent } from './user-posts/user-posts.component';
 import { EditPostComponent } from './edit-post/edit-post.component';
 import { LandingPageComponent } from './landing-page/landing-page.component';
+import { CreateBoardComponent } from './create-board/create-board.component';
 
 export const routes: Routes = [
   { path: 'home', component: HomePageComponent },
@@ -27,6 +28,7 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegistrationComponent },
   { path: 'create-topic', component: CreateTopicComponent },
+  { path: 'create-board', component: CreateBoardComponent },
   { path: 'user/:username', component: UserProfileComponent},
   { path: 'user/:username/posts', component: UserPostsComponent},
   {path: 'admin/dashboard', component: AdminDashboardComponent, canActivate: [authGuard]},

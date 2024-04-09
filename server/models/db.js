@@ -16,7 +16,8 @@ const helpers = {
       id SERIAL, 
       title character varying(255), 
       description varchar(255), 
-      ordering integer, 
+      ordering integer,
+      pinned boolean DEFAULT false, 
       PRIMARY KEY(id)
     )`;
     const topics = `CREATE TABLE IF NOT EXISTS topics (
@@ -185,6 +186,14 @@ const helpers = {
     );
   },
 
+  addBoard1: async function (boardTitle, boardDescription) {
+    // const res = await pool.query('INSERT INTO boards VALUES (DEFAULT, $1)', [boardTitle]);
+    const res = await pool.query(
+      "INSERT INTO boards VALUES (DEFAULT, $1, $2)",
+      [boardTitle, boardDescription]
+    );
+  },
+
   //Edit a board
   editBoard: async function (boardId, boardTitle, boardDescription, ordering) {
     const q =
@@ -195,6 +204,12 @@ const helpers = {
       ordering,
       boardId,
     ]);
+  },
+
+  pinBoard: async function (id, tf) {
+    const q =
+      "UPDATE boards SET pinned = $2 WHERE id = $1";
+    const res = await pool.query(q, [id, tf]);
   },
 
   //Delete a board

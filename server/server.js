@@ -325,6 +325,17 @@ app.get("/api/board/:id", async (req, res) => {
   }
 });
 
+app.post("/api/board/pin", async (req, res) => {
+  let id = req.body.id;
+  let tf = req.body.tf;
+  console.log("Updating: " + id + " from " + tf);
+  if(tf == "false") {
+    await db.helpers.pinBoard(id, "true");
+  } else {
+    await db.helpers.pinBoard(id, "false");
+  }
+});
+
 app.get("/api/board/:id/latest", async (req, res) => {
   try {
     let id = req.params.id;
@@ -350,6 +361,15 @@ app.post("/api/board", async (req, res) => {
     boardTitle,
     boardDescription,
     ordering
+  );
+});
+
+app.post("/api/add/board", async (req, res) => {
+  let boardTitle = req.body.boardTitle;
+  let boardDescription = req.body.boardDescription;
+  const board = await db.helpers.addBoard1(
+    boardTitle,
+    boardDescription
   );
 });
 
