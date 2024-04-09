@@ -4,11 +4,6 @@
         <h2>{{ userData.username }}</h2>
         <div class="image-profile">
             <img src="{{ userData.icon }}" class="icon">   
-            <!-- <img
-              src="http://localhost:8080/api/userimages/{{ userData.username }}"
-              class="icon"
-              alt="Profile image of Jimmy Nishimwe"
-      /> -->
         </div>
         <p>{{userData.email || '' }}</p>
         <div *ngIf="userData.postsLink; then hasPosts else noPosts"></div>
@@ -23,26 +18,4 @@
         
         <button class="btn btn-outline-primary" (click)="editUser()">Edit</button>
     </div>
-    <p>{{ userData.email || "" }}</p>
-    <div *ngIf="userData.postsLink; then hasPosts; else noPosts"></div>
-    <ng-template #hasPosts
-      ><p><a href="{{ userData.postsLink }}">View posts</a></p></ng-template
-    >
-    <ng-template #noPosts>User has not posted</ng-template>
-    <app-user-profile-upload></app-user-profile-upload>
-  </div>
-  <p>{{ userData.email || "" }}</p>
-  <div *ngIf="userData.postsLink; then hasPosts; else noPosts"></div>
-  <ng-template #hasPosts
-    ><p><a href="{{ userData.postsLink }}">View posts</a></p></ng-template
-  >
-  <ng-template #noPosts>User has not posted</ng-template>
-</div>
-
-<div class="col-sm-10 description">
-  <div class="description-text">
-    <p>{{ userData.description }}</p>
-  </div>
-
-  <button class="btn btn-outline-primary" (click)="editUser()">Edit</button>
 </div>

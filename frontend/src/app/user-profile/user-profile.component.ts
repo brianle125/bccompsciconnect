@@ -32,11 +32,9 @@ export class UserProfileComponent implements OnInit {
     ''
   );
   user: any;
-  //Session user
-
   imageurl: any;
-
   isCurrentUser: boolean = false;
+
   constructor(
     private userService: UserService,
     private route: ActivatedRoute,
@@ -52,15 +50,28 @@ export class UserProfileComponent implements OnInit {
         this.user = data as any;
         console.log(this.user[0].profile_image);
         // Check if the icon needs conversion (i.e., it's a Blob)
-
-        // If it's not a Blob, directly use the icon as it is (likely a URL)
-        this.userData = new UserProfileData(
-          this.user[0].username,
-          this.user[0].icon,
-          this.user[0].email,
-          this.user[0].description,
-          `/user/${username}/posts`
-        );
+        if(this.user[0].profile_image !== null) {
+          if(this.user[0].profile_image.type === 'Buffer') {
+            let icon = 'data:image/jpg;base64,' + arrayBufferToBase64(this.user[0].profile_image.data)
+            this.userData = new UserProfileData(
+              this.user[0].username,
+              icon,
+              this.user[0].email,
+              this.user[0].description,
+              `/user/${username}/posts`
+            );
+          }
+          else {
+            // If it's not a Blob, directly use the icon as it is (likely a URL)
+            this.userData = new UserProfileData(
+              this.user[0].username,
+              this.user[0].icon,
+              this.user[0].email,
+              this.user[0].description,
+              `/user/${username}/posts`
+            );
+          } 
+        }
       });
 
       this.userService.isLoggedIn().subscribe((data) => {
