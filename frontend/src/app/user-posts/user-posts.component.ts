@@ -23,13 +23,15 @@ export class UserPostsComponent implements OnInit {
     this.userService.getUser(username).subscribe((data) => {
       let response = data as any;
       console.log(response[0])
-      let profilePic = 'data:image/jpg;base64,' + arrayBufferToBase64(response[0].profile_image.data)
-
+      let profilePic = 'assets/user.png'
+      if(response[0].profile_image !== null) {
+        profilePic = 'data:image/jpg;base64,' + arrayBufferToBase64(response[0].profile_image.data)
+      }
+      
       //get posts by user id and display
       if(response[0].id !== null) {
         this.postService.getPostsByUserID(response[0].id).subscribe((postsJson) => {
           postsJson.forEach((post) => {
-            console.log(post)
             let postData: PostData = new PostData(post.body, response[0].username, '', profilePic, post.created_at, null, null)
             this.posts.push(postData)
           })
