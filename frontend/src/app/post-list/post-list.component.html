@@ -1,26 +1,26 @@
 <div *ngFor="let post of posts" class="post col-sm-12">
   <div class="col-sm-2 info">
-    <a class="username" [href]="post.profileLink">{{ post.username }}</a>
-    <div class="profile-pic-frame">
-      <img
-        class="profile-pic"
-        [src]="'http://localhost:8080/api/userimages/' + post.username"
-        [alt]="post.username + '-profile-pic'"
-      />
-    </div>
-    <div class="dates-section">
-      <div class="dates-labels">
-        <div>created:</div>
-        <div *ngIf="post.edited != null">edited:</div>
+      <a class="username" [href]="post.profileLink">{{post.username}}</a>
+      <div class="profile-pic-frame">
+        <img
+          class="profile-pic"
+          [src]="'http://localhost:8080/api/userimages/' + post.username"
+          [alt]="post.username + '-profile-pic'"
+        />
       </div>
-      <div class="dates">
-        <div>{{ post.created }}</div>
-        <div *ngIf="post.edited != null">{{ post.edited }}</div>
+      <div class="dates-section">
+          <div class="dates-labels">
+              <div>created:</div>
+              <div *ngIf="post.edited != null">edited:</div>
+          </div>
+          <div class="dates">
+              <div>{{post.created | date:'medium'}}</div>
+              <div *ngIf="post.edited != null">{{post.edited | date:'medium'}}</div>
+          </div>
       </div>
-    </div>
-    <div class="after-dates-section">
-      <a *ngIf="post.editLink != null" [href]="post?.editLink">edit</a>
-    </div>
+      <div class="after-dates-section">
+          <a *ngIf="post.editLink != null" [href]="post?.editLink">edit</a>
+      </div>
   </div>
   <div class="col-sm-10 message">
     <app-formatted-text [text]="post.message"></app-formatted-text>

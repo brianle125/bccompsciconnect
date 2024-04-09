@@ -386,12 +386,14 @@ app.delete("/api/board/:boardId", async (req, res) => {
 app.get("/api/board/:boardId/topic/:topicId", async (req, res) => {
   let boardId = req.params.boardId;
   let topicId = req.params.topicId;
+  const board = await db.helpers.getBoard(boardId)
   const topic = await db.helpers.getTopic(topicId);
   const posts = await db.helpers.getPosts(topicId);
   const postCount = await db.helpers.getPostCount(topicId);
-
+  await db.helpers.addViewToTopic(topicId);
   //Subject to change; this just bundles the topic and associated Posts together
   res.json({
+    board: board,
     topic: topic,
     posts: posts,
     postCount: postCount.rows[0].count,
@@ -465,14 +467,38 @@ app.post("/api/board/:boardId/add-topic", requireLogin, async (req, res) => {
   }
   let body = req.body;
   let boardId = req.params.boardId;
-  await db.helpers.addTopic(
+  let topicId = await db.helpers.addTopic(
     boardId,
     body.question,
     req.session.user.id,
     body.body
   );
-  res.json({ message: "success" });
+  res.json({ 'topicId': topicId });
 });
+
+app.get("/api/board/:boardId/topic/:topicId/post/:postId", async (req, res) => {
+  let params = req.params
+  let post = await db.helpers.getPost(params.postId)
+  if(post.length < 1) {
+    res.error(404).json({ error: { code: 404, message: "no post with given id found" }})
+    return
+  }
+  res.json(post[0])
+})
+
+const editPostSchema = joi.object({
+  text: joi.string().required(),
+});
+
+app.put("/api/board/:boardId/topic/:topicId/post/:postId", async (req, res) => {
+  let valid = editPostSchema.validate(req.body)
+  if(valid.error != null) {
+    res.status(400).json({ error: { code: 400, message: "invalid schema" } });
+  }
+
+  let post = await db.helpers.editPost(req.params.postId, req.body.text)
+  res.json({ message: "success"})
+})
 
 // Getting images
 

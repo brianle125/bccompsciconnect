@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { api } from './common-strings';
 import { Observable } from 'rxjs';
+import { BoardResponse } from './board.service';
 
 @Injectable({
   providedIn: 'root',
@@ -38,7 +39,13 @@ export interface GetTopicType {
   boardid: number,
   question: string,
   created_by: number,
+  username: string,
   created_at: string,
+  created_at_unix: string,
   last_modified: string| null,
-  latest_post: string
+  last_modified_unix: string| null,
+  latest_post: string,
+  latest_post_unix: string,
+  num_replies: number,
+  num_views: number
 }
