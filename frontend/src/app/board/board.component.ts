@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TopicListComponent } from '../topic-list/topic-list.component';
+import { TopicListComponent, TopicListEntry } from '../topic-list/topic-list.component';
 import { TopBarComponent } from '../top-bar/top-bar.component';
 import { BoardService } from '../board.service';
+import { unixTimeStampStringToDate } from '../helpers';
 
 @Component({
   selector: 'app-board',
@@ -15,24 +16,44 @@ import { BoardService } from '../board.service';
  * The main page for a board
  */
 export class BoardComponent implements OnInit {
-  public board: number | null = null
+  public boardId: number | null = null
   public createTopicLink: string | null = null;
+  public topics: TopicListEntry[] = []
+  public boardTitle: string = ''
+  public description: string = ''
 
   // constructor for the route that creates topics
-  constructor(private router: Router, private activatedRoute: ActivatedRoute) {}
+  constructor(private router: Router, private activatedRoute: ActivatedRoute, private boardService: BoardService) {}
   ngOnInit(): void {
     let tempBoardID: string | null = this.activatedRoute.snapshot.params['board-id']
-    if(tempBoardID != null) {
-      let id: number = parseInt(tempBoardID)
-      if(!Number.isNaN(id)) {
-        this.board = id
-        this.createTopicLink = `board/${id}/create-topic`
-
-      }
-    } else {
+    if(tempBoardID == null || Number.isNaN(tempBoardID)) {
       this.router.navigate(['/'])
-      
+      return
     }
+
+    this.boardId = parseInt(tempBoardID)
+    this.createTopicLink = `board/${this.boardId}/create-topic`
+
+    this.boardService.getBoard(this.boardId).subscribe((data) => {
+      console.log(data)
+      let board = data.board
+      this.boardTitle = board.title
+      this.description = board.description
+      let tempTopics: TopicListEntry[] = []
+      for(let i = 0; i < data.topics.length; i++) {
+        let target = data.topics[i]
+        tempTopics.push(new TopicListEntry(
+          target.question, 
+          target.username, 
+          target.num_views, 
+          target.num_replies, 
+          unixTimeStampStringToDate(target.created_at_unix), 
+          unixTimeStampStringToDate(target.latest_post_unix), 
+          `/board/${this.boardId}/topic/${target.id}`
+        ))
+        this.topics = tempTopics
+      }
+    })
   }
 
 

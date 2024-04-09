@@ -14,40 +14,12 @@ import { unixTimeStampStringToDate } from '../helpers';
 /**
  * Component to list topics
  */
-export class TopicListComponent implements OnInit {
-  public boardTitle: string = ''
-  public description: string = ''
+export class TopicListComponent {
   @Input() topics: TopicListEntry[] = []
-  constructor(private boardService: BoardService, private route: ActivatedRoute) {}
-
-  ngOnInit(): void {
-    const routeParams = this.route.snapshot.paramMap;
-    const boardId = Number(routeParams.get('board-id'));
-
-    this.boardService.getBoard(boardId).subscribe((data) => {
-      console.log(data)
-      let board = data.board
-      this.boardTitle = board.title
-      this.description = board.description
-      let tempTopics: TopicListEntry[] = []
-      for(let i = 0; i < data.topics.length; i++) {
-        let target = data.topics[i]
-        tempTopics.push(new TopicListEntry(
-          target.question, 
-          target.username, 
-          target.num_views, 
-          target.num_replies, 
-          unixTimeStampStringToDate(target.created_at_unix), 
-          unixTimeStampStringToDate(target.latest_post_unix), 
-          `/board/${boardId}/topic/${target.id}`
-        ))
-        this.topics = tempTopics
-      }
-    })
-  }
+  constructor() {}
 }
 
-class TopicListEntry {
+export class TopicListEntry {
   constructor(
     public title: string,
     public originalPoster: string,
