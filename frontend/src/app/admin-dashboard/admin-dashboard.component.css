@@ -1,17 +1,26 @@
+main {
+    width: 100vw;
+    height: 40vw;
+}
 #users {
     width: 50%;
-    height: fit-content;
-    min-height: 50%;
-    background-color: grey;
+    min-height: 100%;
+    background-color: #f2f2f2;
+    border-radius: 5px;
+    border: 1px solid #ccc; 
 }
 
 #editUser {
     width: 50%;
     height: fit-content;
-    min-height: 50%;
+    min-height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
+    background-color: #f2f2f2;
+    border-radius: 5px;
+    border: 1px solid #ccc; 
+    font-size: 2rem;
 }
 
 main {
@@ -21,3 +30,36 @@ main {
 form {
     width: 40%;
 }
+
+th {
+    font-weight: bold;
+    text-align: center;
+}
+
+table {
+    font-size: 2rem;
+    text-align: center;
+}
+
+h1 {
+    font-family: Helvetica, Arial, sans-serif;
+    font-weight: bold;
+}
+
+#topHeader {
+    padding-left: 5%;
+}
+
+form > button {
+    size: 2rem;
+}
+
+#editUser input[type="text"] {
+    height: 4rem;
+}
+
+#editUser button {
+    size: 3rem;
+    font-size: 2rem;
+}
+

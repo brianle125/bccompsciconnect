@@ -51,3 +51,11 @@ h1 {
     margin-right: 30px;
     float: right;
 }
+
+.home-pic {
+    height: 75px;
+    width: fit-content;
+    background-color: black;
+    margin-top: 0px;
+}
+
