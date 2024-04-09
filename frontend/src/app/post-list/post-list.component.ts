@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { PostService } from '../post.service';
 import { FormattedTextComponent } from '../formatted-text/formatted-text.component';
+import { api } from '../common-strings';
 
 @Component({
   selector: 'app-post-list',
@@ -14,8 +15,6 @@ export class PostListComponent {
   @Input() public posts: PostData[] = []
 
   constructor(private postService: PostService) {}
-
-
 
 }
 

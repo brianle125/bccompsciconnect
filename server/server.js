@@ -61,7 +61,7 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-// app.use(express.static(path.join(__dirname, 'static')));
+//app.use(express.static(path.join(__dirname, 'static')));
 
 // internal modules
 const db = require("./models/db");
@@ -74,7 +74,7 @@ const helpers = require("./helpers");
 //USING THE GENERATED BUTTON
 app.post("/api/google/", async (req, res) => {
   const payload = req.body;
-  const possibleUser = await db.helpers.getUser(payload.email);
+  let possibleUser = await db.helpers.getUser(payload.email);
 
   //add user to database if email doesn't exist, otherwise login with existing credentials
   if (possibleUser.length === 0) {
@@ -277,23 +277,10 @@ app.post("/api/uploadprofile", upload.single("image"), async (req, res) => {
   );
 });
 
-////////////////////////
-// const exists = await db.helpers.getProfilePicture(req.body.username)
-// console.log(exists.length)
-// if(exists.length === 0) {
-//    //else add new profile
-//    console.log("adding profile")
-//   await db.helpers.addProfilePicture(req.body.username, req.file.originalname, req.file.buffer)
-// }
-// else
-// {
-//   await db.helpers.changeProfilePicture(req.body.username, req.file.originalname, req.file.buffer)
-// }
-
-app.get("/api/getprofile/:userid", async (req, res) => {
-  const image = await db.helpers.getProfilePicture(req.params.userid);
-  res.json(image);
-});
+app.get("/api/getprofile/:username", async (req, res) => {
+  const image = await db.helpers.getProfilePicture(req.params.username)
+  res.json(image)
+})
 
 // BOARDS //
 
@@ -496,11 +483,17 @@ app.post("/api/board/:boardId/add-topic", requireLogin, async (req, res) => {
   res.json({ 'topicId': topicId });
 });
 
+app.get("/api/posts/:userID", async (req, res) => {
+  let userID = req.params.userID
+  const posts = await db.helpers.getPostsByUser(userID)
+  res.json(posts);
+})
+
 app.get("/api/board/:boardId/topic/:topicId/post/:postId", async (req, res) => {
   let params = req.params
   let post = await db.helpers.getPost(params.postId)
   if(post.length < 1) {
-    res.error(404).json({ error: { code: 404, message: "no post with given id found" }})
+    res.status(404).json({ error: { code: 404, message: "no post with given id found" }})
     return
   }
   res.json(post[0])

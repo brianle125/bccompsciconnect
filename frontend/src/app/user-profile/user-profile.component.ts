@@ -32,11 +32,9 @@ export class UserProfileComponent implements OnInit {
     ''
   );
   user: any;
-  //Session user
-
   imageurl: any;
-
   isCurrentUser: boolean = false;
+
   constructor(
     private userService: UserService,
     private route: ActivatedRoute,
@@ -46,26 +44,40 @@ export class UserProfileComponent implements OnInit {
   ngOnInit(): void {
     const routeParams = this.route.snapshot.paramMap;
     const username = routeParams.get('username');
+
+    //Users can only edit their own profiles
+    this.userService.isLoggedIn().subscribe((data) => {
+      let response = data as any;
+      if(response.loggedIn && response.user === username)
+      {
+        this.isCurrentUser = true;
+      }
+    })
+
+
     if (username) {
       this.userService.getUser(username).subscribe((data) => {
         // Assuming you have the user data
         this.user = data as any;
-        console.log(this.user[0].profile_image);
-        // Check if the icon needs conversion (i.e., it's a Blob)
+        if(this.user.length === 0) {
+          return;
+        }
 
-        // If it's not a Blob, directly use the icon as it is (likely a URL)
+        //Load user data
         this.userData = new UserProfileData(
           this.user[0].username,
-          this.user[0].icon,
+          'assets/user.png',
           this.user[0].email,
           this.user[0].description,
           `/user/${username}/posts`
         );
-      });
 
-      this.userService.isLoggedIn().subscribe((data) => {
-        let amilogged = data as any;
-        console.log(amilogged.loggedIn);
+        // Check if the icon needs conversion (i.e., it's a Blob)
+        if(this.user[0].profile_image !== null) {
+          if(this.user[0].profile_image.type === 'Buffer') {
+            this.userData.icon = 'data:image/jpg;base64,' + arrayBufferToBase64(this.user[0].profile_image.data)
+          } 
+        } 
       });
     }
   }
@@ -74,11 +86,6 @@ export class UserProfileComponent implements OnInit {
     this.router.navigate([`/user/${this.userData.username}/edit`]);
   }
 
-  //CHECK IF LOGGED IN, AND IF CURRENT SESSION MATCHES THE USER
-  addProfilePicture(file: FileList) {
-    this.userService.isLoggedIn().subscribe((data) => {});
-    //get image
-  }
 }
 
 export class UserProfileData {
