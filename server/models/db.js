@@ -1,6 +1,8 @@
 const { Pool } = require("pg");
 require("dotenv").config();
 
+const argon2 = require('argon2')
+
 const pool = new Pool({
   user: "postgres",
   host: 'localhost' || process.env.DB_HOST,
@@ -39,7 +41,7 @@ const helpers = {
       id SERIAL, 
       username varchar(255), 
       email varchar(255), 
-      password varchar(1000),
+      password varchar(100),
       description varchar(500),
       role varchar(255), 
       created_at timestamptz,
@@ -133,7 +135,7 @@ const helpers = {
     const query = await pool.query(q, [
       username,
       email,
-      password,
+      await argon2.hash(password),
       role,
       google_id,
     ]);
@@ -147,7 +149,7 @@ const helpers = {
     oldUsername
   ) {
     const q = `UPDATE users SET username=$1, email=$2, password=$3, description=$4 WHERE username = '${oldUsername}'`;
-    const query = await pool.query(q, [username, email, password, description]);
+    const query = await pool.query(q, [username, email, await argon2.hash(password), description]);
   },
 
   editUserById: async function (id, username, role) {
@@ -497,6 +499,10 @@ const helpers = {
       throw err; // Rethrow or handle as preferred
     }
   },
+
+  checkPassword: async function(hash, plainTextPassword) {
+    return await argon2.verify(hash, plainTextPassword)
+  }
 };
 
 module.exports = { helpers };
