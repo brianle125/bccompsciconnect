@@ -13,6 +13,7 @@ import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.compo
 import { authGuard } from './auth.guard';
 import { sessionGuard } from './session.guard';
 import { UserPostsComponent } from './user-posts/user-posts.component';
+import { EditPostComponent } from './edit-post/edit-post.component';
 import { LandingPageComponent } from './landing-page/landing-page.component';
 
 export const routes: Routes = [
@@ -21,6 +22,7 @@ export const routes: Routes = [
   { path: 'board/:board-id', component: BoardComponent },
   { path: 'board/:board-id/topic/:topic-id', component: TopicComponent },
   { path: 'board/:board-id/topic/:topic-id/create-post', component: CreatePostComponent },
+  { path: 'board/:board-id/topic/:topic-id/post/:post-id/edit-post', component: EditPostComponent },
   { path: 'board/:board-id/create-topic', component: CreateTopicComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegistrationComponent },

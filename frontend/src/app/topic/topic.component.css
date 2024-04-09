@@ -5,3 +5,8 @@
 .post-text {
     display: inline-block
 }
+
+.content {
+    padding-left: 10px;
+    padding-right: 10px;
+}

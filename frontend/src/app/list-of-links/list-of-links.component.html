@@ -1,0 +1,4 @@
+<span *ngFor="let link of links; let i = index">
+    <a [href]="link.link">{{link.name}}</a>
+    <span *ngIf="i != links.length - 1"> > </span>
+</span>

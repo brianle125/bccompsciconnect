@@ -14,6 +14,7 @@ import { Observable } from 'rxjs';
 export class TextEditorComponent {
   public static TEXT_INPUT = 'text-input'
 
+  @Input() defaultText: string = ''
   @Output() formSubmitted: EventEmitter<string> = new EventEmitter()
   @Output() previewClicked: EventEmitter<string> = new EventEmitter()
   public form: FormGroup
@@ -29,35 +30,15 @@ export class TextEditorComponent {
     return this.form.controls[TextEditorComponent.TEXT_INPUT].getRawValue();
   }
 
-  // ngOnChanges(changes: SimpleChanges): void {
-  //   console.log(changes)
-  //   if(changes['defaultText'] != undefined) {
-  //     this.form.get(RecipeFormComponent.RECIPE_NAME)?.setValue(this.defaultText.name)
-  //     this.form.get(RecipeFormComponent.RECIPE_INGREDIENTS)?.setValue(this.defaultText.ingredients)
-  //     this.form.get(RecipeFormComponent.RECIPE_INSTRUCTIONS)?.setValue(this.defaultText.instructions)
-  //   }
-  // }
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log(changes)
+    if(changes['defaultText'] != undefined) {
+      this.form.get(TextEditorComponent.TEXT_INPUT)?.setValue(this.defaultText)
+    }
+  }
 
   public onSubmit(val: any): void {
     this.formSubmitted.emit(val[TextEditorComponent.TEXT_INPUT])
-    // console.log('valid', this.form.valid)
-
-    // if(val[RecipeFormComponent.RECIPE_NAME] == null 
-    //   || val[RecipeFormComponent.RECIPE_INSTRUCTIONS] == null 
-    //   || val[RecipeFormComponent.RECIPE_INGREDIENTS] == null) {
-    //   console.error("form field null")
-    //   return
-    // } 
-
-    // let recipe = new Recipe(
-    //   Recipe.generateId(),
-    //   val[RecipeFormComponent.RECIPE_NAME],
-    //   val[RecipeFormComponent.RECIPE_INGREDIENTS],
-    //   val[RecipeFormComponent.RECIPE_INSTRUCTIONS]
-    // )
-    
-    // this.recipeFormSubmitted.emit(recipe)
-    // console.log(recipe)
   }
 
   public onPreviewClicked(): void {

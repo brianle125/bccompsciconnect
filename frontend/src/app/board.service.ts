@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { api } from './common-strings'
 import { Observable } from 'rxjs';
+import { GetTopicType } from './topic.service';
 
 
 @Injectable({
@@ -19,8 +20,8 @@ export class BoardService {
     return this.http.get<any[]>(`${api}/boards`, { withCredentials: true }) as Observable<BoardResponse[]>
   }
 
-  getBoard(id: any) {
-    return this.http.get<any>(`${api}/board/${id}`, { withCredentials: true })
+  getBoard(id: number): Observable<GetBoardType> {
+    return this.http.get<GetBoardType>(`${api}/board/${id}`, { withCredentials: true })
   }
 
   addBoard(title: string, description: string, ordering: number) {
@@ -52,4 +53,9 @@ export interface BoardResponse {
   description: string,
   id: string,
   ordering: string
+}
+
+export interface GetBoardType {
+  board: BoardResponse,
+  topics: GetTopicType[]
 }

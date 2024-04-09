@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { UserService } from '../user.service';
 import { PostService } from '../post.service';
 import { ActivatedRoute } from '@angular/router';
-import { arrayBufferToBase64 } from '../image-helper';
+import { arrayBufferToBase64 } from '../helpers';
 
 @Component({
   selector: 'app-user-posts',

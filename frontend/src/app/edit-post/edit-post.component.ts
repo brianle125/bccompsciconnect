@@ -7,28 +7,42 @@ import { TopBarComponent } from '../top-bar/top-bar.component';
 import { PostService } from '../post.service';
 
 @Component({
-  selector: 'app-create-post',
+  selector: 'app-edit-post',
   standalone: true,
   imports: [TextEditorComponent, FormattedTextComponent, TopBarComponent],
-  templateUrl: './create-post.component.html',
-  styleUrl: './create-post.component.css'
+  templateUrl: './edit-post.component.html',
+  styleUrl: './edit-post.component.css'
 })
-export class CreatePostComponent implements OnInit{
+
+export class EditPostComponent implements OnInit{
   public previewText: string = ''
   public boardID: number | null = null
   public topicID: number | null = null
+  public postID: number | null = null
+  public originalMessage: string = ''
 
   constructor(private activatedRoute: ActivatedRoute, private router: Router, private postService: PostService) {}
   ngOnInit(): void {
     let tempBoardID: string | null = this.activatedRoute.snapshot.params['board-id']
     let tempTopicID: string | null = this.activatedRoute.snapshot.params['topic-id']
-    if(tempBoardID == null || tempTopicID == null) {
+    let tempPostID: string | null = this.activatedRoute.snapshot.params['post-id']
+    
+
+    
+    if(tempBoardID == null || tempTopicID == null || tempPostID == null) {
       this.router.navigate(['/'])
-    } else {
-      // if(!Number.isNaN(id))
-      this.boardID = parseInt(tempBoardID)
-      this.topicID = parseInt(tempTopicID)
+      return
     }
+
+    // if(!Number.isNaN(id))
+    this.boardID = parseInt(tempBoardID)
+    this.topicID = parseInt(tempTopicID)
+    this.postID = parseInt(tempBoardID)
+
+    this.postService.getPost(this.boardID, this.topicID, this.postID).subscribe({
+      next:(val)=>{this.originalMessage = val.body},
+      error:(e)=>{console.log(e)}
+    })
     console.log(this)
   }
 
@@ -37,9 +51,9 @@ export class CreatePostComponent implements OnInit{
   }
 
   public onSubmit(text: string): void {
-    if(this.topicID != null && this.boardID != null) {
-      this.postService.addPost(this.boardID, this.topicID, text).subscribe({
-        next:()=>{this.router.navigate([`board/${this.boardID}/topic/${this.topicID}`])}, 
+    if(this.topicID != null && this.boardID != null && this.postID != null) {
+      this.postService.editPost(this.boardID, this.topicID, this.postID, text).subscribe({
+        next:()=>{this.router.navigate([`board/${this.boardID}/topic/${this.topicID}`])},
         error:(e)=>{console.log(e)}
       })
     }
