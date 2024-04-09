@@ -42,6 +42,7 @@ const helpers = {
       created_at timestamp,
       profile_image bytea, 
       google_id varchar(1000),
+      image_type varchar(1000),
       PRIMARY KEY(id)
     )`;
     const posts = `CREATE TABLE IF NOT EXISTS posts (
@@ -71,7 +72,8 @@ const helpers = {
     )`;
 
     const images = `CREATE TABLE IF NOT EXISTS images (
-      id SERIAL, 
+      username varchar(400),
+      id SERIAL,
       filename varchar(400), 
       image bytea,
       url varchar(400),
@@ -88,7 +90,7 @@ const helpers = {
     const publicUserInfo = `CREATE OR REPLACE VIEW public_user_info 
       AS SELECT id, username, description, role, created_at, profile_image 
       FROM users;
-    `
+    `;
 
     //call queries
     await pool.query(users);
@@ -125,7 +127,13 @@ const helpers = {
 
   addUser: async function (username, email, password, role, google_id) {
     const q = `INSERT INTO users VALUES(DEFAULT, $1, $2, $3, 'User has not changed bio', $4, CURRENT_TIMESTAMP, NULL, $5)`;
-    const query = await pool.query(q, [username, email, password, role, google_id]);
+    const query = await pool.query(q, [
+      username,
+      email,
+      password,
+      role,
+      google_id,
+    ]);
   },
 
   editUserProfile: async function (
@@ -139,7 +147,7 @@ const helpers = {
     const query = await pool.query(q, [username, email, password, description]);
   },
 
-  editUserById: async function(id, username, role) {
+  editUserById: async function (id, username, role) {
     const q = `UPDATE users SET username=$2, role=$3 WHERE id = $1 RETURNING *`;
     const queryResult = await pool.query(q, [id, username, role]);
     return queryResult.rows[0];
@@ -251,7 +259,7 @@ const helpers = {
   },
 
   getPosts: async function (topicId) {
-    const q = `SELECT * FROM posts JOIN public_user_info ON posts.created_by = public_user_info.id WHERE posts.topicid = $1 ORDER BY posts.created_at`
+    const q = `SELECT * FROM posts JOIN public_user_info ON posts.created_by = public_user_info.id WHERE posts.topicid = $1 ORDER BY posts.created_at`;
     // const q = "SELECT * FROM posts WHERE topicid = $1 ORDER BY created_at";
     const res = await pool.query(q, [topicId]);
     return res.rows;
@@ -301,11 +309,16 @@ const helpers = {
 
   //profiles
 
-  saveProfilePicture: async function(image, username) {
-    const p = `UPDATE users SET profile_image = $1 WHERE username = $2`
-    const res = await pool.query(p, [image, username]);
+  saveProfilePicture: async function (image, username, imagetype) {
+    type = imagetype;
+    // Include the imageType field in the UPDATE statement and add a placeholder for it ($3)
+    const sqlQuery = `UPDATE users SET profile_image = $1, image_type = $3 WHERE username = $2`;
+    // Execute the query with the provided parameters in the correct order
+    const res = await pool.query(sqlQuery, [image, username, type]);
+
+    console.log(imagetype);
   },
-  
+
   // addProfilePicture: async function (username, filename, image) {
   //   const q = 'INSERT INTO userProfiles VALUES($1, $2, $3)'
   //   const query = await pool.query(q, [username, filename, image])
@@ -316,11 +329,11 @@ const helpers = {
   //   const query = await pool.query(q, [image, filename, username])
   // },
 
-  getProfilePicture: async function(username) {
+  getProfilePicture: async function (username) {
     // const q = 'SELECT * FROM userProfiles WHERE username = $1'
-    const q = `SELECT profile_image from users WHERE username = $1`
+    const q = `SELECT profile_image from users WHERE username = $1`;
     const res = await pool.query(q, [username]);
-    return res.rows
+    return res.rows;
   },
 
   getProfilePictureById: async function(id) {
@@ -334,7 +347,7 @@ const helpers = {
     return res.rows
   },
 
-  // get images
+  // get user images
 
   getImages: async function () {
     const query = `SELECT * FROM images`;
@@ -349,6 +362,7 @@ const helpers = {
 
   // save images
   saveImage: async function (
+    username,
     filename,
     imageBuffer,
     url,
@@ -356,8 +370,16 @@ const helpers = {
     userid,
     contentType
   ) {
-    const query = `INSERT INTO images (filename, image, url, postid, userid, content_type) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;`;
-    const values = [filename, imageBuffer, url, postid, userid, contentType];
+    const query = `INSERT INTO images (username, filename, image, url, postid, userid, content_type) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;`;
+    const values = [
+      username,
+      filename,
+      imageBuffer,
+      url,
+      postid,
+      userid,
+      contentType,
+    ];
 
     try {
       const res = await pool.query(query, values);
@@ -372,8 +394,12 @@ const helpers = {
   getImagesByUserId: async function (userId) {
     const query = `SELECT * FROM images WHERE userid = $1`;
     try {
-      const res = await pool.query(query, [userId]);
-      return res.rows;
+      const result = await pool.query(query, [userId]);
+      if (result.rows.length > 0) {
+        return result.rows[0];
+      } else {
+        return null; // Or however you prefer to handle no results found
+      }
     } catch (err) {
       console.error("Error executing getImagesByUserId query:", err.stack);
       throw err;
@@ -385,6 +411,22 @@ const helpers = {
     const query = "SELECT * FROM images WHERE id = $1;";
     try {
       const result = await pool.query(query, [imageId]);
+      if (result.rows.length > 0) {
+        return result.rows[0];
+      } else {
+        return null; // Or however you prefer to handle no results found
+      }
+    } catch (err) {
+      console.error("Error executing getImageById query:", err.stack);
+      throw err; // Rethrow or handle as preferred
+    }
+  },
+
+  // get image by id
+  getuserImage: async function (username) {
+    const query = "SELECT * FROM users WHERE username=$1";
+    try {
+      const result = await pool.query(query, [username]);
       if (result.rows.length > 0) {
         return result.rows[0];
       } else {

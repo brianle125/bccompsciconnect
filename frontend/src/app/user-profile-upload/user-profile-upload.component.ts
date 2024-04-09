@@ -8,51 +8,53 @@ import { ActivatedRoute } from '@angular/router';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './user-profile-upload.component.html',
-  styleUrl: './user-profile-upload.component.css'
+  styleUrl: './user-profile-upload.component.css',
 })
-export class UserProfileUploadComponent implements OnInit{
-
-  @Input() requiredFileType:string = ''
-  user: any
+export class UserProfileUploadComponent implements OnInit {
+  @Input() requiredFileType: string = '';
+  user: any;
   fileName = '';
   loggedAsUser: boolean = false;
-  constructor(private userService: UserService, private route: ActivatedRoute) {}
+  constructor(
+    private userService: UserService,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {
     //load user
     const routeParams = this.route.snapshot.paramMap;
     const username = routeParams.get('username');
     this.userService.getUser(username).subscribe((data) => {
-      this.user = data as any
-    })
+      this.user = data as any;
+    });
 
     //Users can only edit their own profile
     this.userService.isLoggedIn().subscribe((data) => {
-      let response = data as any
-      console.log(response)
-      if(response.loggedIn && response.user === username) {
+      let response = data as any;
+      console.log(response);
+      if (response.loggedIn && response.user === username) {
         this.loggedAsUser = true;
       }
-    })
+    });
   }
 
   onFileSelected(event: any) {
-    const file:File = event.target.files[0];
+    const file: File = event.target.files[0];
 
-    if(file.size > 2097152) {
-      alert("Maximum file size is 2MB")
+    if (file.size > 2097152) {
+      alert('Maximum file size is 2MB');
     } else if (file) {
       this.fileName = file.name;
       const formData = new FormData();
-      formData.append("userid", this.user[0].id)
-      formData.append("username", this.user[0].username)
-      formData.append("filename", this.fileName)
-      formData.append("url", "")
-      formData.append("image", file);
-      this.userService.uploadUserProfile(formData).subscribe()
-      console.log(formData)
+      formData.append('userid', this.user[0].id);
+      formData.append('username', this.user[0].username);
+      formData.append('filename', this.fileName);
+      formData.append('url', '');
+      formData.append('image', file);
+      formData.append('image_type', file.type);
+      this.userService.uploadUserProfile(formData).subscribe();
+
       window.location.reload();
     }
-
   }
 }
