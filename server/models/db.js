@@ -227,7 +227,7 @@ const helpers = {
       EXTRACT(EPOCH FROM topics.last_modified) AS last_modified_unix, 
       EXTRACT(EPOCH FROM topics.latest_post) AS latest_post_unix  
       FROM topics JOIN public_user_info ON topics.created_by = public_user_info.id
-      WHERE boardid = $1  
+      WHERE topics.id = $1  
     `;
     const res = await pool.query(q, [id]);
     return res.rows[0];
