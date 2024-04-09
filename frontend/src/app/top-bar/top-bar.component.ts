@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { UserService } from '../user.service';
-import { arrayBufferToBase64 } from '../image-helper';
+import { arrayBufferToBase64 } from '../helpers';
 
 @Component({
   selector: 'app-top-bar',

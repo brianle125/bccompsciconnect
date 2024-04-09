@@ -1,4 +1,8 @@
 <app-top-bar></app-top-bar>
-<a [href]="createTopicLink" class="btn btn-primary">Create Topic</a>
-<app-topic-list></app-topic-list>
-<!-- <app-topic-create></app-topic-create> -->
+<div class="content">
+    <div><app-list-of-links [links]="navLinks"></app-list-of-links></div>
+    <div *ngIf="loggedIn"><a [href]="createTopicLink" class="btn btn-primary">Create Topic</a></div>
+    <h1>{{boardTitle}}</h1>
+    <p>{{description}}</p>
+    <app-topic-list [topics]="topics"></app-topic-list>
+</div>

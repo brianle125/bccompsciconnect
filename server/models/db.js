@@ -27,7 +27,9 @@ const helpers = {
       created_by integer, 
       created_at timestamp, 
       last_modified timestamp, 
-      latest_post timestamp, 
+      latest_post timestamp,
+      num_replies integer,
+      num_views integer,
       PRIMARY KEY(id), 
       CONSTRAINT fk_user FOREIGN KEY (created_by) REFERENCES users(id), 
       CONSTRAINT fk_board FOREIGN KEY (boardid) REFERENCES boards(id) 
@@ -221,7 +223,14 @@ const helpers = {
    */
   getTopics: async function (id) {
     const res = await pool.query(
-      "SELECT * from topics WHERE boardid = $1 ORDER BY last_modified",
+      `SELECT *, 
+        EXTRACT(EPOCH FROM created_at) AS created_at_unix, 
+        EXTRACT(EPOCH FROM last_modified) AS last_modified_unix, 
+        EXTRACT(EPOCH FROM latest_post) AS latest_post_unix 
+        FROM topics 
+        WHERE boardid = $1 
+        ORDER BY last_modified
+      `,
       [id]
     );
     return res.rows;
@@ -236,21 +245,37 @@ const helpers = {
   },
 
   getTopic: async function (id) {
-    const q = "SELECT * FROM topics WHERE id = $1";
+    const q = `SELECT topics.*,
+      public_user_info.username,
+      EXTRACT(EPOCH FROM topics.created_at) AS created_at_unix, 
+      EXTRACT(EPOCH FROM topics.last_modified) AS last_modified_unix, 
+      EXTRACT(EPOCH FROM topics.latest_post) AS latest_post_unix  
+      FROM topics JOIN public_user_info ON topics.created_by = public_user_info.id
+      WHERE topics.id = $1  
+    `;
     const res = await pool.query(q, [id]);
     return res.rows[0];
   },
 
   getTopicsByRange: async function (id, start, end) {
-    const q =
-      "SELECT * FROM topics WHERE boardid = $1  ORDER BY created_at LIMIT $2 OFFSET $3";
+    console.log("reached", id, start, end)
+    const q =`SELECT topics.*,
+      public_user_info.username,
+      EXTRACT(EPOCH FROM topics.created_at) AS created_at_unix, 
+      EXTRACT(EPOCH FROM topics.last_modified) AS last_modified_unix, 
+      EXTRACT(EPOCH FROM topics.latest_post) AS latest_post_unix  
+      FROM topics JOIN public_user_info ON topics.created_by = public_user_info.id
+      WHERE boardid = $1  
+      ORDER BY topics.created_at 
+      LIMIT $2 OFFSET $3
+    `;
     const res = await pool.query(q, [id, end, start]);
     return res.rows;
   },
 
   addTopic: async function (boardID, question, createdBy, body) {
     try {
-      const createTopicQuery = `INSERT INTO topics VALUES (DEFAULT, $1, $2, $3, CURRENT_TIMESTAMP, NUll, CURRENT_TIMESTAMP) RETURNING id`;
+      const createTopicQuery = `INSERT INTO topics VALUES (DEFAULT, $1, $2, $3, CURRENT_TIMESTAMP, NUll, CURRENT_TIMESTAMP, 1, 0) RETURNING id`;
       const createTopicRes = await pool.query(createTopicQuery, [
         boardID,
         question,
@@ -263,6 +288,7 @@ const helpers = {
         topicID,
         body,
       ]);
+      return topicID
     } catch (e) {
       console.log(e);
     }
@@ -273,9 +299,28 @@ const helpers = {
     const res = await pool.query(q, [topicId]);
   },
 
+  addViewToTopic: async function (topicId) {
+    const q = `UPDATE topics SET num_views = num_views + 1 WHERE id = $1`
+    const res = await pool.query(q, [topicId])
+  },
+
+  getPost: async function (postId) {
+    const q = `SELECT *, 
+      EXTRACT(EPOCH FROM posts.created_at) AS created_at_unix, 
+      EXTRACT(EPOCH FROM posts.last_modified) AS last_modified_unix
+      FROM posts JOIN public_user_info ON posts.created_by = public_user_info.id 
+      WHERE posts.id = $1
+    `
+    const res = await pool.query(q, [postId]);
+    return res.rows
+  },
+
   getPosts: async function (topicId) {
-    const q = `SELECT * FROM posts JOIN public_user_info ON posts.created_by = public_user_info.id WHERE posts.topicid = $1 ORDER BY posts.created_at`;
-    // const q = "SELECT * FROM posts WHERE topicid = $1 ORDER BY created_at";
+    const q = `SELECT *,
+      EXTRACT(EPOCH FROM posts.created_at) AS created_at_unix, 
+      EXTRACT(EPOCH FROM posts.last_modified) AS last_modified_unix
+      FROM posts JOIN public_user_info ON posts.created_by = public_user_info.id 
+      WHERE posts.topicid = $1 ORDER BY posts.created_at`
     const res = await pool.query(q, [topicId]);
     return res.rows;
   },
@@ -298,7 +343,7 @@ const helpers = {
   addPost: async function (topicId, text, userId) {
     //update latest post in topic
     const updated =
-      "UPDATE topics SET latest_post = CURRENT_TIMESTAMP WHERE id = $1";
+      "UPDATE topics SET latest_post = CURRENT_TIMESTAMP, num_replies = num_replies + 1 WHERE id = $1";
     const updateQuery = await pool.query(updated, [topicId]);
     //add the post
     const q = `INSERT INTO posts VALUES(DEFAULT, $1, $2, $3, 'status', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`;

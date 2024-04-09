@@ -1,3 +1,8 @@
 .topic-frame {
     border: 1px solid black;
 }
+
+.content {
+    padding-left: 10px;
+    padding-right: 10px;
+}

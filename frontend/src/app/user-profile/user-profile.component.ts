@@ -6,7 +6,7 @@ import { TopBarComponent } from '../top-bar/top-bar.component';
 import { UserEditComponent } from '../user-edit/user-edit.component';
 import { PostListComponent } from '../post-list/post-list.component';
 import { UserProfileUploadComponent } from '../user-profile-upload/user-profile-upload.component';
-import { arrayBufferToBase64 } from '../image-helper';
+import { arrayBufferToBase64 } from '../helpers';
 import { HttpClient } from '@angular/common/http';
 
 @Component({

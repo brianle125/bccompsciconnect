@@ -7,3 +7,7 @@ export function arrayBufferToBase64(buffer : any) {
     }
     return window.btoa( binary );
 }
+
+export function unixTimeStampStringToDate(unixTime: string): Date {
+    return new Date(Math.round(parseFloat(unixTime) * 1000))
+}

@@ -7,6 +7,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { PostService } from '../post.service';
 import { forkJoin } from 'rxjs';
 import { UserService } from '../user.service';
+import { unixTimeStampStringToDate } from '../helpers';
+import { LinkData, ListOfLinksComponent } from '../list-of-links/list-of-links.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-topic',
@@ -14,9 +17,11 @@ import { UserService } from '../user.service';
   templateUrl: './topic.component.html',
   styleUrl: './topic.component.css',
   imports: [
+    CommonModule,
     PostListComponent,
     TopBarComponent,
     FormattedTextComponent,
+    ListOfLinksComponent
   ],
 })
 /**
@@ -27,6 +32,8 @@ export class TopicComponent {
   private topic: number | null = null
   public createPostLink: string | null = null
   public posts: PostData[] = []
+  public navLinks: LinkData[] = []
+  public loggedIn: boolean = false
 
   constructor(private router: Router, private activatedRoute: ActivatedRoute, private postService: PostService, private userService: UserService) {}
   ngOnInit(): void {
@@ -52,15 +59,27 @@ export class TopicComponent {
         posts: this.postService.getPostByTopicID(this.board, this.topic),
         user: this.userService.isLoggedIn()
       }).subscribe((res) => {
+        // set loggedIn
+        this.loggedIn = res.user.loggedIn
+
+        // create list of links
+        console.log(res)
+        this.navLinks = [
+          new LinkData('BcCompSciConnect', '/home'), 
+          new LinkData(res.posts.board.title, `board/${this.board}`),
+          new LinkData(res.posts.topic.question, `board/${this.board}/topic/${this.topic}`)
+        ]
+
+        // read in posts
         let userID: number | null = null
         if(res.user.loggedIn) {
           userID = res.user.id
         }
         let allPosts: PostData[] = []
           res.posts.posts.forEach((post) => {
-            let postData: PostData = new PostData(post.body, post.username, '', 'assets/user.png', post.created_at, null, null)
+            let postData: PostData = new PostData( post.body,  post.username,  '',  'assets/user.png', unixTimeStampStringToDate(post.created_at_unix),  null,  null)
             if(userID != null && post.id == userID) {
-              postData.editLink = '' // TODO implement
+              postData.editLink = `board/${this.board}/topic/${this.topic}/post/${post.id}/edit-post`
             }
             allPosts.push(postData)
           })
