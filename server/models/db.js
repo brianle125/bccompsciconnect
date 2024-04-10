@@ -128,6 +128,11 @@ const helpers = {
     return res.rows;
   },
 
+  getUserByEmail: async function (username) {
+    const q = "SELECT * FROM users WHERE email=$1";
+    const res = await pool.query(q, [username]);
+    return res.rows;
+  },
   addUser: async function (username, email, password, role, google_id) {
     const q = `INSERT INTO users VALUES(DEFAULT, $1, $2, $3, 'User has not changed bio', $4, CURRENT_TIMESTAMP, NULL, $5)`;
     const query = await pool.query(q, [

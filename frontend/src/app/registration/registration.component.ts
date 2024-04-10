@@ -33,7 +33,6 @@ export class RegistrationComponent {
         return;
     }
     
-    //CHECK IF USER EXITS IF THEY DO SEND BACK TO
     this.userService.checkUserExists(this.form.value.name).subscribe((data) => {
       let exists = data as any;
       console.log('Does it exist?' + exists.exists)
@@ -41,12 +40,23 @@ export class RegistrationComponent {
         alert('Username is taken')
         this.form.reset();
         this.router.navigate(['/register'])
+        return;
       } 
-      else {
-        this.userService.addUser(this.form.value).subscribe((data) => {
-        })
+    })
+    
+    this.userService.checkEmailExists(this.form.value.email).subscribe((data) => {
+      let exists = data as any;
+      console.log('Does it exist?' + exists.exists)
+      if(exists.exists === true) {
+        alert('Email is taken')
+        this.form.reset();
+        this.router.navigate(['/register'])
+        return;
+      } 
+    
+      this.userService.addUser(this.form.value).subscribe(() => {
         this.router.navigate(['/']);
-      }
+      });
     })
 
   }
