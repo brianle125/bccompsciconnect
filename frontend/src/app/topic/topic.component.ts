@@ -81,13 +81,13 @@ export class TopicComponent {
             let postData: PostData = new PostData(
               post.body,  
               post.username,  
-              '',  
+              `/user/${post.username}`,  
               `${api}/userimages/${post.username}`, 
               unixTimeStampStringToDate(post.created_at_unix),  
               null,  
               null
             )
-            if(userID != null && post.id == userID) {
+            if(userID != null && post.user_id == userID) {
               postData.editLink = `board/${this.board}/topic/${this.topic}/post/${post.id}/edit-post`
             }
             allPosts.push(postData)

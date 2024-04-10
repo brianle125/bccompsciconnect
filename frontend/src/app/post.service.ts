@@ -51,8 +51,6 @@ export interface GetPostType {
   created_at_unix: string,
   last_modified: string,
   last_modified_unix: string,
+  user_id: number,
   username: string,
-  description: string,
-  role: string,
-  profile_image: string | null
 }
