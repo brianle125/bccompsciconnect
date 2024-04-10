@@ -38,13 +38,6 @@ span {
     align-items: center;
 }
 
-#buttons {
-    display: flex;
-    flex-direction: row;
-    margin: 3px;
-    border-radius: 3px;
-    padding-right: 8vw;
-}
 
 button {
     margin: 3px;
