@@ -90,6 +90,10 @@ export class UserProfileComponent implements OnInit {
     this.router.navigate([`/user/${this.userData.username}/edit`]);
   }
 
+  goToPosts() {
+    this.router.navigate([`/user/${this.userData.username}`])
+  }
+
 }
 
 export class UserProfileData {
