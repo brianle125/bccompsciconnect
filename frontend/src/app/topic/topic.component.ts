@@ -83,12 +83,15 @@ export class TopicComponent {
               post.username,  
               `/user/${post.username}`,  
               `${api}/userimages/${post.username}`, 
-              unixTimeStampStringToDate(post.created_at_unix),  
+              new Date(post.created_at),
               null,  
               null
             )
             if(userID != null && post.user_id == userID) {
               postData.editLink = `board/${this.board}/topic/${this.topic}/post/${post.id}/edit-post`
+            }
+            if(Math.abs(parseFloat(post.last_modified_unix) - parseFloat(post.created_at_unix)) > 5) {
+              postData.edited = new Date(post.last_modified)
             }
             allPosts.push(postData)
           })
