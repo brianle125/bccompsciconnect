@@ -13,7 +13,9 @@ import { Observable } from 'rxjs';
   templateUrl: './topic-text-editor.component.html',
   styleUrl: './topic-text-editor.component.css'
 })
-
+/**
+ * Form for creating topics
+ */
 export class TopicTextEditorComponent {
   public static TEXT_INPUT = 'text-input'
   public static TOPIC_TITLE = 'topic-title'
