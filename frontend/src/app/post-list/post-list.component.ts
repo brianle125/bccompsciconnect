@@ -17,14 +17,6 @@ export class PostListComponent {
   @Input() public posts: PostData[] = []
 
   constructor(private postService: PostService, private userService: UserService) {}
-  
-  returnastring(username: any) {
-    let exists = false;
-    if(exists) {
-      return api + '/userimages/' + username;
-    }
-    return 'assets/user.png'
-  }
 }
 
 export class PostData {
