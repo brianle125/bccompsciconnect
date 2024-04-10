@@ -58,7 +58,7 @@ export class LoginComponent implements OnInit {
     this.userService.googleAuthUser(payload).subscribe();
     
     this.router.navigate(['/home']).then(() => {
-      alert("Logged in!")
+      alert("logged in!")
       window.location.reload();
     });
   }
