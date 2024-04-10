@@ -44,7 +44,7 @@ export class TopicTextEditorComponent {
   // }
 
   public onSubmit(val: any): void {
-    this.formSubmitted.emit(new TitleAndPost(val[TopicTextEditorComponent.TEXT_INPUT], val[TopicTextEditorComponent.TOPIC_TITLE]))
+    this.formSubmitted.emit(new TitleAndPost(val[TopicTextEditorComponent.TOPIC_TITLE], val[TopicTextEditorComponent.TEXT_INPUT]))
   }
 
   public onPreviewClicked(): void {
