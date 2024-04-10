@@ -432,6 +432,11 @@ app.delete("/api/board/:boardId/topic/:topicId", async (req, res) => {
   res.redirect(302, `/api/board/${boardId}`);
 });
 
+app.post("/api/topic/delete", async (req,res) => {
+    let topicId =  req.body.id;
+    await db.helpers.deleteTopic(topicId);
+})
+
 const postPostSchema = joi.object({
   text: joi.string().required(),
 });
