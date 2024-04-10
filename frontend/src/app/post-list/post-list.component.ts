@@ -12,6 +12,10 @@ import { UserService } from '../user.service';
   templateUrl: './post-list.component.html',
   styleUrl: './post-list.component.css'
 })
+
+/**
+ * Display a list of posts
+ */
 export class PostListComponent {
   api: string = api
   @Input() public posts: PostData[] = []

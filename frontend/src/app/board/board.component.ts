@@ -62,15 +62,20 @@ export class BoardComponent implements OnInit {
         let tempTopics: TopicListEntry[] = []
         for(let i = 0; i < data.board.topics.length; i++) {
           let target = data.board.topics[i]
-          tempTopics.push(new TopicListEntry(
+          let topicEntry: TopicListEntry = new TopicListEntry(
             target.question, 
             target.username, 
             target.num_views, 
             target.num_replies, 
-            unixTimeStampStringToDate(target.created_at_unix), 
-            unixTimeStampStringToDate(target.latest_post_unix), 
+            new Date(target.created_at), 
+            new Date(target.latest_post), 
             `/board/${this.boardId}/topic/${target.id}`
-          ))
+          )
+          if(topicEntry.title.length > 50) {
+            topicEntry.title = topicEntry.title.slice(0, 50) + '...'
+          }
+          tempTopics.push(topicEntry)
+          
           this.topics = tempTopics
         }
       }

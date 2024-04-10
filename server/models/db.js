@@ -304,7 +304,9 @@ const helpers = {
   },
 
   getPost: async function (postId) {
-    const q = `SELECT *, 
+    const q = `SELECT posts.*, 
+      public_user_info.id AS user_id,
+      public_user_info.username,
       EXTRACT(EPOCH FROM posts.created_at) AS created_at_unix, 
       EXTRACT(EPOCH FROM posts.last_modified) AS last_modified_unix
       FROM posts JOIN public_user_info ON posts.created_by = public_user_info.id 
@@ -315,7 +317,9 @@ const helpers = {
   },
 
   getPosts: async function (topicId) {
-    const q = `SELECT *,
+    const q = `SELECT posts.*, 
+      public_user_info.id AS user_id,
+      public_user_info.username,
       EXTRACT(EPOCH FROM posts.created_at) AS created_at_unix, 
       EXTRACT(EPOCH FROM posts.last_modified) AS last_modified_unix
       FROM posts JOIN public_user_info ON posts.created_by = public_user_info.id 

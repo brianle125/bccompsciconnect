@@ -56,7 +56,6 @@ export class LoginComponent implements OnInit {
   async handleCredentialResponse(response: any) {
     const payload = await this.decodeJWTToken(response.credential)
     this.userService.googleAuthUser(payload).subscribe();
-    
     this.router.navigate(['/home']).then(() => {
       alert("logged in!")
       window.location.reload();
@@ -70,9 +69,9 @@ export class LoginComponent implements OnInit {
       if(response.body.status === "success") {
         // Navigate to the home page if the user is found
         this.router.navigate(['/home']);
-      } else {
-        alert("Email or password incorrect.");
-        window.location.reload();
+      } else if(response.body.status === "failed") {
+        alert("User/pass not found.");
+        this.router.navigate(['/register']);
       } 
     })
   }

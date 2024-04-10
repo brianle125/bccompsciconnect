@@ -37,7 +37,7 @@ export class EditPostComponent implements OnInit{
     // if(!Number.isNaN(id))
     this.boardID = parseInt(tempBoardID)
     this.topicID = parseInt(tempTopicID)
-    this.postID = parseInt(tempBoardID)
+    this.postID = parseInt(tempPostID)
 
     this.postService.getPost(this.boardID, this.topicID, this.postID).subscribe({
       next:(val)=>{this.originalMessage = val.body},
