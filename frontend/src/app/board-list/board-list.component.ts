@@ -78,6 +78,13 @@ export class BoardList implements OnInit{
   deleteBoard(id: number) {
     console.log("Clicked on delete: " + id);
     const page = this.pages.find(page => page.order === id);
+    if(page) {
+      this.boardService.deleteBoard(id).subscribe((data)=> {
+        let response = data as any;
+        console.log(response);
+      })
+      window.location.reload();
+    }
   }
 
 

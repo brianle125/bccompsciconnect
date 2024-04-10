@@ -349,6 +349,11 @@ app.post("/api/board/pin", async (req, res) => {
   }
 });
 
+app.post("/api/board/delete", async (req, res) => {
+  let id = req.body.id;
+  await db.helpers.deleteBoard(id);
+});
+
 app.get("/api/board/:id/latest", async (req, res) => {
   try {
     let id = req.params.id;
