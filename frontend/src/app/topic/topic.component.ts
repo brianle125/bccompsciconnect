@@ -10,6 +10,7 @@ import { UserService } from '../user.service';
 import { unixTimeStampStringToDate } from '../helpers';
 import { LinkData, ListOfLinksComponent } from '../list-of-links/list-of-links.component';
 import { CommonModule } from '@angular/common';
+import { api } from '../common-strings';
 
 @Component({
   selector: 'app-topic',
@@ -77,13 +78,22 @@ export class TopicComponent {
         }
         let allPosts: PostData[] = []
           res.posts.posts.forEach((post) => {
-            let postData: PostData = new PostData( post.body,  post.username,  '',  'assets/user.png', unixTimeStampStringToDate(post.created_at_unix),  null,  null)
+            let postData: PostData = new PostData(
+              post.body,  
+              post.username,  
+              '',  
+              `${api}/userimages/${post.username}`, 
+              unixTimeStampStringToDate(post.created_at_unix),  
+              null,  
+              null
+            )
             if(userID != null && post.id == userID) {
               postData.editLink = `board/${this.board}/topic/${this.topic}/post/${post.id}/edit-post`
             }
             allPosts.push(postData)
           })
           this.posts = allPosts
+         
       })
     }
     

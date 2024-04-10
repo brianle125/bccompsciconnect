@@ -4,8 +4,9 @@
       <div class="profile-pic-frame">
         <img
           class="profile-pic"
-          [src]="'http://localhost:8080/api/userimages/' + post.username"
+          [src]="post.profileLink"
           [alt]="post.username + '-profile-pic'"
+          onerror="console.error('failed to get ', this.src); this.src = 'assets/user.png'"
         />
       </div>
       <div class="dates-section">
