@@ -55,7 +55,7 @@ export class RegistrationComponent {
       } 
     
       this.userService.addUser(this.form.value).subscribe(() => {
-        this.router.navigate(['/']);
+        this.router.navigate(['/login']);
       });
     })
 

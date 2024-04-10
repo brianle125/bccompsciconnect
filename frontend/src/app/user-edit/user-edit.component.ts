@@ -109,6 +109,7 @@ export class UserEditComponent implements OnInit {
     //If username belongs to someone else stop edit, otherwise continue
     this.userService.isLoggedIn().subscribe((data) => {
       let response = data as any;
+  
       this.userService
         .checkUserExists(this.form.value.username)
         .subscribe((data) => {
@@ -117,7 +118,14 @@ export class UserEditComponent implements OnInit {
             alert('Username is taken');
             this.form.reset();
           } else {
-            this.userService
+            this.userService.checkEmailExists(this.form.value.email).subscribe((data) => {
+              let exists = data as any;
+              if(exists.exists === true) {
+                alert('Email is taken')
+                this.form.reset();
+                this.router.navigate([`/user/${username}/edit`])
+              } else {
+                this.userService
               .editUserProfile(username, this.form.value)
               .subscribe();
             this.router
@@ -126,6 +134,9 @@ export class UserEditComponent implements OnInit {
                 alert('User details successfully edited!');
                 window.location.reload();
               });
+              }
+            })
+
           }
         });
     });
