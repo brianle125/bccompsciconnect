@@ -3,6 +3,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { PostService } from '../post.service';
 import { FormattedTextComponent } from '../formatted-text/formatted-text.component';
 import { api } from '../common-strings';
+import { UserService } from '../user.service';
 
 @Component({
   selector: 'app-post-list',
@@ -12,10 +13,18 @@ import { api } from '../common-strings';
   styleUrl: './post-list.component.css'
 })
 export class PostListComponent {
+  api: string = api
   @Input() public posts: PostData[] = []
 
-  constructor(private postService: PostService) {}
-
+  constructor(private postService: PostService, private userService: UserService) {}
+  
+  returnastring(username: any) {
+    let exists = false;
+    if(exists) {
+      return api + '/userimages/' + username;
+    }
+    return 'assets/user.png'
+  }
 }
 
 export class PostData {

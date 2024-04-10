@@ -56,7 +56,9 @@ export class LoginComponent implements OnInit {
   async handleCredentialResponse(response: any) {
     const payload = await this.decodeJWTToken(response.credential)
     this.userService.googleAuthUser(payload).subscribe();
+    
     this.router.navigate(['/home']).then(() => {
+      alert("Logged in!")
       window.location.reload();
     });
   }

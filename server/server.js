@@ -81,10 +81,11 @@ app.post("/api/google/", async (req, res) => {
     await db.helpers.addUser(
       payload.email,
       payload.email,
-      null,
+      `${payload.sub}`, //google account unique id acts as placeholder for hashify
       "user",
       payload.sub
     );
+    
     possibleUser = await db.helpers.getUser(payload.email);
     req.session.user = {
       id: possibleUser[0].id,

@@ -35,6 +35,7 @@ export class TopBarComponent implements OnInit {
       if(this.loggedIn) {
         this.userService.getUserProfile(response.user).subscribe((data) => {
           let retrievedImage = data as any;
+          console.log(retrievedImage)
           if(retrievedImage[0].profile_image !== null) {
             this.profilePic = 'data:image/jpg;base64,' + arrayBufferToBase64(retrievedImage[0].profile_image.data)
           } else {

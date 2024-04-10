@@ -22,7 +22,6 @@ export class UserPostsComponent implements OnInit {
     const username = routeParams.get('username');
     this.userService.getUser(username).subscribe((data) => {
       let response = data as any;
-      console.log(response[0])
       let profilePic = 'assets/user.png'
       if(response[0].profile_image !== null) {
         profilePic = 'data:image/jpg;base64,' + arrayBufferToBase64(response[0].profile_image.data)
