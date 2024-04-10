@@ -39,24 +39,24 @@ export class RegistrationComponent {
       if(exists.exists === true) {
         alert('Username is taken')
         this.form.reset();
-        this.router.navigate(['/register'])
+        this.router.navigate(['/register']);
         return;
+      } else {
+        this.userService.checkEmailExists(this.form.value.email).subscribe((data) => {
+          let exists = data as any;
+          console.log('Does it exist?' + exists.exists)
+          if(exists.exists === true) {
+            alert('Email is taken')
+            this.form.reset();
+            this.router.navigate(['/register'])
+            return;
+          } else {
+            this.userService.addUser(this.form.value).subscribe(() => {
+              this.router.navigate(['/']);
+            });
+          } 
+        })
       } 
-    })
-    
-    this.userService.checkEmailExists(this.form.value.email).subscribe((data) => {
-      let exists = data as any;
-      console.log('Does it exist?' + exists.exists)
-      if(exists.exists === true) {
-        alert('Email is taken')
-        this.form.reset();
-        this.router.navigate(['/register'])
-        return;
-      } 
-    
-      this.userService.addUser(this.form.value).subscribe(() => {
-        this.router.navigate(['/']);
-      });
     })
 
   }
