@@ -28,6 +28,10 @@ export class RegistrationComponent {
     console.log(this.form.value.name)
     console.log(this.form.value.email)
     console.log(this.form.value.password)
+    if(this.form.value.confirm_password != this.form.value.password) {
+        alert("Passwords do not match.")
+        return;
+    }
     
     //CHECK IF USER EXITS IF THEY DO SEND BACK TO
     this.userService.checkUserExists(this.form.value.name).subscribe((data) => {
@@ -39,7 +43,6 @@ export class RegistrationComponent {
         this.router.navigate(['/register'])
       } 
       else {
-        console.log("ADDING USER")
         this.userService.addUser(this.form.value).subscribe((data) => {
         })
         this.router.navigate(['/']);

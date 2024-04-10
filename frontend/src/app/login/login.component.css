@@ -3,7 +3,6 @@ main {
     height: 100vh;
     background-color: #ffffff;
     display: flex;
-    justify-content: center;
     align-items: center;
     flex-direction: column;
     font-family: Arial, sans-serif;
@@ -34,4 +33,10 @@ form {
 
 label {
     font-weight: bold;
+}
+
+img {
+    height: 30%;
+    width: fit-content;
+    background-color: black;
 }
