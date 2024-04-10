@@ -1,10 +1,13 @@
 <!-- <app-page-bar *ngFor="let page of pages;"></app-page-bar> -->
 <main>
-  <section id="pinned-boards">
-    <span><h1>Pinned Boards</h1><button class="btn btn-primary" (click)="createBoard()" *ngIf="loggedIn">Create Board</button></span>
-    <section *ngFor="let page of pinned_pages" class="col-sm-12 page">
+  <section class="display-boards">
+    <span>
+      <h1>Pinned Boards</h1>
+      <button class="btn btn-primary" (click)="createBoard()" *ngIf="loggedIn">Create Board</button>
+    </span>
+    <section *ngFor="let page of pinned_pages" class="board">
       <div class="image-frame">
-        <img src="{{ page.icon }}" class="icon" />
+        <img [src]="page.icon" class="icon" />
       </div>
       <div class="text">
         <h2>
@@ -12,17 +15,16 @@
         </h2>
         <p>{{ page.description }}</p>
       </div>
-      <button id="pin-button"class="btn btn-light" *ngIf="loggedIn" (click)="pin(page.order)">Unpin</button>
+      <button id="pin-button" class="btn btn-light" *ngIf="loggedIn" (click)="pin(page.order)">Unpin</button>
     </section>
   </section>
-  <section id="all-boards">
+  <section class="display-boards">
     <span>
       <h1>Boards</h1>
-      
     </span>
-    <section *ngFor="let page of pages" class="col-sm-12 page">
+    <section *ngFor="let page of pages" class="board">
       <div class="image-frame">
-        <img src="{{ page.icon }}" class="icon" />
+        <img [src]="page.icon" class="icon" />
       </div>
       <div class="text">
         <h2>
@@ -30,7 +32,7 @@
         </h2>
         <p>{{ page.description }}</p>
       </div>
-      <button id="pin-button"class="btn btn-light" *ngIf="loggedIn" (click)="pin(page.order)">Pin</button>
+      <button id="pin-button" class="btn btn-light" *ngIf="loggedIn" (click)="pin(page.order)">Pin</button>
     </section>
   </section>
 </main>
