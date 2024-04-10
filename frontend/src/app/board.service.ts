@@ -43,6 +43,10 @@ export class BoardService {
     return this.http.post(`${api}/add/board`, {'boardTitle': title, 'boardDescription': description}, { withCredentials: true })
   }
 
+  deleteBoard(id: any) {
+    return this.http.post(`${api}/board/delete`, { id: id }, { withCredentials: true })
+  }
+
   addSampleBoards() {
     // for testing
     this.addBoard('Courses', 'Discuss course related problems.', 0)

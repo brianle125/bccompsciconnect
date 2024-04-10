@@ -27,6 +27,7 @@ export class BoardComponent implements OnInit {
   public boardTitle: string = ''
   public description: string = ''
   public loggedIn: boolean = false
+  public isAdmin: boolean = false;
 
   // constructor for the route that creates topics
   constructor(private router: Router, private activatedRoute: ActivatedRoute, private boardService: BoardService, private userService: UserService) {}
@@ -45,7 +46,7 @@ export class BoardComponent implements OnInit {
         console.log(data)
         // logged in
         this.loggedIn = data.user.loggedIn
-
+        this.isAdmin = data.user.role === 'admin';
         // set up title and description
         let board = data.board.board
         this.boardTitle = board.title

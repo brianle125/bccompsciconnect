@@ -3,6 +3,9 @@ import { Component, Input, OnInit } from '@angular/core';
 import { BoardService } from '../board.service';
 import { ActivatedRoute } from '@angular/router';
 import { unixTimeStampStringToDate } from '../helpers';
+import { UserService } from '../user.service';
+import { TopicService } from '../topic.service';
+import { last } from 'rxjs';
 
 @Component({
   selector: 'app-topic-list',
@@ -14,9 +17,33 @@ import { unixTimeStampStringToDate } from '../helpers';
 /**
  * Component to list topics
  */
-export class TopicListComponent {
+export class TopicListComponent implements OnInit {
   @Input() topics: TopicListEntry[] = []
-  constructor() {}
+  public loggedIn = false;
+  public isAdmin = false;
+  public loggedInUser = "";
+  constructor(private userService: UserService, private topicService: TopicService) {
+  }
+
+  ngOnInit() {
+    this.userService.isLoggedIn().subscribe((data: any) => {
+      this.loggedIn = data.loggedIn;
+      this.isAdmin = data.role === 'admin';
+      this.loggedInUser = data.user;
+      console.log(data)
+    });
+  }
+
+  deleteTopic(data: any) {
+      console.log(data.link);
+      const topicId = parseInt(data.link);
+      const lastChar = data.link.charAt(data.link.length - 1);
+      console.log(parseInt(lastChar));
+      this.topicService.deleteTopic(parseInt(lastChar)).subscribe((data:any)=> {
+          
+      })
+      window.location.reload()
+  }
 }
 
 export class TopicListEntry {

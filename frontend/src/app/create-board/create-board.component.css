@@ -15,3 +15,7 @@ textarea {
     height: 40%;
     margin-bottom: 3px ;
 }
+
+#btn btn-primary btn-block {
+    background-color: blue;
+}
