@@ -403,6 +403,7 @@ app.get("/api/board/:boardId/topic/:topicId", async (req, res) => {
   const posts = await db.helpers.getPosts(topicId);
   const postCount = await db.helpers.getPostCount(topicId);
   await db.helpers.addViewToTopic(topicId);
+  console.log(posts)
   //Subject to change; this just bundles the topic and associated Posts together
   res.json({
     board: board,

@@ -11,6 +11,10 @@ import { api } from '../common-strings';
   templateUrl: './post-list.component.html',
   styleUrl: './post-list.component.css'
 })
+
+/**
+ * Display a list of posts
+ */
 export class PostListComponent {
   @Input() public posts: PostData[] = []
 

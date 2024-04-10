@@ -10,6 +10,9 @@ import { arrayBufferToBase64 } from '../helpers';
   templateUrl: './top-bar.component.html',
   styleUrl: './top-bar.component.css'
 })
+/**
+ * The navigation bar at the top of most screens
+ */
 export class TopBarComponent implements OnInit {
   loggedIn: boolean = false;
   isAdmin: boolean = false;
