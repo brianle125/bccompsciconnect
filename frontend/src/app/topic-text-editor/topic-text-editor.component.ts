@@ -34,15 +34,6 @@ export class TopicTextEditorComponent {
     return this.form.controls[TopicTextEditorComponent.TEXT_INPUT].getRawValue();
   }
 
-  // ngOnChanges(changes: SimpleChanges): void {
-  //   console.log(changes)
-  //   if(changes['defaultText'] != undefined) {
-  //     this.form.get(RecipeFormComponent.RECIPE_NAME)?.setValue(this.defaultText.name)
-  //     this.form.get(RecipeFormComponent.RECIPE_INGREDIENTS)?.setValue(this.defaultText.ingredients)
-  //     this.form.get(RecipeFormComponent.RECIPE_INSTRUCTIONS)?.setValue(this.defaultText.instructions)
-  //   }
-  // }
-
   public onSubmit(val: any): void {
     this.formSubmitted.emit(new TitleAndPost(val[TopicTextEditorComponent.TOPIC_TITLE], val[TopicTextEditorComponent.TEXT_INPUT]))
   }
