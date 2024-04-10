@@ -10,7 +10,6 @@ import { UserService } from '../user.service';
 import { unixTimeStampStringToDate } from '../helpers';
 import { LinkData, ListOfLinksComponent } from '../list-of-links/list-of-links.component';
 import { CommonModule } from '@angular/common';
-import { api } from '../common-strings';
 
 @Component({
   selector: 'app-topic',
@@ -78,18 +77,12 @@ export class TopicComponent {
         }
         let allPosts: PostData[] = []
           res.posts.posts.forEach((post) => {
-            let file = 'assets/user.png'
-            this.userService.getUserProfile(post.username).subscribe((data) => {
-              let image = data as any
-              if(image[0].profile_image !== null) {
-                file = api + '/userimages/' + post.username
-              }
-              let postData: PostData = new PostData( post.body,  post.username,  `/user/${post.username}`,  file, unixTimeStampStringToDate(post.created_at_unix),  null,  null)
-              if(userID != null && post.id == userID) {
-                postData.editLink = `board/${this.board}/topic/${this.topic}/post/${post.id}/edit-post`
-              }
-              allPosts.push(postData)
-            })
+            let time = new Date(post.created_at).getTime() / 1000
+            let postData: PostData = new PostData( post.body,  post.username,  `/user/${post.username}`,  'assets/user.png', unixTimeStampStringToDate(time.toString()),  null,  null)
+            if(userID != null && post.id == userID) {
+              postData.editLink = `board/${this.board}/topic/${this.topic}/post/${post.id}/edit-post`
+            }
+            allPosts.push(postData)
           })
           this.posts = allPosts
       })
