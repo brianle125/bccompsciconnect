@@ -39,6 +39,14 @@ export class LoginComponent implements OnInit {
     );
     // @ts-ignore
     google.accounts.id.prompt((notification: PromptMomentNotification) => {});
+
+
+    this.userService.isLoggedIn().subscribe((data) => {
+      let response = data as any;
+      if(response.loggedIn) {
+        this.router.navigate(['/home'])
+      }
+    })
   }
   
   async decodeJWTToken(token: any){
@@ -48,7 +56,8 @@ export class LoginComponent implements OnInit {
   async handleCredentialResponse(response: any) {
     const payload = await this.decodeJWTToken(response.credential)
     this.userService.googleAuthUser(payload).subscribe();
-    this.router.navigate(['/']).then(() => {
+    this.router.navigate(['/home']).then(() => {
+      alert("logged in!")
       window.location.reload();
     });
   }
@@ -63,7 +72,7 @@ export class LoginComponent implements OnInit {
       } else {
         alert("Email or password incorrect.");
         window.location.reload();
-      } 
+      }
     })
   }
 

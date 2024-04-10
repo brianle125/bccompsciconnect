@@ -1,9 +1,11 @@
 const { Pool } = require("pg");
 require("dotenv").config();
 
+const argon2 = require('argon2')
+
 const pool = new Pool({
   user: "postgres",
-  host: "localhost" || process.env.DB_HOST,
+  host: 'localhost' || process.env.DB_HOST,
   database: "testing",
   password: process.env.LOCAL_PASS,
 });
@@ -31,15 +33,14 @@ const helpers = {
       num_replies integer,
       num_views integer,
       PRIMARY KEY(id), 
-      CONSTRAINT fk_user FOREIGN KEY (created_by) REFERENCES users(id), 
-      CONSTRAINT fk_board FOREIGN KEY (boardid) REFERENCES boards(id) 
-      ON DELETE CASCADE
+      CONSTRAINT fk_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE, 
+      CONSTRAINT fk_board FOREIGN KEY (boardid) REFERENCES boards(id) ON DELETE CASCADE
     )`;
     const users = `CREATE TABLE IF NOT EXISTS users (
       id SERIAL, 
       username varchar(255), 
       email varchar(255), 
-      password varchar(1000),
+      password varchar(100),
       description varchar(500),
       role varchar(255), 
       created_at timestamp,
@@ -57,9 +58,8 @@ const helpers = {
       created_at timestamp, 
       last_modified timestamp, 
       PRIMARY KEY(id), 
-      CONSTRAINT fk_user FOREIGN KEY (created_by) REFERENCES users(id),
-      CONSTRAINT fk_topic FOREIGN KEY(topicid) REFERENCES topics(id) 
-      ON DELETE CASCADE
+      CONSTRAINT fk_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE,
+      CONSTRAINT fk_topic FOREIGN KEY(topicid) REFERENCES topics(id) ON DELETE CASCADE
     )`;
     const login = `CREATE TABLE IF NOT EXISTS login (
       id SERIAL, 
@@ -84,9 +84,8 @@ const helpers = {
       userid integer,
       content_type varchar(400),
       PRIMARY KEY(id), 
-      CONSTRAINT fk_user_id FOREIGN KEY (userid) REFERENCES users(id),
-      CONSTRAINT fk_post_id FOREIGN KEY(postid) REFERENCES posts(id) 
-      ON DELETE CASCADE
+      CONSTRAINT fk_user_id FOREIGN KEY (userid) REFERENCES users(id) ON DELETE CASCADE,
+      CONSTRAINT fk_post_id FOREIGN KEY(postid) REFERENCES posts(id) ON DELETE CASCADE
     )`;
 
     // stuff that's ok to send to everyone
@@ -138,7 +137,7 @@ const helpers = {
     const query = await pool.query(q, [
       username,
       email,
-      password,
+      await argon2.hash(password),
       role,
       google_id,
     ]);
@@ -152,7 +151,7 @@ const helpers = {
     oldUsername
   ) {
     const q = `UPDATE users SET username=$1, email=$2, password=$3, description=$4 WHERE username = '${oldUsername}'`;
-    const query = await pool.query(q, [username, email, password, description]);
+    const query = await pool.query(q, [username, email, await argon2.hash(password), description]);
   },
 
   editUserById: async function (id, username, role) {
@@ -310,7 +309,9 @@ const helpers = {
   },
 
   getPost: async function (postId) {
-    const q = `SELECT *, 
+    const q = `SELECT posts.*, 
+      public_user_info.id AS user_id,
+      public_user_info.username,
       EXTRACT(EPOCH FROM posts.created_at) AS created_at_unix, 
       EXTRACT(EPOCH FROM posts.last_modified) AS last_modified_unix
       FROM posts JOIN public_user_info ON posts.created_by = public_user_info.id 
@@ -321,12 +322,20 @@ const helpers = {
   },
 
   getPosts: async function (topicId) {
-    const q = `SELECT *,
+    const q = `SELECT posts.*, 
+      public_user_info.id AS user_id,
+      public_user_info.username,
       EXTRACT(EPOCH FROM posts.created_at) AS created_at_unix, 
       EXTRACT(EPOCH FROM posts.last_modified) AS last_modified_unix
       FROM posts JOIN public_user_info ON posts.created_by = public_user_info.id 
       WHERE posts.topicid = $1 ORDER BY posts.created_at`
     const res = await pool.query(q, [topicId]);
+    return res.rows;
+  },
+
+  getPostsByUser: async function(userId) {
+    const q = `SELECT * from posts WHERE created_by = $1 ORDER BY created_by`
+    const res = await pool.query(q, [userId])
     return res.rows;
   },
 
@@ -395,9 +404,15 @@ const helpers = {
     return res.rows;
   },
 
-  getProfilePictures: async function () {
-    const res = `SELECT * from userProfiles`;
-    return res.rows;
+  getProfilePictureById: async function(id) {
+    const q = `SELECT profile_image from users WHERE id = $1`
+    const res = await pool.query(q, [id]);
+    return res.rows
+  },
+
+  getProfilePictures: async function() {
+    const res = `SELECT * from userProfiles`
+    return res.rows
   },
 
   // get user images
@@ -490,6 +505,10 @@ const helpers = {
       throw err; // Rethrow or handle as preferred
     }
   },
+
+  checkPassword: async function(hash, plainTextPassword) {
+    return await argon2.verify(hash, plainTextPassword)
+  }
 };
 
 module.exports = { helpers };

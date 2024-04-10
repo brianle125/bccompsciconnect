@@ -103,24 +103,12 @@ export class UserEditComponent implements OnInit {
     const username = routeParams.get('username');
 
     if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
-    console.log(this.form.value);
-
-    this.userService.editUserProfile(username, this.form.value).subscribe();
-    // this.userService.editUserProfileUsername(username, this.form.value).subscribe()
-    // this.userService.editUserProfileDescription(username, this.form.value).subscribe()
-    // this.userService.editUserProfileEmail(username, this.form.value).subscribe()
-    // this.userService.editUserProfilePassword(username, this.form.value).subscribe()
-
-    this.router.navigate([`/user/${this.form.value.username}`]).then(() => {
-      alert('User details successfully edited!');
-      window.location.reload();
-    });
     //If username belongs to someone else stop edit, otherwise continue
     this.userService.isLoggedIn().subscribe((data) => {
       let response = data as any;
-
       this.userService
         .checkUserExists(this.form.value.username)
         .subscribe((data) => {
@@ -141,6 +129,7 @@ export class UserEditComponent implements OnInit {
           }
         });
     });
+    
 
     //Otherwise edit is granted
   }

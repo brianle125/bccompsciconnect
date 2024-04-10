@@ -10,6 +10,9 @@ import { arrayBufferToBase64 } from '../helpers';
   templateUrl: './top-bar.component.html',
   styleUrl: './top-bar.component.css'
 })
+/**
+ * The navigation bar at the top of most screens
+ */
 export class TopBarComponent implements OnInit {
   loggedIn: boolean = false;
   isAdmin: boolean = false;
@@ -35,6 +38,7 @@ export class TopBarComponent implements OnInit {
       if(this.loggedIn) {
         this.userService.getUserProfile(response.user).subscribe((data) => {
           let retrievedImage = data as any;
+          console.log(retrievedImage)
           if(retrievedImage[0].profile_image !== null) {
             this.profilePic = 'data:image/jpg;base64,' + arrayBufferToBase64(retrievedImage[0].profile_image.data)
           } else {

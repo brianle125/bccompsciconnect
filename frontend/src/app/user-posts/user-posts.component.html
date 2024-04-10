@@ -1,0 +1,5 @@
+<div class="post-history">
+    <h2>Post History</h2>
+    <app-post-list [posts]="posts"></app-post-list>
+    <div *ngIf="posts.length == 0"><p>User has not posted</p></div>
+</div>

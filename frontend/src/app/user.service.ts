@@ -69,14 +69,13 @@ export class UserService {
   }
 
   uploadUserProfile(image: any): Observable<any> {
-    alert(image);
     return this.http.post(`${api}/uploadprofile`, image, {
       withCredentials: true,
     });
   }
 
-  getUserProfile(userid: any): Observable<any> {
-    return this.http.get(`${api}/getprofile/${userid}`, {
+  getUserProfile(username: any): Observable<any> {
+    return this.http.get(`${api}/getprofile/${username}`, {
       withCredentials: true,
     });
   }
@@ -84,7 +83,7 @@ export class UserService {
   // this will fetch the image directly from the database
   // In user.service.ts
   getUserProfileImage(username: string): Observable<any> {
-    return this.http.get(`/api/userimages/${username}`);
+    return this.http.get(`/api/userimages/${username}`, {withCredentials: true});
   }
 
   //google auth

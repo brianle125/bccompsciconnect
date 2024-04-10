@@ -12,6 +12,7 @@ import { PostListComponent } from './post-list/post-list.component';
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
 import { authGuard } from './auth.guard';
 import { sessionGuard } from './session.guard';
+import { UserPostsComponent } from './user-posts/user-posts.component';
 import { EditPostComponent } from './edit-post/edit-post.component';
 import { LandingPageComponent } from './landing-page/landing-page.component';
 import { CreateBoardComponent } from './create-board/create-board.component';
@@ -29,7 +30,8 @@ export const routes: Routes = [
   { path: 'create-topic', component: CreateTopicComponent },
   { path: 'create-board', component: CreateBoardComponent, canActivate: [authGuard] },
   { path: 'user/:username', component: UserProfileComponent},
+  { path: 'user/:username/posts', component: UserPostsComponent},
   {path: 'admin/dashboard', component: AdminDashboardComponent, canActivate: [authGuard]},
-  // tentative
-  { path: 'user/:username/edit', component: UserEditComponent, canActivate: [sessionGuard]}
+  { path: 'user/:username/edit', component: UserEditComponent, canActivate: [sessionGuard]},
+
 ];
