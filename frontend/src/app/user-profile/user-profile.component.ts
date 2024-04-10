@@ -8,6 +8,7 @@ import { PostListComponent } from '../post-list/post-list.component';
 import { UserProfileUploadComponent } from '../user-profile-upload/user-profile-upload.component';
 import { arrayBufferToBase64 } from '../helpers';
 import { HttpClient } from '@angular/common/http';
+import { PostService } from '../post.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -37,6 +38,7 @@ export class UserProfileComponent implements OnInit {
 
   constructor(
     private userService: UserService,
+    private postService: PostService,
     private route: ActivatedRoute,
     private router: Router,
     private http: HttpClient
@@ -71,19 +73,25 @@ export class UserProfileComponent implements OnInit {
           this.user[0].description,
           `/user/${username}/posts`
         );
+        
 
         // Check if the icon needs conversion (i.e., it's a Blob)
         if(this.user[0].profile_image !== null) {
           if(this.user[0].profile_image.type === 'Buffer') {
             this.userData.icon = 'data:image/jpg;base64,' + arrayBufferToBase64(this.user[0].profile_image.data)
           } 
-        } 
+        }
       });
     }
+    
   }
 
   editUser() {
     this.router.navigate([`/user/${this.userData.username}/edit`]);
+  }
+
+  goToPosts() {
+    this.router.navigate([`/user/${this.userData.username}`])
   }
 
 }
