@@ -3,7 +3,7 @@
   <section class="display-boards">
     <span>
       <h1>Pinned Boards</h1>
-      <button class="btn btn-primary" (click)="createBoard()" *ngIf="loggedIn">Create Board</button>
+      <button class="btn btn-primary" (click)="createBoard()" *ngIf="isAdmin">Create Board</button>
     </span>
     <section *ngFor="let page of pinned_pages" class="board">
       <div class="image-frame">
@@ -15,7 +15,7 @@
         </h2>
         <p>{{ page.description }}</p>
       </div>
-      <button id="pin-button" class="btn btn-light" *ngIf="loggedIn" (click)="pin(page.order)">Unpin</button>
+      <button id="pin-button" class="btn btn-light" *ngIf="isAdmin" (click)="pin(page.order)">Unpin</button>
     </section>
   </section>
   <section class="display-boards">
@@ -32,7 +32,8 @@
         </h2>
         <p>{{ page.description }}</p>
       </div>
-      <button id="pin-button" class="btn btn-light" *ngIf="loggedIn" (click)="pin(page.order)">Pin</button>
+      <button id="pin-button" class="btn btn-light" *ngIf="isAdmin" (click)="pin(page.order)">Pin</button>
+      <button id="pin-button" class="btn btn-light" *ngIf="isAdmin" (click)="deleteBoard(page.order)">Delete</button>
     </section>
   </section>
 </main>

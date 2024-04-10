@@ -30,6 +30,7 @@ main {
     font-family: Helvetica, Arial, sans-serif;
     font-weight: bold;
     border: 5px rebeccapurple;
+    user-select: none; 
 }
 
 span {
