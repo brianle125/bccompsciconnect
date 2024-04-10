@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { TopBarComponent } from "../top-bar/top-bar.component";
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { BoardService } from '../board.service';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-create-board',
@@ -12,7 +13,7 @@ import { BoardService } from '../board.service';
 })
 export class CreateBoardComponent {
     form: FormGroup
-    constructor(private boardService: BoardService) {
+    constructor(private boardService: BoardService, private router: Router ) {
         let formControls = {
             title: new FormControl('',[ Validators.required, Validators.nullValidator, ]),
             description: new FormControl('',[ Validators.required, Validators.nullValidator]),
@@ -25,6 +26,7 @@ export class CreateBoardComponent {
         console.log(this.form.value.description);
         this.boardService.addBoard1(this.form.value.title, this.form.value.description).subscribe((data) => {
             let response = data as any;
-          })
+        })
+        this.router.navigate(['/home'])
     }
 }

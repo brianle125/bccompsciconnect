@@ -120,7 +120,7 @@ export class UserEditComponent implements OnInit {
           } else {
             this.userService.checkEmailExists(this.form.value.email).subscribe((data) => {
               let exists = data as any;
-              if(exists.exists === true) {
+              if(exists.exists === true && response.email !== this.form.value.email) {
                 alert('Email is taken')
                 this.form.reset();
                 this.router.navigate([`/user/${username}/edit`])

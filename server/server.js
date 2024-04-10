@@ -61,7 +61,7 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-//app.use(express.static(path.join(__dirname, 'static')));
+app.use(express.static(path.join(__dirname, 'static')));
 
 // internal modules
 const db = require("./models/db");
@@ -141,6 +141,7 @@ app.get("/api/login", async (req, res) => {
         loggedIn: true,
         id: req.session.user.id,
         user: req.session.user.username,
+        email: req.session.user.email,
         role: req.session.user.role,
       })
     : res.status(200).send({ loggedIn: false });
@@ -656,9 +657,9 @@ app.get("/api/images/:imageId", async (req, res) => {
   }
 });
 
-// app.get("*", (req, res) =>{
-//   res.sendFile(path.join(__dirname, "static/index.html"));
-// });
+app.get("*", (req, res) =>{
+  res.sendFile(path.join(__dirname, "static/index.html"));
+});
 
 //TODO: Socket connection
 
