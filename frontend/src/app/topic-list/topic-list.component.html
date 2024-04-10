@@ -24,6 +24,7 @@
                 {{topic?.created | date:'medium'}}<br>
                 {{topic?.lastUpdated | date:'medium'}}
             </div>
+            <button class="btn btn-light" *ngIf="isAdmin || loggedInUser === topic.originalPoster" (click)="deleteTopic(topic)">Delete</button>
         </div>
     </div>
     

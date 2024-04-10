@@ -14,6 +14,11 @@ export class TopicService {
     return this.http.get(`${api}/board/${boardId}`, {withCredentials:true}) as Observable<GetTopicType[]>
   }
 
+  deleteTopic(boardId: number) {
+    console.log("Posted!");
+    return this.http.post(`${api}/topic/delete`, { id: boardId }, {withCredentials:true}) as Observable<GetTopicType[]>
+  }
+
   addTopic(boardID: number, topic: string, body: string): Observable<any> {
     let reqBody: AddTopicParams = {
       'question': topic,
