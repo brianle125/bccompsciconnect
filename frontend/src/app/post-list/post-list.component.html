@@ -4,7 +4,7 @@
       <div class="profile-pic-frame">
         <img
           class="profile-pic"
-          [src]="post.profileLink"
+          [src]="post.profilePic"
           [alt]="post.username + '-profile-pic'"
           onerror="console.error('failed to get ', this.src); this.src = 'assets/user.png'"
         />
