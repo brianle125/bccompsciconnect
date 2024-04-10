@@ -78,7 +78,7 @@ export class UserService {
   // this will fetch the image directly from the database
   // In user.service.ts
   getUserProfileImage(username: string): Observable<any> {
-    return this.http.get(`/api/userimages/${username}`);
+    return this.http.get(`/api/userimages/${username}`, {withCredentials: true});
   }
 
   //google auth

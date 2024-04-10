@@ -33,9 +33,8 @@ const helpers = {
       num_replies integer,
       num_views integer,
       PRIMARY KEY(id), 
-      CONSTRAINT fk_user FOREIGN KEY (created_by) REFERENCES users(id), 
-      CONSTRAINT fk_board FOREIGN KEY (boardid) REFERENCES boards(id) 
-      ON DELETE CASCADE
+      CONSTRAINT fk_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE, 
+      CONSTRAINT fk_board FOREIGN KEY (boardid) REFERENCES boards(id) ON DELETE CASCADE
     )`;
     const users = `CREATE TABLE IF NOT EXISTS users (
       id SERIAL, 
@@ -59,9 +58,8 @@ const helpers = {
       created_at timestamp, 
       last_modified timestamp, 
       PRIMARY KEY(id), 
-      CONSTRAINT fk_user FOREIGN KEY (created_by) REFERENCES users(id),
-      CONSTRAINT fk_topic FOREIGN KEY(topicid) REFERENCES topics(id) 
-      ON DELETE CASCADE
+      CONSTRAINT fk_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE,
+      CONSTRAINT fk_topic FOREIGN KEY(topicid) REFERENCES topics(id) ON DELETE CASCADE
     )`;
     const login = `CREATE TABLE IF NOT EXISTS login (
       id SERIAL, 
@@ -86,9 +84,8 @@ const helpers = {
       userid integer,
       content_type varchar(400),
       PRIMARY KEY(id), 
-      CONSTRAINT fk_user_id FOREIGN KEY (userid) REFERENCES users(id),
-      CONSTRAINT fk_post_id FOREIGN KEY(postid) REFERENCES posts(id) 
-      ON DELETE CASCADE
+      CONSTRAINT fk_user_id FOREIGN KEY (userid) REFERENCES users(id) ON DELETE CASCADE,
+      CONSTRAINT fk_post_id FOREIGN KEY(postid) REFERENCES posts(id) ON DELETE CASCADE
     )`;
 
     // stuff that's ok to send to everyone

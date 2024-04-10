@@ -57,6 +57,7 @@ export class LoginComponent implements OnInit {
     const payload = await this.decodeJWTToken(response.credential)
     this.userService.googleAuthUser(payload).subscribe();
     this.router.navigate(['/home']).then(() => {
+      alert("logged in!")
       window.location.reload();
     });
   }
@@ -71,7 +72,7 @@ export class LoginComponent implements OnInit {
       } else {
         alert("Email or password incorrect.");
         window.location.reload();
-      } 
+      }
     })
   }
 
