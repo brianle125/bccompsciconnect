@@ -16,6 +16,11 @@ export class UserService {
     });
   }
 
+  checkEmailExists(email: any): Observable<any> {
+    console.log("CHECKING EMAIL")
+    return this.http.get(`${api}/checkemail/${email}`, { withCredentials: true });
+  }
+
   isLoggedIn(): Observable<any> {
     return this.http.get(`${api}/login`, { withCredentials: true });
   }

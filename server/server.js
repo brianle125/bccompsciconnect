@@ -216,6 +216,18 @@ app.get("/api/usercheck", async (req, res) => {
   });
 });
 
+app.get("/api/checkemail/:email", async (req,res)=> {
+    let email = req.params.email;
+    const user = await db.helpers.getUserByEmail(email);
+    console.log("User length:" + user.length);
+    if (user.length !== 0) {
+      exists = true;
+    }
+    res.json({
+      exists: exists,
+    });
+})
+
 // USERS //
 
 app.get("/api/user/:username", async (req, res) => {
